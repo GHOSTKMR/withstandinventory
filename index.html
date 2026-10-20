@@ -17,6 +17,13 @@
 .login-card{width:100%;max-width:430px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px;box-shadow:0 18px 55px #0005}
 .login-card .brand{font-size:30px}.login-help{color:var(--muted);font-size:12px}.store-picker{min-width:170px;max-width:240px}
 #appRoot[hidden],#loginScreen[hidden]{display:none!important}
+
+/* ===== Stock grid (additive) ===== */
+#page-entry .table td, #page-entry .table th { padding:6px 8px; }
+#page-entry input.qty { padding:4px 6px; min-height:32px; }
+#page-entry tr.row-dirty td { background:#1c2a1f; }
+.light-mode #page-entry tr.row-dirty td { background:#e7f4ec; }
+#page-entry input.qty[readonly] { opacity:.65; cursor:not-allowed; }
 </style></head>
 <body>
 <section id="loginScreen" class="login-screen">
@@ -32,18 +39,101 @@
   </div>
 </section>
 <div id="appRoot" hidden><div class="container-fluid app"><div class="row g-0">
-<aside class="col-md-2 sidebar"><div class="brandline"><div><div class="brand">Stock<span>Wise</span></div><div class="subbrand" data-i18n="subtitle">RESTAURANT INVENTORY</div></div><span class="badge text-bg-dark border border-secondary">v1.1</span></div><div class="navstack mt-4">
-<button class="navbtn active" data-page="dashboard" data-i18n="navDashboard">▦ &nbsp; Dashboard</button><button class="navbtn" data-page="entry" data-i18n="navEntry">＋ &nbsp; Stock Entry</button><button class="navbtn" data-page="records" data-i18n="navRecords">▤ &nbsp; Records</button><button class="navbtn" data-page="reports" data-i18n="navReports">▥ &nbsp; Reports</button><button class="navbtn" data-page="items" data-i18n="navItems">☷ &nbsp; Item Master</button><button class="navbtn" data-page="setup" data-i18n="navSetup">⚙ &nbsp; Setup</button></div><div class="mt-4 small-help"><div><span id="statusDot" class="statusdot"></span><span id="connectionText">Google Sheets not checked</span></div><div class="mt-2" data-i18n="dataSource">Data source: Google Sheets</div></div></aside>
+<aside class="col-md-2 sidebar"><div class="brandline"><div><div class="brand">Stock<span>Wise</span></div><div class="subbrand" data-i18n="subtitle">RESTAURANT INVENTORY</div></div><span class="badge text-bg-dark border border-secondary">v1.3</span></div><div class="navstack mt-4">
+<button class="navbtn active" data-page="dashboard" data-i18n="navDashboard">▦ &nbsp; Dashboard</button><button class="navbtn" data-page="entry">▦ &nbsp; Stock Grid</button><button class="navbtn" data-page="records" data-i18n="navRecords">▤ &nbsp; Records</button><button class="navbtn" data-page="reports" data-i18n="navReports">▥ &nbsp; Reports</button><button class="navbtn" data-page="items" data-i18n="navItems">☷ &nbsp; Item Master</button><button class="navbtn" data-page="setup" data-i18n="navSetup">⚙ &nbsp; Setup</button></div><div class="mt-4 small-help"><div><span id="statusDot" class="statusdot"></span><span id="connectionText">Google Sheets not checked</span></div><div class="mt-2" data-i18n="dataSource">Data source: Google Sheets</div></div></aside>
 <main class="col-md-10"><div class="main"><div class="topline"><div><div class="toolbar-actions mb-2"><button class="btn-soft icon-btn" onclick="toggleSidebar()" title="Expand or collapse menu" data-i18n="menuToggle">☰ Menu</button><button class="btn-soft" onclick="toggleTheme()" id="themeBtn" data-i18n="themeDark">☀ Light mode</button><button class="btn-soft" onclick="toggleLanguage()" id="languageBtn">العربية</button></div><div class="eyebrow" data-i18n="eyebrow">Operations control</div><h1 id="pageTitle">Dashboard</h1><div class="muted" data-i18n="pageSub">Daily stock control · actual vs theoretical · variance monitoring</div></div><div class="quick align-items-center"><label for="storeSelect" class="small-help mb-0">Store</label><select class="form-select store-picker" id="storeSelect" aria-label="Select store"></select><button class="btn-soft" onclick="refreshAll(true)" data-i18n="refresh">↻ Refresh data</button><button class="btn-green" onclick="showPage('entry')" data-i18n="newEntry">＋ New entry</button><button class="btn-soft" onclick="logoutStockWise()">Log out</button></div></div>
-<section id="page-dashboard" class="page active"><div class="row g-3 mb-3"><div class="col-6 col-xl-3"><div class="stat"><div class="stat-label" data-i18n="itemsMaster">ITEMS IN MASTER</div><div class="stat-value" id="statItems">0</div><div class="stat-note" data-i18n="loadedItemMaster">Loaded from item master</div></div></div><div class="col-6 col-xl-3"><div class="stat"><div class="stat-label" data-i18n="stockRecords">STOCK RECORDS</div><div class="stat-value" id="statRecords">0</div><div class="stat-note" data-i18n="acrossTabs">Across loaded inventory tabs</div></div></div><div class="col-6 col-xl-3"><div class="stat"><div class="stat-label" data-i18n="varianceItems">VARIANCE ITEMS</div><div class="stat-value" id="statVariance">0</div><div class="stat-note" data-i18n="physicalDiffers">Physical count differs from closing</div></div></div><div class="col-6 col-xl-3"><div class="stat"><div class="stat-label" data-i18n="lastRefresh">LAST REFRESH</div><div class="stat-value" style="font-size:18px" id="statRefresh">—</div><div class="stat-note" data-i18n="browserSession">Current browser session</div></div></div></div>
-<div class="row g-3 mb-3"><div class="col-12 col-xl-4"><div class="panel chart-panel"><h2 data-i18n="varianceOverview">Variance overview</h2><div class="chart-wrap"><canvas id="varianceDonut" aria-label="Variance overview chart"></canvas></div><div class="small-help" data-i18n="varianceOverviewNote">Matched, shortage and excess records</div></div></div><div class="col-12 col-xl-4"><div class="panel chart-panel"><h2 data-i18n="topVariance">Largest variance items</h2><div class="chart-wrap"><canvas id="topVarianceChart" aria-label="Largest variance items chart"></canvas></div><div class="small-help" data-i18n="topVarianceNote">Top items by absolute variance</div></div></div><div class="col-12 col-xl-4"><div class="panel chart-panel"><h2 data-i18n="varianceTrend">Variance trend</h2><div class="chart-wrap"><canvas id="varianceTrendChart" aria-label="Variance trend chart"></canvas></div><div class="small-help" data-i18n="varianceTrendNote">Daily net variance for the loaded records</div></div></div></div>
-<div class="panel mb-3"><div class="section-head"><h2 class="mb-0" data-i18n="recentRecords">Recent inventory records</h2><button class="btn-soft" onclick="showPage('records')" data-i18n="viewAll">View all →</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Item code</th><th>Item name</th><th>Opening</th><th>Received</th><th>Closing</th><th>Physical</th><th>Variance</th></tr></thead><tbody id="dashboardRows"></tbody></table></div></div><div class="panel"><h2 data-i18n="inventoryFormula">Inventory formula</h2><div class="muted">Expected closing = Opening + Receiving + Transfer In − Transfer Out − Waste − Sold</div><div class="muted mt-2">Variance = Physical Count − Expected Closing. Positive variance means excess stock; negative variance means shortage.</div></div></section>
-<section id="page-entry" class="page"><div class="panel"><div class="section-head"><h2 id="entryHeading" class="mb-0">Enter daily stock</h2><span class="badge badge-good">Google Sheets</span></div><form id="inventoryForm"><input id="editId" type="hidden"><div class="row g-3"><div class="col-6 col-md-3"><label class="form-label" for="date">Inventory date *</label><input class="form-control" type="date" id="date" required></div><div class="col-6 col-md-3"><label class="form-label" for="itemCode">Item code *</label><input class="form-control" id="itemCode" list="itemCodeList" placeholder="e.g. W-0369" required autocomplete="off"><datalist id="itemCodeList"></datalist></div><div class="col-12 col-md-6"><label class="form-label" for="itemName">Item name *</label><input class="form-control" id="itemName" placeholder="Select or type item name" required></div><div class="col-6 col-md-3"><label class="form-label" for="opening">Opening stock</label><input class="form-control qty" type="number" id="opening" min="0" step="0.001" value="0"><div class="small-help">For Oct 1, opening can be saved here. Other dates may use the sheet's formula.</div></div><div class="col-6 col-md-3"><label class="form-label" for="receiving">Receiving stock</label><input class="form-control qty" type="number" id="receiving" min="0" step="0.001" value="0"></div><div class="col-6 col-md-3"><label class="form-label" for="transferIn">Transfer in</label><input class="form-control qty" type="number" id="transferIn" min="0" step="0.001" value="0"></div><div class="col-6 col-md-3"><label class="form-label" for="transferOut">Transfer out</label><input class="form-control qty" type="number" id="transferOut" min="0" step="0.001" value="0"></div><div class="col-6 col-md-3"><label class="form-label" for="waste">Waste</label><input class="form-control qty" type="number" id="waste" min="0" step="0.001" value="0"></div><div class="col-6 col-md-3"><label class="form-label" for="sold">Sold / consumption</label><input class="form-control qty" type="number" id="sold" min="0" step="0.001" value="0"></div><div class="col-6 col-md-3"><label class="form-label" for="physical">Physical count</label><input class="form-control" type="number" id="physical" min="0" step="0.001" placeholder="Leave blank if not counted"></div><div class="col-12"><div class="panel" style="background:#0b100e;padding:13px"><div class="row g-2"><div class="col-6"><div class="small-help">CALCULATED CLOSING</div><div class="stat-value" id="previewClosing" style="font-size:23px">0.000</div></div><div class="col-6"><div class="small-help">VARIANCE PREVIEW</div><div class="stat-value" id="previewVariance" style="font-size:23px">—</div></div></div></div></div><div class="col-12"><label class="form-label" for="notes">Notes (saved in this browser only)</label><textarea class="form-control" id="notes" rows="2" placeholder="Optional note"></textarea></div><div class="col-12 d-flex gap-2 flex-wrap"><button class="btn-green" type="submit" id="saveBtn">Save to Google Sheets</button><button class="btn-soft" type="button" onclick="resetForm()">Clear form</button><span class="small-help align-self-center" id="formStatus">Saving updates an existing date/item row in the sheet.</span></div></div></form></div></section>
+
+<section id="page-dashboard" class="page active">
+<div class="row g-3 mb-3">
+<div class="col-6 col-xl-3"><div class="stat"><div class="stat-label" data-i18n="itemsMaster">ITEMS IN MASTER</div><div class="stat-value" id="statItems">0</div><div class="stat-note" data-i18n="loadedItemMaster">Loaded from item master</div></div></div>
+<div class="col-6 col-xl-3"><div class="stat"><div class="stat-label" data-i18n="stockRecords">STOCK RECORDS</div><div class="stat-value" id="statRecords">0</div><div class="stat-note" data-i18n="acrossTabs">Across loaded inventory tabs</div></div></div>
+<div class="col-6 col-xl-3"><div class="stat"><div class="stat-label" data-i18n="varianceItems">VARIANCE ITEMS</div><div class="stat-value" id="statVariance">0</div><div class="stat-note" data-i18n="physicalDiffers">Physical count differs from closing</div></div></div>
+<div class="col-6 col-xl-3"><div class="stat"><div class="stat-label" data-i18n="lastRefresh">LAST REFRESH</div><div class="stat-value" style="font-size:18px" id="statRefresh">—</div><div class="stat-note" data-i18n="browserSession">Current browser session</div></div></div>
+</div>
+<div class="row g-3 mb-3">
+<div class="col-12 col-xl-4"><div class="panel chart-panel"><h2 data-i18n="varianceOverview">Variance overview</h2><div class="chart-wrap"><canvas id="varianceDonut" aria-label="Variance overview chart"></canvas></div><div class="small-help" data-i18n="varianceOverviewNote">Matched, shortage and excess records</div></div></div>
+<div class="col-12 col-xl-4"><div class="panel chart-panel"><h2 data-i18n="topVariance">Largest variance items</h2><div class="chart-wrap"><canvas id="topVarianceChart" aria-label="Largest variance items chart"></canvas></div><div class="small-help" data-i18n="topVarianceNote">Top items by absolute variance</div></div></div>
+<div class="col-12 col-xl-4"><div class="panel chart-panel"><h2 data-i18n="varianceTrend">Variance trend</h2><div class="chart-wrap"><canvas id="varianceTrendChart" aria-label="Variance trend chart"></canvas></div><div class="small-help" data-i18n="varianceTrendNote">Daily net variance for the loaded records</div></div></div>
+</div>
+<div class="panel mb-3"><div class="section-head"><h2 class="mb-0" data-i18n="recentRecords">Recent inventory records</h2><button class="btn-soft" onclick="showPage('records')" data-i18n="viewAll">View all →</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Item code</th><th>Item name</th><th>Opening</th><th>Received</th><th>Closing</th><th>Physical</th><th>Variance</th></tr></thead><tbody id="dashboardRows"></tbody></table></div></div>
+<div class="panel"><h2 data-i18n="inventoryFormula">Inventory formula</h2><div class="muted">Expected closing = Opening + Receiving + Transfer In − Transfer Out − Waste − Sold</div><div class="muted mt-2">Variance = Physical Count − Expected Closing. Positive variance means excess stock; negative variance means shortage.</div></div>
+</section>
+
+<!-- ============= STOCK GRID (primary entry page) ============= -->
+<section id="page-entry" class="page">
+  <div class="panel mb-3">
+    <div class="section-head">
+      <h2 class="mb-0">Daily stock entry grid</h2>
+      <span class="badge badge-good" id="gridSheetBadge">—</span>
+    </div>
+    <div class="row g-2 mb-3">
+      <div class="col-12 col-md-3">
+        <label class="form-label" for="gridDate">Inventory date *</label>
+        <input class="form-control" type="date" id="gridDate">
+      </div>
+      <div class="col-12 col-md-4">
+        <label class="form-label" for="gridSearch">Search code or name</label>
+        <input class="form-control" id="gridSearch" placeholder="Filter rows…" autocomplete="off">
+      </div>
+      <div class="col-12 col-md-5 d-flex align-items-end gap-2 flex-wrap">
+        <button class="btn-soft" type="button" onclick="gridLoad()">↻ Load grid</button>
+        <button class="btn-green" type="button" id="gridSaveBtn" onclick="gridSaveChanged()">Save changed rows</button>
+        <button class="btn-soft" type="button" onclick="gridClearChanges()">Clear changes</button>
+        <span class="small-help align-self-center" id="gridStatus">Pick a date and click Load grid.</span>
+      </div>
+    </div>
+    <div class="small-help mb-2">
+      Opening is editable only on <b>2026-10-01</b>. Closing and Variance are preview only and are <b>never posted</b> (sheet formulas stay intact).
+      All changed rows are saved in a single batch and verified against Google Sheets.
+    </div>
+    <div class="table-wrap" style="max-height:70vh">
+      <table class="table" id="gridTable">
+        <thead><tr>
+          <th>Code</th><th>Item name</th><th>Opening</th><th>Receiving</th>
+          <th>Transfer in</th><th>Transfer out</th><th>Waste</th><th>Sold</th>
+          <th>Closing</th><th>Physical</th><th>Variance</th><th>Status</th>
+        </tr></thead>
+        <tbody id="gridRows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="section-head">
+      <h2 class="mb-0">Single-item entry (fallback)</h2>
+      <button class="btn-soft" type="button" onclick="document.getElementById('singleFormWrap').classList.toggle('hide')">Toggle</button>
+    </div>
+    <div id="singleFormWrap" class="hide">
+      <form id="inventoryForm">
+        <input id="editId" type="hidden">
+        <div class="row g-3">
+          <div class="col-6 col-md-3"><label class="form-label" for="date">Date *</label><input class="form-control" type="date" id="date" required></div>
+          <div class="col-6 col-md-3"><label class="form-label" for="itemCode">Item code *</label><input class="form-control" id="itemCode" list="itemCodeList" required autocomplete="off"><datalist id="itemCodeList"></datalist></div>
+          <div class="col-12 col-md-6"><label class="form-label" for="itemName">Item name *</label><input class="form-control" id="itemName" required></div>
+          <div class="col-6 col-md-3"><label class="form-label" for="opening">Opening</label><input class="form-control qty" type="number" id="opening" min="0" step="0.001" value="0"></div>
+          <div class="col-6 col-md-3"><label class="form-label" for="receiving">Receiving</label><input class="form-control qty" type="number" id="receiving" min="0" step="0.001" value="0"></div>
+          <div class="col-6 col-md-3"><label class="form-label" for="transferIn">Transfer in</label><input class="form-control qty" type="number" id="transferIn" min="0" step="0.001" value="0"></div>
+          <div class="col-6 col-md-3"><label class="form-label" for="transferOut">Transfer out</label><input class="form-control qty" type="number" id="transferOut" min="0" step="0.001" value="0"></div>
+          <div class="col-6 col-md-3"><label class="form-label" for="waste">Waste</label><input class="form-control qty" type="number" id="waste" min="0" step="0.001" value="0"></div>
+          <div class="col-6 col-md-3"><label class="form-label" for="sold">Sold</label><input class="form-control qty" type="number" id="sold" min="0" step="0.001" value="0"></div>
+          <div class="col-6 col-md-3"><label class="form-label" for="physical">Physical</label><input class="form-control" type="number" id="physical" min="0" step="0.001"></div>
+          <div class="col-12"><div class="panel" style="background:#0b100e;padding:13px"><div class="row g-2"><div class="col-6"><div class="small-help">CLOSING</div><div class="stat-value" id="previewClosing" style="font-size:23px">0.000</div></div><div class="col-6"><div class="small-help">VARIANCE</div><div class="stat-value" id="previewVariance" style="font-size:23px">—</div></div></div></div></div>
+          <div class="col-12 d-flex gap-2 flex-wrap"><button class="btn-green" type="submit" id="saveBtn">Save row</button><button class="btn-soft" type="button" onclick="resetForm()">Clear</button><span class="small-help align-self-center" id="formStatus"></span></div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
 <section id="page-records" class="page"><div class="panel"><div class="section-head"><h2 class="mb-0">Inventory records</h2><button class="btn-soft" onclick="exportCSV()">Export CSV</button></div><div class="row g-2 mb-3"><div class="col-12 col-md-3"><label class="form-label">Month / sheet</label><select class="form-select" id="recordMonth"><option value="">All loaded sheets</option></select></div><div class="col-12 col-md-5"><label class="form-label">Search</label><input class="form-control" id="recordSearch" placeholder="Search code or item name"></div><div class="col-12 col-md-4 d-flex align-items-end"><button class="btn-soft" onclick="renderRecords()">Apply filters</button></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Code</th><th>Item name</th><th>Opening</th><th>Received</th><th>Transfer in</th><th>Transfer out</th><th>Waste</th><th>Sold</th><th>Closing</th><th>Physical</th><th>Variance</th><th>Action</th></tr></thead><tbody id="recordsRows"></tbody></table></div><div id="recordsSummary" class="small-help mt-3"></div></div></section>
+
 <section id="page-reports" class="page"><div class="panel mb-3"><h2>Inventory variance report</h2><div class="row g-2 mb-3"><div class="col-12 col-md-4"><label class="form-label">Sheet</label><select class="form-select" id="reportMonth"><option value="">All loaded sheets</option></select></div><div class="col-12 col-md-4"><label class="form-label">Variance filter</label><select class="form-select" id="varianceFilter"><option value="all">All records</option><option value="variance">Only non-zero variance</option><option value="shortage">Shortages only</option><option value="excess">Excess only</option></select></div><div class="col-12 col-md-4 d-flex align-items-end"><button class="btn-soft" onclick="renderReports()">Generate report</button></div></div><div class="row g-3 mb-3"><div class="col-6 col-lg-3"><div class="stat"><div class="stat-label">COUNTED RECORDS</div><div class="stat-value" id="reportCount">0</div></div></div><div class="col-6 col-lg-3"><div class="stat"><div class="stat-label">SHORTAGES</div><div class="stat-value" id="reportShortages">0</div></div></div><div class="col-6 col-lg-3"><div class="stat"><div class="stat-label">EXCESS</div><div class="stat-value" id="reportExcess">0</div></div></div><div class="col-6 col-lg-3"><div class="stat"><div class="stat-label">NET VARIANCE</div><div class="stat-value" id="reportNet">0</div></div></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Code</th><th>Item</th><th>Expected closing</th><th>Physical</th><th>Variance</th><th>Result</th></tr></thead><tbody id="reportRows"></tbody></table></div></div></section>
+
 <section id="page-items" class="page"><div class="panel"><div class="section-head"><h2 class="mb-0">Item master</h2><button class="btn-soft" onclick="loadItemMaster()">↻ Reload items</button></div><p class="small-help">Items are loaded from your Google Sheet. To avoid accidental mismatches, add or edit official item codes in the Item Master sheet itself.</p><div class="row g-2 mb-3"><div class="col-12 col-md-6"><input class="form-control" id="itemSearch" placeholder="Search item code or name" oninput="renderItems()"></div><div class="col-12 col-md-6 text-md-end align-self-center"><span id="itemCount" class="small-help"></span></div></div><div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Item code</th><th>Item name</th></tr></thead><tbody id="itemsRows"></tbody></table></div></div></section>
+
 <section id="page-setup" class="page"><div class="panel mb-3"><h2>Google Apps Script connection</h2><p class="small-help">Paste your deployed Apps Script web app URL. The deployment must be accessible to the intended users and support the items, months, records and POST save actions.</p><label class="form-label" for="scriptUrl">Apps Script web app URL</label><input class="form-control" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec"><div class="quick mt-3"><button class="btn-green" onclick="saveScriptUrl()">Save URL</button><button class="btn-soft" onclick="testConnection()">Test connection</button><button class="btn-soft" onclick="refreshAll(true)">Load Sheets data</button></div><div id="setupStatus" class="small-help mt-3">Connection not tested.</div></div><div class="panel"><h2>Important notes</h2><ul class="muted mb-0"><li>Google Sheets is the shared source of truth; browser local storage is used only to remember this URL and temporary interface preferences.</li><li>Saving updates a matching date and item code row. If your backend only updates existing rows, the date/item row must already exist in the target tab.</li><li>Opening stock may be protected by sheet formulas. This page does not change sheet formulas or create missing rows.</li><li>Notes are kept in this browser only; the current Apps Script save endpoint does not store them.</li><li>Do not use this app for live stock until a test entry has been checked in the sheet.</li></ul></div></section>
 <footer>StockWise · Restaurant Inventory Manager · Google Sheets backend</footer></div></main></div></div><div id="toast" class="toastbox" role="status"></div>
+
 <script>
 "use strict";
 const $ = id => document.getElementById(id);
@@ -58,8 +148,8 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 function toast(message){const el=$("toast");el.textContent=message;el.style.display="block";clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display="none",4200)}
 
 const i18n={
- en:{subtitle:"RESTAURANT INVENTORY",navDashboard:"▦  Dashboard",navEntry:"＋  Stock Entry",navRecords:"▤  Records",navReports:"▥  Reports",navItems:"☷  Item Master",navSetup:"⚙  Setup",dataSource:"Data source: Google Sheets",menuToggle:"☰ Menu",themeDark:"☀ Light mode",themeLight:"☾ Dark mode",eyebrow:"Operations control",pageSub:"Daily stock control · actual vs theoretical · variance monitoring",refresh:"↻ Refresh data",newEntry:"＋ New entry",itemsMaster:"ITEMS IN MASTER",stockRecords:"STOCK RECORDS",varianceItems:"VARIANCE ITEMS",lastRefresh:"LAST REFRESH",loadedItemMaster:"Loaded from item master",acrossTabs:"Across loaded inventory tabs",physicalDiffers:"Physical count differs from closing",browserSession:"Current browser session",recentRecords:"Recent inventory records",viewAll:"View all →",inventoryFormula:"Inventory formula",varianceOverview:"Variance overview",varianceOverviewNote:"Matched, shortage and excess records",topVariance:"Largest variance items",topVarianceNote:"Top items by absolute variance",varianceTrend:"Variance trend",varianceTrendNote:"Daily net variance for the loaded records",titleDashboard:"Dashboard",titleEntry:"Stock Entry",titleRecords:"Inventory Records",titleReports:"Reports",titleItems:"Item Master",titleSetup:"Setup"},
- ar:{subtitle:"مخزون المطعم",navDashboard:"▦  لوحة المعلومات",navEntry:"＋  إدخال المخزون",navRecords:"▤  السجلات",navReports:"▥  التقارير",navItems:"☷  دليل الأصناف",navSetup:"⚙  الإعدادات",dataSource:"مصدر البيانات: جداول Google",menuToggle:"☰ القائمة",themeDark:"☀ الوضع الفاتح",themeLight:"☾ الوضع الداكن",eyebrow:"مراقبة العمليات",pageSub:"مراقبة المخزون اليومي · الفعلي مقابل النظري · متابعة الفروقات",refresh:"↻ تحديث البيانات",newEntry:"＋ إدخال جديد",itemsMaster:"الأصناف في الدليل",stockRecords:"سجلات المخزون",varianceItems:"أصناف بها فروقات",lastRefresh:"آخر تحديث",loadedItemMaster:"تم التحميل من دليل الأصناف",acrossTabs:"في جميع أوراق المخزون المحمّلة",physicalDiffers:"العد الفعلي يختلف عن الرصيد المتوقع",browserSession:"جلسة المتصفح الحالية",recentRecords:"أحدث سجلات المخزون",viewAll:"عرض الكل ←",inventoryFormula:"معادلة المخزون",varianceOverview:"ملخص الفروقات",varianceOverviewNote:"مطابق، عجز، وزيادة في المخزون",topVariance:"أكبر فروقات الأصناف",topVarianceNote:"أعلى الأصناف حسب قيمة الفرق المطلقة",varianceTrend:"اتجاه الفروقات",varianceTrendNote:"صافي الفروقات اليومية للسجلات المحمّلة",titleDashboard:"لوحة المعلومات",titleEntry:"إدخال المخزون",titleRecords:"سجلات المخزون",titleReports:"التقارير",titleItems:"دليل الأصناف",titleSetup:"الإعدادات"}
+ en:{subtitle:"RESTAURANT INVENTORY",navDashboard:"▦  Dashboard",navRecords:"▤  Records",navReports:"▥  Reports",navItems:"☷  Item Master",navSetup:"⚙  Setup",dataSource:"Data source: Google Sheets",menuToggle:"☰ Menu",themeDark:"☀ Light mode",themeLight:"☾ Dark mode",eyebrow:"Operations control",pageSub:"Daily stock control · actual vs theoretical · variance monitoring",refresh:"↻ Refresh data",newEntry:"＋ New entry",itemsMaster:"ITEMS IN MASTER",stockRecords:"STOCK RECORDS",varianceItems:"VARIANCE ITEMS",lastRefresh:"LAST REFRESH",loadedItemMaster:"Loaded from item master",acrossTabs:"Across loaded inventory tabs",physicalDiffers:"Physical count differs from closing",browserSession:"Current browser session",recentRecords:"Recent inventory records",viewAll:"View all →",inventoryFormula:"Inventory formula",varianceOverview:"Variance overview",varianceOverviewNote:"Matched, shortage and excess records",topVariance:"Largest variance items",topVarianceNote:"Top items by absolute variance",varianceTrend:"Variance trend",varianceTrendNote:"Daily net variance for the loaded records",titleDashboard:"Dashboard",titleEntry:"Stock Grid",titleRecords:"Inventory Records",titleReports:"Reports",titleItems:"Item Master",titleSetup:"Setup"},
+ ar:{subtitle:"مخزون المطعم",navDashboard:"▦  لوحة المعلومات",navRecords:"▤  السجلات",navReports:"▥  التقارير",navItems:"☷  دليل الأصناف",navSetup:"⚙  الإعدادات",dataSource:"مصدر البيانات: جداول Google",menuToggle:"☰ القائمة",themeDark:"☀ الوضع الفاتح",themeLight:"☾ الوضع الداكن",eyebrow:"مراقبة العمليات",pageSub:"مراقبة المخزون اليومي · الفعلي مقابل النظري · متابعة الفروقات",refresh:"↻ تحديث البيانات",newEntry:"＋ إدخال جديد",itemsMaster:"الأصناف في الدليل",stockRecords:"سجلات المخزون",varianceItems:"أصناف بها فروقات",lastRefresh:"آخر تحديث",loadedItemMaster:"تم التحميل من دليل الأصناف",acrossTabs:"في جميع أوراق المخزون المحمّلة",physicalDiffers:"العد الفعلي يختلف عن الرصيد المتوقع",browserSession:"جلسة المتصفح الحالية",recentRecords:"أحدث سجلات المخزون",viewAll:"عرض الكل ←",inventoryFormula:"معادلة المخزون",varianceOverview:"ملخص الفروقات",varianceOverviewNote:"مطابق، عجز، وزيادة في المخزون",topVariance:"أكبر فروقات الأصناف",topVarianceNote:"أعلى الأصناف حسب قيمة الفرق المطلقة",varianceTrend:"اتجاه الفروقات",varianceTrendNote:"صافي الفروقات اليومية للسجلات المحمّلة",titleDashboard:"لوحة المعلومات",titleEntry:"شبكة المخزون",titleRecords:"سجلات المخزون",titleReports:"التقارير",titleItems:"دليل الأصناف",titleSetup:"الإعدادات"}
 };
 let currentLanguage=localStorage.getItem("stockwise_language")||"en";
 let chartInstances={};
@@ -73,7 +163,7 @@ function renderCharts(){if(typeof Chart==="undefined")return;const valid=records
  const top=[...valid].sort((a,b)=>Math.abs(b.variance)-Math.abs(a.variance)).slice(0,7).reverse();upsert("topVarianceChart",{type:"bar",data:{labels:top.map(r=>r.code||r.name||"—"),datasets:[{label:currentLanguage==="ar"?"الفرق":"Variance",data:top.map(r=>r.variance),backgroundColor:top.map(r=>r.variance<0?"#ff7777":"#53df91"),borderRadius:8,borderSkipped:false,maxBarThickness:26}]},options:{...base,indexAxis:"y",scales:{x:{grid:{color:gridColor},ticks:{color:textColor}},y:{grid:{display:false},ticks:{color:textColor}}},plugins:{...base.plugins,legend:{display:false}}}});
  const byDate={};valid.forEach(r=>{const d=r.date||"Unknown";byDate[d]=(byDate[d]||0)+r.variance});const trend=Object.entries(byDate).sort((a,b)=>a[0].localeCompare(b[0])).slice(-14);upsert("varianceTrendChart",{type:"line",data:{labels:trend.map(x=>x[0]),datasets:[{label:currentLanguage==="ar"?"صافي الفرق":"Net variance",data:trend.map(x=>x[1]),borderColor:"#53df91",backgroundColor:"#53df9128",fill:true,tension:.35,pointRadius:3,pointHoverRadius:5}]},options:{...base,scales:{x:{grid:{color:gridColor},ticks:{color:textColor,maxRotation:45,minRotation:0}},y:{grid:{color:gridColor},ticks:{color:textColor}}},plugins:{...base.plugins,legend:{display:false}}}});
 }
-function showPage(page){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$("page-"+page).classList.add("active");document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.page===page));const titles={dashboard:"Dashboard",entry:"Stock Entry",records:"Inventory Records",reports:"Reports",items:"Item Master",setup:"Setup"};$("pageTitle").textContent=titles[page]||"StockWise";applyLanguage();if(page==="dashboard")renderCharts();if(page==="entry")updatePreview();if(page==="records")renderRecords();if(page==="reports")renderReports();if(page==="items")renderItems();window.scrollTo({top:0,behavior:"smooth"})}
+function showPage(page){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$("page-"+page).classList.add("active");document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.page===page));const titles={dashboard:"Dashboard",entry:"Stock Grid",records:"Inventory Records",reports:"Reports",items:"Item Master",setup:"Setup"};$("pageTitle").textContent=titles[page]||"StockWise";applyLanguage();if(page==="dashboard")renderCharts();if(page==="records")renderRecords();if(page==="reports")renderReports();if(page==="items")renderItems();if(page==="entry" && window.gridOnShow)window.gridOnShow();window.scrollTo({top:0,behavior:"smooth"})}
 document.querySelectorAll(".navbtn").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
 function getAppsScriptUrl(){return localStorage.getItem("stockwise_script_url")||DEFAULT_URL}
 function saveScriptUrl(){const url=$("scriptUrl").value.trim();if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url))return toast("Enter a valid Apps Script URL ending in /exec.");localStorage.setItem("stockwise_script_url",url);toast("Apps Script URL saved.");testConnection()}
@@ -105,7 +195,7 @@ async function loadRecordsForSheet(sheet){if(!authToken||!selectedStore)throw ne
 async function loadAllRecords(){const all=[];const unique=[...new Set(months)];for(const sheet of unique){try{const list=await loadRecordsForSheet(sheet);all.push(...list)}catch(e){console.warn("Could not load "+sheet,e)}}records=all;}
 function setConnection(ok,message){connected=ok;$("statusDot").classList.toggle("online",ok);$("connectionText").textContent=message;$("setupStatus").textContent=message}
 async function testConnection(){if(!authToken)return setConnection(false,"Log in first before testing the connection.");setConnection(false,"Testing Google Sheets connection…");try{const d=await apiGet({action:"items"});if(d?.success===false)throw new Error(d.error||d.message||"Endpoint returned success:false");const a=unwrapArray(d,["items","data","result","records"]);if(!Array.isArray(a)||!a.length)throw new Error("Response arrived but item list was empty or in an unknown format.");setConnection(true,"Connected · "+a.length+" items returned");toast("Connection test passed: item master loaded.");return true}catch(e){setConnection(false,"Connection failed: "+e.message);toast("Connection test failed. Check deployment and Apps Script JSONP support.");return false}}
-async function refreshAll(showMessage=false){if(!authToken||!selectedStore)return;if(authRole==="store")selectedStore=authStore;const oldText=$("connectionText").textContent;try{setConnection(false,"Loading Google Sheets data…");const itemOK=await loadItemMaster();await loadMonths();await loadAllRecords();if(!itemOK)throw new Error("Item master could not be loaded.");lastRefresh=new Date();setConnection(true,`Loaded ${items.length} items · ${records.length} records`);renderAll();if(showMessage)toast("Sheets data refreshed. Check the records shown below.")}catch(e){setConnection(false,"Could not refresh: "+e.message);if(showMessage)toast(e.message)} }
+async function refreshAll(showMessage=false){if(!authToken||!selectedStore)return;if(authRole==="store")selectedStore=authStore;try{setConnection(false,"Loading Google Sheets data…");const itemOK=await loadItemMaster();await loadMonths();await loadAllRecords();if(!itemOK)throw new Error("Item master could not be loaded.");lastRefresh=new Date();setConnection(true,`Loaded ${items.length} items · ${records.length} records`);renderAll();if(showMessage)toast("Sheets data refreshed. Check the records shown below.")}catch(e){setConnection(false,"Could not refresh: "+e.message);if(showMessage)toast(e.message)} }
 function populateItemDatalist(){$("itemCodeList").innerHTML=items.map(i=>`<option value="${esc(i.code)}">${esc(i.name)}</option>`).join("")}
 function itemByCode(code){return items.find(i=>i.code.toLowerCase()===String(code).trim().toLowerCase())}
 $("itemCode").addEventListener("input",()=>{const item=itemByCode($("itemCode").value);if(item){$("itemName").value=item.name;updatePreview()}});
@@ -113,21 +203,13 @@ $("itemName").addEventListener("input",()=>{const item=items.find(i=>i.name.toLo
 document.querySelectorAll(".qty,#physical").forEach(el=>el.addEventListener("input",updatePreview));$("date").addEventListener("change",updatePreview);
 function num(id){return n($(id).value)}
 function updatePreview(){const keys=["opening","receiving","transferIn","transferOut","waste","sold"];const v={};keys.forEach(k=>v[k]=num(k)??0);const close=v.opening+v.receiving+v.transferIn-v.transferOut-v.waste-v.sold;$("previewClosing").textContent=fmt(close);const p=num("physical");$("previewVariance").textContent=p===null?"—":fmt(p-close);$("previewVariance").style.color=p===null?"var(--text)":p-close<0?"var(--red)":"var(--green)"}
-function resetForm(){ $("inventoryForm").reset();$("editId").value="";$("date").value=today();["opening","receiving","transferIn","transferOut","waste","sold"].forEach(k=>$(k).value="0");$("entryHeading").textContent="Enter daily stock";$("saveBtn").textContent="Save to Google Sheets";$("formStatus").textContent="Saving updates an existing date/item row in the sheet.";updatePreview() }
+function resetForm(){ $("inventoryForm").reset();$("editId").value="";$("date").value=today();["opening","receiving","transferIn","transferOut","waste","sold"].forEach(k=>$(k).value="0");$("saveBtn").textContent="Save row";$("formStatus").textContent="";updatePreview() }
 async function saveToSheet(payload){const url=getAppsScriptUrl();const response=await fetch(url,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});return response}
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function saveAndVerify(payload, sheetName) {
-  // Send the write request only once. no-cors means its response cannot be inspected.
-  try {
-    await Promise.race([
-      saveToSheet(payload),
-      sleep(8000).then(() => { throw new Error("POST response was slow"); })
-    ]);
-  } catch (err) {
-    console.warn("POST response unavailable or slow; checking Google Sheets.", err);
-  }
-  const started = Date.now();
-  let lastError = "";
+  try { await Promise.race([ saveToSheet(payload), sleep(8000).then(()=>{throw new Error("POST response was slow")}) ]); }
+  catch (err) { console.warn("POST unavailable/slow; checking sheet.", err); }
+  const started = Date.now(); let lastError = "";
   while (Date.now() - started < 45000) {
     try {
       const latest = await loadRecordsForSheet(sheetName);
@@ -139,44 +221,37 @@ async function saveAndVerify(payload, sheetName) {
         const isOctoberFirst = sheetName === "Daily Inventory" && payload.date === "2026-10-01";
         const openingMismatch = isOctoberFirst && Math.abs((match.opening ?? 0) - (payload.opening ?? 0)) > 0.0001;
         if (!mismatch && !physicalMismatch && !openingMismatch) return match;
-        lastError = "The row is present, but one or more values do not match yet.";
-      } else {
-        lastError = "Waiting for the matching date and item row.";
-      }
-    } catch (err) {
-      lastError = err.message || "Could not read the saved row.";
-      console.warn("Verification attempt failed:", err);
-    }
+        lastError = "Row present but values not yet matching.";
+      } else lastError = "Waiting for matching date/item row.";
+    } catch (err) { lastError = err.message || "Could not read saved row."; }
     await sleep(2000);
   }
-  throw new Error("Save could not be verified after 45 seconds. " + (lastError || "Check the Google Sheet before retrying."));
+  throw new Error("Save not verified after 45s. " + (lastError || "Check the sheet."));
 }
-$("inventoryForm").addEventListener("submit",async event=>{event.preventDefault();if(!getAppsScriptUrl())return toast("Add your Apps Script URL in Setup first.");const date=$("date").value,code=$("itemCode").value.trim(),name=$("itemName").value.trim();if(!date||!code||!name)return toast("Complete date, item code and item name.");const keys=["opening","receiving","transferIn","transferOut","waste","sold"],values={};for(const key of keys){values[key]=num(key)??0;if(!Number.isFinite(values[key])||values[key]<0)return toast("Enter valid non-negative quantities.")}const physical=num("physical");if(physical!==null&&(!Number.isFinite(physical)||physical<0))return toast("Physical count must be zero or greater.");const closing=values.opening+values.receiving+values.transferIn-values.transferOut-values.waste-values.sold;if(closing<0)return toast("Expected closing stock cannot be negative.");const sheetName=sheetNameForDate(date);if(months.length&&!months.includes(sheetName))return toast(`No matching sheet tab found for ${date}: expected "${sheetName}". Check your Google Sheets tab name.`);if(!itemByCode(code))return toast("This item code is not in the loaded Item Master. Refresh items or check the code.");const payload={token:authToken,storeName:selectedStore,sheetName,date,itemCode:code,opening:values.opening,receiving:values.receiving,transferIn:values.transferIn,transferOut:values.transferOut,waste:values.waste,sold:values.sold,physicalCount:physical};const btn=$("saveBtn");btn.disabled=true;btn.textContent="Saving…";$("formStatus").textContent=`Sending to ${sheetName}…`;try{const match=await saveAndVerify(payload,sheetName);records=records.filter(r=>!(r.date===date&&r.code.toLowerCase()===code.toLowerCase()&&r.sheetName===sheetName));records.push(match);renderAll();toast("Entry saved and verified in Google Sheets.");resetForm();showPage("records")}catch(e){console.error(e);$("formStatus").textContent=e.message;toast("Save not verified: "+e.message)}finally{btn.disabled=false;btn.textContent="Save to Google Sheets"}});
-function renderAll(){renderDashboard();renderRecords();renderReports();renderItems();populateItemDatalist();renderCharts();$("statItems").textContent=items.length;$("statRecords").textContent=records.length;$("statVariance").textContent=records.filter(r=>r.variance!==null&&Math.abs(r.variance)>0.0001).length;$("statRefresh").textContent=lastRefresh?lastRefresh.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}):"—"}
+$("inventoryForm").addEventListener("submit",async event=>{event.preventDefault();const date=$("date").value,code=$("itemCode").value.trim(),name=$("itemName").value.trim();if(!date||!code||!name)return toast("Complete date, code and name.");const keys=["opening","receiving","transferIn","transferOut","waste","sold"],values={};for(const key of keys){values[key]=num(key)??0;if(!Number.isFinite(values[key])||values[key]<0)return toast("Enter valid non-negative quantities.")}const physical=num("physical");if(physical!==null&&(!Number.isFinite(physical)||physical<0))return toast("Physical must be ≥ 0.");const closing=values.opening+values.receiving+values.transferIn-values.transferOut-values.waste-values.sold;if(closing<0)return toast("Closing cannot be negative.");const sheetName=sheetNameForDate(date);if(months.length&&!months.includes(sheetName))return toast(`No sheet tab for ${date}: expected "${sheetName}".`);if(!itemByCode(code))return toast("Item not in Item Master.");const payload={token:authToken,storeName:selectedStore,sheetName,date,itemCode:code,opening:values.opening,receiving:values.receiving,transferIn:values.transferIn,transferOut:values.transferOut,waste:values.waste,sold:values.sold,physicalCount:physical};const btn=$("saveBtn");btn.disabled=true;btn.textContent="Saving…";$("formStatus").textContent=`Sending to ${sheetName}…`;try{const match=await saveAndVerify(payload,sheetName);records=records.filter(r=>!(r.date===date&&r.code.toLowerCase()===code.toLowerCase()&&r.sheetName===sheetName));records.push(match);renderAll();toast("Saved and verified.");resetForm()}catch(e){$("formStatus").textContent=e.message;toast("Save not verified: "+e.message)}finally{btn.disabled=false;btn.textContent="Save row"}});
+function renderAll(){renderDashboard();renderRecords();renderReports();renderItems();populateItemDatalist();renderCharts();$("statItems").textContent=items.length;$("statRecords").textContent=records.length;$("statVariance").textContent=records.filter(r=>r.variance!==null&&Math.abs(r.variance)>0.0001).length;$("statRefresh").textContent=lastRefresh?lastRefresh.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}):"—";if(window.gridOnDataChanged)window.gridOnDataChanged()}
 function varianceHTML(v){if(v===null||v===undefined)return"—";const cls=v<-.0001?"variance-neg":v>.0001?"variance-pos":"muted";return `<span class="${cls}">${v>0?"+":""}${esc(fmt(v))}</span>`}
-function renderDashboard(){const sorted=[...records].sort((a,b)=>(b.date||"").localeCompare(a.date||""));$("dashboardRows").innerHTML=sorted.slice(0,8).map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.opening))}</td><td>${esc(fmt(r.receiving))}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td></tr>`).join("")||'<tr><td colspan="8" class="empty">No records returned from Google Sheets yet.</td></tr>'}
+function renderDashboard(){const sorted=[...records].sort((a,b)=>(b.date||"").localeCompare(a.date||""));$("dashboardRows").innerHTML=sorted.slice(0,8).map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.opening))}</td><td>${esc(fmt(r.receiving))}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td></tr>`).join("")||'<tr><td colspan="8" class="empty">No records yet.</td></tr>'}
 function filteredRecords(){const sheet=$("recordMonth").value,search=($("recordSearch").value||"").trim().toLowerCase();return records.filter(r=>(!sheet||r.sheetName===sheet)&&(!search||r.code.toLowerCase().includes(search)||r.name.toLowerCase().includes(search))).sort((a,b)=>(b.date||"").localeCompare(a.date||""))}
-function renderRecords(){const list=filteredRecords();$("recordsRows").innerHTML=list.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.opening))}</td><td>${esc(fmt(r.receiving))}</td><td>${esc(fmt(r.transferIn))}</td><td>${esc(fmt(r.transferOut))}</td><td>${esc(fmt(r.waste))}</td><td>${esc(fmt(r.sold))}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td><td><button class="btn-soft" onclick="editRecord('${esc(r.id)}')">Edit</button></td></tr>`).join("")||'<tr><td colspan="13" class="empty">No matching records. Refresh data or choose another sheet.</td></tr>';$("recordsSummary").textContent=`Showing ${list.length} record(s). Records are read from Google Sheets; delete is disabled to protect the sheet history.`}
-function editRecord(id){const r=records.find(x=>x.id===id);if(!r)return toast("Record not found. Refresh data and try again.");$("date").value=r.date;$("itemCode").value=r.code;$("itemName").value=r.name;["opening","receiving","transferIn","transferOut","waste","sold"].forEach(k=>$(k).value=r[k]??0);$("physical").value=r.physical??"";$("editId").value=r.id;$("entryHeading").textContent="Update inventory entry";$("formStatus").textContent=`Updates the existing row in ${r.sheetName}.`;showPage("entry");toast("Entry loaded. Save to update the existing sheet row.")}
-function renderReports(){const sheet=$("reportMonth").value,filter=$("varianceFilter").value;let list=records.filter(r=>!sheet||r.sheetName===sheet).filter(r=>r.variance!==null);if(filter==="variance")list=list.filter(r=>Math.abs(r.variance)>.0001);if(filter==="shortage")list=list.filter(r=>r.variance<-.0001);if(filter==="excess")list=list.filter(r=>r.variance>.0001);$("reportCount").textContent=list.length;$("reportShortages").textContent=list.filter(r=>r.variance<-.0001).length;$("reportExcess").textContent=list.filter(r=>r.variance>.0001).length;$("reportNet").textContent=fmt(list.reduce((s,r)=>s+(r.variance||0),0));$("reportRows").innerHTML=list.sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td><td>${r.variance<-.0001?'<span class="badge badge-bad">Shortage</span>':r.variance>.0001?'<span class="badge badge-good">Excess</span>':'<span class="badge">Matched</span>'}</td></tr>`).join("")||'<tr><td colspan="7" class="empty">No physical-count variance records for this filter.</td></tr>'}
-function renderItems(){const search=($("itemSearch")?.value||"").trim().toLowerCase();const list=items.filter(i=>!search||i.code.toLowerCase().includes(search)||i.name.toLowerCase().includes(search));if($("itemsRows"))$("itemsRows").innerHTML=list.map((i,index)=>`<tr><td>${index+1}</td><td>${esc(i.code)}</td><td>${esc(i.name)}</td></tr>`).join("")||'<tr><td colspan="3" class="empty">No items found.</td></tr>';if($("itemCount"))$("itemCount").textContent=`${list.length} item(s)`}
+function renderRecords(){const list=filteredRecords();$("recordsRows").innerHTML=list.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.opening))}</td><td>${esc(fmt(r.receiving))}</td><td>${esc(fmt(r.transferIn))}</td><td>${esc(fmt(r.transferOut))}</td><td>${esc(fmt(r.waste))}</td><td>${esc(fmt(r.sold))}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td><td><button class="btn-soft" onclick="editRecord('${esc(r.id)}')">Edit</button></td></tr>`).join("")||'<tr><td colspan="13" class="empty">No matching records.</td></tr>';$("recordsSummary").textContent=`Showing ${list.length} record(s).`}
+function editRecord(id){const r=records.find(x=>x.id===id);if(!r)return toast("Record not found.");$("date").value=r.date;$("itemCode").value=r.code;$("itemName").value=r.name;["opening","receiving","transferIn","transferOut","waste","sold"].forEach(k=>$(k).value=r[k]??0);$("physical").value=r.physical??"";$("editId").value=r.id;$("formStatus").textContent=`Editing row in ${r.sheetName}.`;showPage("entry");document.getElementById("singleFormWrap").classList.remove("hide");toast("Loaded into single-item form (below the grid).")}
+function renderReports(){const sheet=$("reportMonth").value,filter=$("varianceFilter").value;let list=records.filter(r=>!sheet||r.sheetName===sheet).filter(r=>r.variance!==null);if(filter==="variance")list=list.filter(r=>Math.abs(r.variance)>.0001);if(filter==="shortage")list=list.filter(r=>r.variance<-.0001);if(filter==="excess")list=list.filter(r=>r.variance>.0001);$("reportCount").textContent=list.length;$("reportShortages").textContent=list.filter(r=>r.variance<-.0001).length;$("reportExcess").textContent=list.filter(r=>r.variance>.0001).length;$("reportNet").textContent=fmt(list.reduce((s,r)=>s+(r.variance||0),0));$("reportRows").innerHTML=list.sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td><td>${r.variance<-.0001?'<span class="badge badge-bad">Shortage</span>':r.variance>.0001?'<span class="badge badge-good">Excess</span>':'<span class="badge">Matched</span>'}</td></tr>`).join("")||'<tr><td colspan="7" class="empty">No records for this filter.</td></tr>'}
+function renderItems(){const search=($("itemSearch")?.value||"").trim().toLowerCase();const list=items.filter(i=>!search||i.code.toLowerCase().includes(search)||i.name.toLowerCase().includes(search));if($("itemsRows"))$("itemsRows").innerHTML=list.map((i,index)=>`<tr><td>${index+1}</td><td>${esc(i.code)}</td><td>${esc(i.name)}</td></tr>`).join("")||'<tr><td colspan="3" class="empty">No items.</td></tr>';if($("itemCount"))$("itemCount").textContent=`${list.length} item(s)`}
 function exportCSV(){const list=filteredRecords();const headers=["sheetName","date","code","name","opening","receiving","transferIn","transferOut","waste","sold","closing","physical","variance"];const cell=v=>'"'+String(v??"").replace(/"/g,'""')+'"';const csv=[headers.join(","),...list.map(r=>headers.map(k=>cell(r[k])).join(","))].join("\r\n");const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="stockwise-inventory-records.csv";a.click();URL.revokeObjectURL(a.href)}
 $("recordSearch").addEventListener("input",renderRecords);$("recordMonth").addEventListener("change",renderRecords);$("reportMonth").addEventListener("change",renderReports);$("varianceFilter").addEventListener("change",renderReports);
 
-/********************
- MULTI-STORE LOGIN
-********************/
+/******************** MULTI-STORE LOGIN ********************/
 async function loginStockWise(loginCode){
  const response=await apiGet({action:"login",loginCode:String(loginCode||"").trim()});
  if(!response||response.success!==true) throw new Error(response?.error||"Login failed.");
  const data=response.data;
- if(!data||!data.token||!data.role) throw new Error("The server did not return a valid login session.");
+ if(!data||!data.token||!data.role) throw new Error("Server did not return a valid session.");
  authToken=data.token;authRole=data.role;authStore=data.storeName||"";
  const storeResponse=await apiGet({action:"stores"});
  if(!storeResponse||storeResponse.success!==true) throw new Error(storeResponse?.error||"Could not load permitted stores.");
  stores=Array.isArray(storeResponse.data)?storeResponse.data:[];
- if(!stores.length) throw new Error("No stores are assigned to this login.");
- if(authRole==="store" && (stores.length!==1||stores[0]!==authStore)) throw new Error("The server returned an unexpected store permission.");
+ if(!stores.length) throw new Error("No stores assigned to this login.");
+ if(authRole==="store" && (stores.length!==1||stores[0]!==authStore)) throw new Error("Unexpected store permission.");
  selectedStore=authRole==="store"?authStore:stores[0];
  const select=$("storeSelect");
  select.innerHTML=stores.map(name=>`<option value="${esc(name)}">${esc(name)}</option>`).join("");
@@ -188,6 +263,7 @@ async function loginStockWise(loginCode){
 }
 function logoutStockWise(){
  authToken="";authRole="";authStore="";stores=[];selectedStore="";items=[...defaultItems];records=[];months=[];connected=false;
+ if(window.gridResetState)window.gridResetState();
  $("appRoot").hidden=true;$("loginScreen").hidden=false;$("loginCode").value="";$("loginStatus").textContent="You have logged out. Enter your access code to continue.";
  setConnection(false,"Logged out");
 }
@@ -201,8 +277,283 @@ $("storeSelect").addEventListener("change",async function(){
  if(authRole!=="area") {this.value=authStore;return;}
  if(!stores.includes(this.value)) {this.value=selectedStore;return;}
  selectedStore=this.value;records=[];items=[...defaultItems];months=[];
+ if(window.gridResetState)window.gridResetState();
  await refreshAll(true);
 });
 
-(function init(){ $("date").value=today();$("scriptUrl").value=localStorage.getItem("stockwise_script_url")||DEFAULT_URL;if(localStorage.getItem("stockwise_theme")==="light")document.body.classList.add("light-mode");if(localStorage.getItem("stockwise_sidebar_collapsed")==="1")document.querySelector(".app").classList.add("sidebar-collapsed");applyLanguage();populateItemDatalist();renderAll();setConnection(false,"Please log in to load store data."); })();
+/* ============================================================
+   STOCK GRID module — additive only. Reuses existing helpers:
+   sheetNameForDate, saveAndVerify, loadRecordsForSheet,
+   itemByCode, renderAll, toast, fmt, esc, today.
+   ============================================================ */
+(function () {
+  "use strict";
+  const G = { date:"", sheet:"", rows:[], saving:false };
+
+  function computeRow(r){
+    r.closing = (Number(r.opening)||0)+(Number(r.receiving)||0)+(Number(r.transferIn)||0)
+              -(Number(r.transferOut)||0)-(Number(r.waste)||0)-(Number(r.sold)||0);
+    const p = (r.physical===""||r.physical===null||r.physical===undefined)?null:Number(r.physical);
+    r.variance = (p===null||!Number.isFinite(p))?null:p-r.closing;
+    return r;
+  }
+  function buildRows(date){
+    if(!items||!items.length) return [];
+    const ex = {};
+    records.filter(r=>r.date===date).forEach(r=>{ex[String(r.code).toLowerCase()]=r;});
+    return items.map(it=>{
+      const e = ex[String(it.code).toLowerCase()];
+      const r = {
+        code:it.code, name:it.name,
+        opening: e?(e.opening??0):0,
+        receiving: e?(e.receiving??0):0,
+        transferIn: e?(e.transferIn??0):0,
+        transferOut: e?(e.transferOut??0):0,
+        waste: e?(e.waste??0):0,
+        sold: e?(e.sold??0):0,
+        physical: (e && e.physical!==null)?e.physical:"",
+        existing: !!e, dirty:false, status: e?"loaded":"new"
+      };
+      return computeRow(r);
+    });
+  }
+  function varCls(v){ if(v===null) return "muted"; if(v<-0.0001) return "variance-neg"; if(v>0.0001) return "variance-pos"; return "muted"; }
+
+  function render(){
+    const q = ($("gridSearch")?.value||"").trim().toLowerCase();
+    const tb = $("gridRows"); if(!tb) return;
+    if(!G.rows.length){ tb.innerHTML='<tr><td colspan="12" class="empty">No rows. Open Setup → Load Sheets data, then click Load grid.</td></tr>'; return; }
+    const visible = G.rows.filter(r=>!q || r.code.toLowerCase().includes(q) || (r.name||"").toLowerCase().includes(q));
+    const openingRo = G.date !== "2026-10-01";
+    const inp = (f,r,ro)=>{
+      const val = (r[f]===""||r[f]==null)?"":r[f];
+      const bc = r.dirty ? ";border-color:var(--green)" : "";
+      return `<input class="form-control qty" type="number" min="0" step="0.001" data-code="${esc(r.code)}" data-field="${f}" value="${esc(val)}" ${ro?"readonly":""} style="min-width:80px${bc}">`;
+    };
+    tb.innerHTML = visible.map(r=>{
+      const badge = r.status==="saved"?'<span class="badge badge-good">Saved ✓</span>':
+                    r.status==="error"?'<span class="badge badge-bad">Error</span>':
+                    r.status==="saving"?'<span class="badge badge-warn">Saving…</span>':
+                    r.dirty?'<span class="badge badge-warn">Changed</span>':
+                    r.existing?'<span class="badge">Loaded</span>':'<span class="badge">New</span>';
+      return `<tr data-code="${esc(r.code)}" class="${r.dirty?'row-dirty':''}">
+        <td>${esc(r.code)}</td><td>${esc(r.name)}</td>
+        <td>${inp("opening",r,openingRo)}</td>
+        <td>${inp("receiving",r)}</td>
+        <td>${inp("transferIn",r)}</td>
+        <td>${inp("transferOut",r)}</td>
+        <td>${inp("waste",r)}</td>
+        <td>${inp("sold",r)}</td>
+        <td class="g-close">${esc(fmt(r.closing))}</td>
+        <td>${inp("physical",r)}</td>
+        <td class="g-var"><span class="${varCls(r.variance)}">${r.variance===null?"—":(r.variance>0?"+":"")+esc(fmt(r.variance))}</span></td>
+        <td class="g-stat">${badge}</td>
+      </tr>`;
+    }).join("");
+
+    tb.querySelectorAll("input.qty").forEach(inp=>{
+      inp.addEventListener("input",()=>{
+        const r = G.rows.find(x=>x.code===inp.dataset.code); if(!r) return;
+        const raw = inp.value.trim();
+        r[inp.dataset.field] = raw===""?"":Number(raw);
+        if(raw!=="" && !Number.isFinite(Number(r[inp.dataset.field]))) return;
+        r.dirty = true; if(r.status!=="saving") r.status = "changed";
+        computeRow(r);
+        const tr = inp.closest("tr");
+        tr.classList.add("row-dirty");
+        tr.querySelector(".g-close").textContent = fmt(r.closing);
+        tr.querySelector(".g-var").innerHTML = `<span class="${varCls(r.variance)}">${r.variance===null?"—":(r.variance>0?"+":"")+esc(fmt(r.variance))}</span>`;
+        tr.querySelector(".g-stat").innerHTML = '<span class="badge badge-warn">Changed</span>';
+        inp.style.borderColor = "var(--green)";
+      });
+      inp.addEventListener("keydown",e=>{
+        if(e.key!=="Enter") return; e.preventDefault();
+        const all = Array.from(tb.querySelectorAll(`input[data-field="${inp.dataset.field}"]`));
+        const i = all.indexOf(inp); if(i>=0 && all[i+1]) all[i+1].focus();
+      });
+    });
+  }
+
+  window.gridLoad = function(){
+    const d = $("gridDate").value;
+    if(!d) return toast("Pick a date first.");
+    if(!items||!items.length) return toast("Item Master empty — Setup → Load Sheets data.");
+    G.date = d; G.sheet = sheetNameForDate(d);
+    $("gridSheetBadge").textContent = G.sheet;
+    G.rows = buildRows(d);
+    render();
+    $("gridStatus").textContent = `${G.rows.length} rows · ${G.rows.filter(r=>r.existing).length} existing, ${G.rows.filter(r=>!r.existing).length} new.`;
+  };
+
+  window.gridClearChanges = function(){
+    if(G.saving) return toast("Save in progress.");
+    G.rows.forEach(r=>{r.dirty=false;r.status=r.existing?"loaded":"new";});
+    render(); $("gridStatus").textContent="Changes cleared.";
+  };
+
+  window.gridSaveChanged = async function(){
+    if(G.saving) return toast("Save already running.");
+    if(!G.date) return toast("Load the grid first.");
+    const dirty = G.rows.filter(r=>r.dirty);
+    if(!dirty.length) return toast("No changed rows.");
+
+    const openingEditable = G.date === "2026-10-01";
+
+    for(const r of dirty){
+      for(const f of ["receiving","transferIn","transferOut","waste","sold"]){
+        const v = Number(r[f]??0); if(!Number.isFinite(v)||v<0) return toast(`Row ${r.code}: ${f} invalid.`);
+      }
+      if(openingEditable){ const v=Number(r.opening??0); if(!Number.isFinite(v)||v<0) return toast(`Row ${r.code}: opening invalid.`); }
+      if(r.physical!==""&&r.physical!=null){ const v=Number(r.physical); if(!Number.isFinite(v)||v<0) return toast(`Row ${r.code}: physical invalid.`); }
+      if(Number(r.closing)<0) return toast(`Row ${r.code}: closing negative.`);
+      if(!itemByCode(r.code)) return toast(`Row ${r.code} not in Item Master.`);
+    }
+
+    const itemsPayload = dirty.map(r=>{
+      const entry = { itemCode: r.code };
+      if(openingEditable) entry.opening = Number(r.opening??0);
+      entry.receiving    = (r.receiving===""||r.receiving==null) ? "" : Number(r.receiving);
+      entry.transferIn   = (r.transferIn===""||r.transferIn==null) ? "" : Number(r.transferIn);
+      entry.transferOut  = (r.transferOut===""||r.transferOut==null) ? "" : Number(r.transferOut);
+      entry.waste        = (r.waste===""||r.waste==null) ? "" : Number(r.waste);
+      entry.sold         = (r.sold===""||r.sold==null) ? "" : Number(r.sold);
+      entry.physicalCount= (r.physical===""||r.physical==null) ? "" : Number(r.physical);
+      return entry;
+    });
+
+    const payload = {
+      token: authToken,
+      storeName: selectedStore,
+      sheetName: G.sheet,
+      date: G.date,
+      items: itemsPayload
+    };
+
+    G.saving = true;
+    $("gridSaveBtn").disabled = true;
+    dirty.forEach(r=>{ r.status="saving"; });
+    render();
+    $("gridStatus").textContent = `Sending ${dirty.length} row(s) in one batch to ${G.sheet}…`;
+
+    try {
+      await Promise.race([
+        saveToSheet(payload), 
+        sleep(20000).then(()=>{ throw new Error("POST did not complete within 20s."); })
+      ]);
+    } catch (err) {
+      console.warn("Bulk POST slow/unreadable; verifying via sheet read anyway.", err);
+    }
+
+    const submitted = new Map(dirty.map(r=>[String(r.code).toLowerCase(), r]));
+    const started = Date.now();
+    let verifiedMatch = null;
+    let lastReason = "";
+
+    while (Date.now() - started < 60000) {
+      try {
+        const latest = await loadRecordsForSheet(G.sheet);
+        const byCode = {};
+        latest.filter(r=>r.date===G.date).forEach(r=>{ byCode[String(r.code).toLowerCase()]=r; });
+
+        let allOk = true;
+        let reason = "";
+        for (const [code, row] of submitted) {
+          const m = byCode[code];
+          if (!m) { allOk=false; reason=`Missing row for ${row.code}.`; break; }
+          const want = {
+            receiving:    (row.receiving===""||row.receiving==null)?null:Number(row.receiving),
+            transferIn:   (row.transferIn===""||row.transferIn==null)?null:Number(row.transferIn),
+            transferOut:  (row.transferOut===""||row.transferOut==null)?null:Number(row.transferOut),
+            waste:        (row.waste===""||row.waste==null)?null:Number(row.waste),
+            sold:         (row.sold===""||row.sold==null)?null:Number(row.sold),
+            physicalCount:(row.physical===""||row.physical==null)?null:Number(row.physical)
+          };
+          if (openingEditable) want.opening = Number(row.opening??0);
+
+          for (const k of Object.keys(want)) {
+            const w = want[k];
+            if (w === null) continue; 
+            const got = k==="physicalCount" ? m.physical : m[k];
+            // Wait for sheet formulas to calculate if 'got' is currently null
+            if (got === null || got === undefined || Math.abs(Number(got) - w) > 0.0001) {
+              allOk=false; reason=`Row ${row.code}: ${k} not yet matching.`; break;
+            }
+          }
+          if (!allOk) break;
+        }
+
+        if (allOk) { verifiedMatch = byCode; break; }
+        lastReason = reason;
+      } catch (err) {
+        lastReason = err.message || "Could not re-read sheet.";
+      }
+      await sleep(2500);
+    }
+
+    if (!verifiedMatch) {
+      dirty.forEach(r=>{ r.status="error"; });
+      G.saving = false;
+      $("gridSaveBtn").disabled = false;
+      render();
+      const msg = `Batch save could not be verified. ${lastReason || "Check the sheet."}`;
+      $("gridStatus").textContent = msg;
+      toast(msg);
+      return;
+    }
+
+    let ok = 0;
+    dirty.forEach(r=>{
+      const m = verifiedMatch[String(r.code).toLowerCase()];
+      records = records.filter(x=>!(x.date===G.date && String(x.code).toLowerCase()===String(r.code).toLowerCase() && x.sheetName===G.sheet));
+      if (m) records.push(m);
+      r.existing = true; r.dirty = false; r.status = "saved";
+      ["opening","receiving","transferIn","transferOut","waste","sold","physical"].forEach(k=>{ if(m && m[k]!=null) r[k]=m[k]; });
+      computeRow(r);
+      ok++;
+    });
+
+    G.saving = false;
+    $("gridSaveBtn").disabled = false;
+    renderAll();
+    const msg = `Saved and verified ${ok}/${dirty.length} rows in one batch.`;
+    $("gridStatus").textContent = msg;
+    toast(msg);
+  };
+
+  window.gridResetState = function(){ G.date="";G.sheet="";G.rows=[];G.saving=false;
+    if($("gridRows"))$("gridRows").innerHTML="";
+    if($("gridSheetBadge"))$("gridSheetBadge").textContent="—";
+    if($("gridStatus"))$("gridStatus").textContent="Pick a date and click Load grid.";
+  };
+
+  window.gridOnShow = function(){
+    if(!$("gridDate")) return;
+    if(!$("gridDate").value) $("gridDate").value = today();
+    $("gridSheetBadge").textContent = sheetNameForDate($("gridDate").value);
+    if(!G.rows.length && items && items.length) window.gridLoad();
+  };
+
+  window.gridOnDataChanged = function(){
+    if(!G.rows.length) return;
+    const dirty = {}; G.rows.forEach(r=>{ if(r.dirty) dirty[r.code]=r; });
+    const fresh = buildRows(G.date);
+    G.rows = fresh.map(r=>{
+      const d = dirty[r.code];
+      if(d){ ["opening","receiving","transferIn","transferOut","waste","sold","physical"].forEach(k=>r[k]=d[k]); r.dirty=true; r.status=d.status==="saved"?"saved":"changed"; computeRow(r); }
+      return r;
+    });
+    render();
+  };
+
+  function bind(){
+    const d = $("gridDate"); if(d) d.addEventListener("change",()=>{
+      if($("gridSheetBadge")) $("gridSheetBadge").textContent = sheetNameForDate(d.value);
+      if($("gridStatus")) $("gridStatus").textContent = "Date changed — click Load grid.";
+    });
+    const s = $("gridSearch"); if(s) s.addEventListener("input",()=>{ if(G.rows.length) render(); });
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", bind); else bind();
+})();
+
+(function init(){ $("date").value=today();$("gridDate").value=today();$("gridSheetBadge").textContent=sheetNameForDate(today());$("scriptUrl").value=localStorage.getItem("stockwise_script_url")||DEFAULT_URL;if(localStorage.getItem("stockwise_theme")==="light")document.body.classList.add("light-mode");if(localStorage.getItem("stockwise_sidebar_collapsed")==="1")document.querySelector(".app").classList.add("sidebar-collapsed");applyLanguage();populateItemDatalist();renderAll();setConnection(false,"Please log in to load store data."); })();
 </script></div></body></html>
