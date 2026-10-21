@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>StockWise | Restaurant Inventory Manager</title>
+<title>StockWise | Withstand Inventory</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
@@ -133,10 +133,24 @@
 <script>
 "use strict";
 const $ = id => document.getElementById(id);
-const DEFAULT_URL = "https://script.google.com/macros/s/AKfycbx9-i2XycERO2IwFOHr8XSeiACVCWw97f9iTwrm1qYOkOuqu6b-c5VH7fU4YGxhA98x/exec";
+
+/**
+ * STORE MULTI-URL MAPPING
+ * Exact Apps Script URLs for each store.
+ */
+const STORE_URLS = {
+  "west walk": "https://script.google.com/macros/s/AKfycbztbc2rtuc-xp7zQSDyeDpcMOeOFxmhdadm3seMB46LQOrNqAAKU1EZb5j3JLuR5GVA3A/exec",
+  "iconic": "https://script.google.com/macros/s/AKfycbxOPBHJlmk_LeDVLv-OzaEU9_DK1V0Xyv9ru069ZFtqET_Qvr0o9-co4nzSBpFlEmt9Hg/exec",
+  "gate mall": "https://script.google.com/macros/s/AKfycbz8194pepiIjOKrr_V1HIizNHmjbQ6kuAZrPsKGNcNlHdaQ5CF5PlecoMTCL_BM1HnU6A/exec",
+  "bani hajir": "https://script.google.com/macros/s/AKfycbymQ6JIuEMTOThFTQnFtCcNlkhxS7taM9pF6gUpKsu5cQCEJ1qjs7VT5waCBXAUHP6P/exec",
+  "al mashaf": "https://script.google.com/macros/s/AKfycby-Y2arnltnU-iFKVO-AuJn0YqbQPLgJ2HyJrx3EWDjrQUl8Nu8DpiHJ7hhVZ217ETuzA/exec"
+};
+const DEFAULT_URL = STORE_URLS["west walk"];
+
 let authToken="", authRole="", authStore="", stores=[], selectedStore="";
 const defaultItems=[{code:"W-0369",name:"Greek Yoghurt Dodoni",unit:"Kg"},{code:"W-0187",name:"Baladna Mozzarella",unit:"Kg"},{code:"W-0204",name:"Acqua Panna",unit:"pcs"},{code:"W-0218",name:"San Pellegrino",unit:"pcs"},{code:"W-0603",name:"Wrap & Co Swedish Bread",unit:"pcs"}];
 let items=[...defaultItems],records=[],months=[],connected=false,lastRefresh=null,toastTimer;
+
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
 const n=v=>{if(v===null||v===undefined||v==="")return null;const x=Number(v);return Number.isFinite(x)?x:null};
 const fmt=v=>v===null||v===undefined||v===""?"—":Number(v).toLocaleString(undefined,{maximumFractionDigits:3});
@@ -153,23 +167,93 @@ function applyLanguage(){const dict=i18n[currentLanguage]||i18n.en;document.docu
 function toggleLanguage(){currentLanguage=currentLanguage==="en"?"ar":"en";localStorage.setItem("stockwise_language",currentLanguage);applyLanguage();renderCharts()}
 function toggleTheme(){document.body.classList.toggle("light-mode");localStorage.setItem("stockwise_theme",document.body.classList.contains("light-mode")?"light":"dark");applyLanguage();renderCharts()}
 function toggleSidebar(){document.querySelector(".app").classList.toggle("sidebar-collapsed");localStorage.setItem("stockwise_sidebar_collapsed",document.querySelector(".app").classList.contains("sidebar-collapsed")?"1":"0");setTimeout(()=>Object.values(chartInstances).forEach(c=>c.resize()),220)}
-function renderCharts(){if(typeof Chart==="undefined")return;const valid=records.filter(r=>r.variance!==null&&Number.isFinite(r.variance));const shortages=valid.filter(r=>r.variance<-.0001).length,excess=valid.filter(r=>r.variance>.0001).length,matched=valid.length-shortages-excess;const light=document.body.classList.contains("light-mode"),textColor=light?"#425449":"#b7c8bd",gridColor=light?"#dce6df":"#2b3b32";const base={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:textColor,boxWidth:12,usePointStyle:true}}}};
- const upsert=(id,config)=>{const canvas=$(id);if(!canvas)return;if(chartInstances[id]){chartInstances[id].destroy()}chartInstances[id]=new Chart(canvas,config)};
- 
- // 1. Variance Donut
- upsert("varianceDonut",{type:"doughnut",data:{labels:currentLanguage==="ar"?["عجز","زيادة","مطابق"]:["Shortage","Excess","Matched"],datasets:[{data:[shortages,excess,matched],backgroundColor:["#ff7777","#53df91","#78958a"],borderWidth:0,hoverOffset:7}]},options:{...base,cutout:"68%",plugins:{...base.plugins,legend:{position:"bottom",labels:{color:textColor,boxWidth:10,usePointStyle:true,padding:14}}}}});
- 
- // 2. Variance Trend
- const byDate={};valid.forEach(r=>{const d=r.date||"Unknown";byDate[d]=(byDate[d]||0)+r.variance});const trend=Object.entries(byDate).sort((a,b)=>a[0].localeCompare(b[0])).slice(-14);upsert("varianceTrendChart",{type:"line",data:{labels:trend.map(x=>x[0]),datasets:[{label:currentLanguage==="ar"?"صافي الفرق":"Net variance",data:trend.map(x=>x[1]),borderColor:"#53df91",backgroundColor:"#53df9128",fill:true,tension:.35,pointRadius:3,pointHoverRadius:5}]},options:{...base,scales:{x:{grid:{color:gridColor},ticks:{color:textColor,maxRotation:45,minRotation:0}},y:{grid:{color:gridColor},ticks:{color:textColor}}},plugins:{...base.plugins,legend:{display:false}}}});
 
- // 3. Waste Chart
- const wasteList=valid.filter(r=>r.waste>0).sort((a,b)=>b.waste-a.waste).slice(0,5);
- upsert("wasteChart",{type:"bar",data:{labels:wasteList.map(r=>r.code),datasets:[{label:"Waste Qty",data:wasteList.map(r=>r.waste),backgroundColor:"#f5c96a",borderRadius:6}]},options:{...base,plugins:{...base.plugins,legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:textColor}},y:{grid:{color:gridColor},ticks:{color:textColor}}}}});
+function renderCharts(){
+  if(typeof Chart==="undefined")return;
+  const valid=records.filter(r=>r.variance!==null&&Number.isFinite(r.variance));
+  const shortages=valid.filter(r=>r.variance<-.0001).length,excess=valid.filter(r=>r.variance>.0001).length,matched=valid.length-shortages-excess;
+  const light=document.body.classList.contains("light-mode"),textColor=light?"#425449":"#b7c8bd",gridColor=light?"#dce6df":"#2b3b32";
+  const base={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:textColor,boxWidth:12,usePointStyle:true}}}};
+  
+  const upsert=(id,config)=>{
+    const canvas=$(id);if(!canvas)return;
+    if(chartInstances[id]){chartInstances[id].destroy()}
+    chartInstances[id]=new Chart(canvas,config)
+  };
+ 
+  // 1. Variance Donut
+  upsert("varianceDonut",{type:"doughnut",data:{labels:currentLanguage==="ar"?["عجز","زيادة","مطابق"]:["Shortage","Excess","Matched"],datasets:[{data:[shortages,excess,matched],backgroundColor:["#ff7777","#53df91","#78958a"],borderWidth:0,hoverOffset:7}]},options:{...base,cutout:"68%",plugins:{...base.plugins,legend:{position:"bottom",labels:{color:textColor,boxWidth:10,usePointStyle:true,padding:14}}}}});
+ 
+  // 2. Variance Trend
+  const byDate={};
+  valid.forEach(r=>{
+    const d=r.date||"Unknown";
+    byDate[d]=(byDate[d]||0)+r.variance
+  });
+  const trend=Object.entries(byDate).sort((a,b)=>a[0].localeCompare(b[0])).slice(-14);
+  upsert("varianceTrendChart",{
+    type:"line",
+    data:{
+      labels:trend.map(x=>x[0]),
+      datasets:[{
+        label:currentLanguage==="ar"?"صافي الفرق":"Net variance",
+        data:trend.map(x=>x[1]),
+        borderColor:"#53df91",
+        backgroundColor:"#53df9128",
+        fill:true,
+        tension:.35,
+        pointRadius:3,
+        pointHoverRadius:5
+      }]
+    },
+    options:{...base,scales:{x:{grid:{color:gridColor},ticks:{color:textColor,maxRotation:45,minRotation:0}},y:{grid:{color:gridColor},ticks:{color:textColor}}},plugins:{...base.plugins,legend:{display:false}}}
+  });
+
+  // 3. Waste Chart
+  const wasteList=valid.filter(r=>r.waste>0).sort((a,b)=>b.waste-a.waste).slice(0,5);
+  upsert("wasteChart",{
+    type:"bar",
+    data:{
+      labels:wasteList.map(r=>r.code),
+      datasets:[{label:"Waste Qty",data:wasteList.map(r=>r.waste),backgroundColor:"#f5c96a",borderRadius:6}]
+    },
+    options:{...base,plugins:{...base.plugins,legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:textColor}},y:{grid:{color:gridColor},ticks:{color:textColor}}}}
+  });
 }
-function showPage(page){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$("page-"+page).classList.add("active");document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.page===page));const titles={dashboard:"Dashboard",entry:"Stock Grid",records:"Inventory Records",reports:"Reports",items:"Item Master",setup:"Setup"};$("pageTitle").textContent=titles[page]||"StockWise";applyLanguage();if(page==="dashboard")renderCharts();if(page==="records")renderRecords();if(page==="reports")renderReports();if(page==="items")renderItems();if(page==="entry" && window.gridOnShow)window.gridOnShow();window.scrollTo({top:0,behavior:"smooth"})}
+
+function showPage(page){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  $("page-"+page).classList.add("active");
+  document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+  const titles={dashboard:"Dashboard",entry:"Stock Grid",records:"Inventory Records",reports:"Reports",items:"Item Master",setup:"Setup"};
+  $("pageTitle").textContent=titles[page]||"StockWise";applyLanguage();
+  if(page==="dashboard")renderCharts();
+  if(page==="records")renderRecords();
+  if(page==="reports")renderReports();
+  if(page==="items")renderItems();
+  if(page==="entry" && window.gridOnShow)window.gridOnShow();
+  window.scrollTo({top:0,behavior:"smooth"})
+}
 document.querySelectorAll(".navbtn").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
-function getAppsScriptUrl(){return localStorage.getItem("stockwise_script_url")||DEFAULT_URL}
-function saveScriptUrl(){const url=$("scriptUrl").value.trim();if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url))return toast("Enter a valid Apps Script URL ending in /exec.");localStorage.setItem("stockwise_script_url",url);toast("Apps Script URL saved.");testConnection()}
+
+// DYNAMIC URL SWITCHING BASED ON STORE
+function getAppsScriptUrl(){
+  if(selectedStore && STORE_URLS[selectedStore.toLowerCase()]){
+    return STORE_URLS[selectedStore.toLowerCase()];
+  }
+  return DEFAULT_URL;
+}
+function saveScriptUrl(){
+  const url=$("scriptUrl").value.trim();
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url))return toast("Enter a valid Apps Script URL ending in /exec.");
+  if(selectedStore){
+    STORE_URLS[selectedStore.toLowerCase()] = url;
+  }
+  localStorage.setItem("stockwise_script_url_"+selectedStore.toLowerCase(),url);
+  toast("Apps Script URL saved for "+selectedStore+".");
+  testConnection()
+}
+
 function apiGet(params,timeoutMs=15000){
  const base=getAppsScriptUrl();
  const request={...params};
@@ -191,14 +275,60 @@ function getField(o,...keys){for(const k of keys){if(o&&o[k]!==undefined&&o[k]!=
 function normalizeItem(x){return{code:String(getField(x,"code","itemCode","itemcode","item_code")??"").trim(),name:String(getField(x,"name","itemName","itemname","item_name")??"").trim(),unit:String(getField(x,"unit","uom","Unit")??"")}}
 function normalizeRecord(x,sheetName){const dateRaw=getField(x,"date","Date","inventoryDate");let date="";if(dateRaw instanceof Date)date=dateRaw.toISOString().slice(0,10);else if(typeof dateRaw==="string"){const m=dateRaw.match(/^(\d{4}-\d{2}-\d{2})/);if(m)date=m[1];else{const d=new Date(dateRaw);if(!isNaN(d))date=d.toISOString().slice(0,10)}}else if(typeof dateRaw==="number"){const d=new Date(dateRaw);if(!isNaN(d))date=d.toISOString().slice(0,10)}const code=String(getField(x,"itemCode","itemcode","code","Item Code")??"").trim();const name=String(getField(x,"itemName","itemname","name","Item Name")??"").trim();const opening=n(getField(x,"opening","openingStock","opening_stock"))??0;const receiving=n(getField(x,"receiving","received","receivingStock"))??0;const transferIn=n(getField(x,"transferIn","transfer_in","transferin"))??0;const transferOut=n(getField(x,"transferOut","transfer_out","transferout"))??0;const waste=n(getField(x,"waste"))??0;const sold=n(getField(x,"sold","consumption"))??0;const closing=n(getField(x,"closing","closingStock","closing_stock"));const physical=n(getField(x,"physicalCount","physical","actual","physical_count"));const variance=n(getField(x,"variance"));const row=getField(x,"row","rowNumber");return{id:String(sheetName)+":"+String(row??date+":"+code),sheetName,date,code,name,opening,receiving,transferIn,transferOut,waste,sold,closing:closing??(opening+receiving+transferIn-transferOut-waste-sold),physical,variance:variance??(physical===null?null:physical-(closing??(opening+receiving+transferIn-transferOut-waste-sold))),row}}
 function sheetNameForDate(date){const [y,m]=date.split("-").map(Number);if(y===2026&&m===10)return"Daily Inventory";return new Date(y,m-1,1).toLocaleString("en-US",{month:"long",year:"numeric"})}
+
 async function loadItemMaster(){if(!authToken||!selectedStore)throw new Error("Please log in and select a store first.");try{const data=await apiGet({action:"items"});if(data?.success===false)throw new Error(data.error||data.message||"Items endpoint returned an error.");const arr=unwrapArray(data,["items","data","result","records"]);if(!arr.length)throw new Error("Item endpoint returned no item list. Check the Apps Script response format.");items=arr.map(normalizeItem).filter(x=>x.code||x.name);renderItems();populateItemDatalist();$("statItems").textContent=items.length;return true}catch(e){console.error(e);toast("Could not load items: "+e.message);return false}}
 async function loadMonths(){if(!authToken||!selectedStore)throw new Error("Please log in and select a store first.");try{const data=await apiGet({action:"months"});if(data?.success===false)throw new Error(data.error||data.message||"Months endpoint returned an error.");let arr=unwrapArray(data,["months","sheets","data","result"]);if(!arr.length&&Array.isArray(data?.data?.months))arr=data.data.months;months=arr.map(x=>typeof x==="string"?x:String(getField(x,"name","sheetName","sheet","title")??"")).filter(Boolean);if(!months.length)months=["Daily Inventory","November 2026","December 2026","January 2027","February 2027","March 2027","April 2027","May 2027","June 2027","July 2027"];populateMonthSelects();return true}catch(e){console.warn(e);months=["Daily Inventory","November 2026","December 2026","January 2027","February 2027","March 2027","April 2027","May 2027","June 2027","July 2027"];populateMonthSelects();return false}}
 function populateMonthSelects(){["recordMonth","reportMonth"].forEach(id=>{const sel=$(id),old=sel.value;sel.innerHTML='<option value="">All loaded sheets</option>'+months.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("");if(months.includes(old))sel.value=old})}
 async function loadRecordsForSheet(sheet){if(!authToken||!selectedStore)throw new Error("Please log in and select a store first.");const data=await apiGet({action:"records",sheetName:sheet});if(data?.success===false)throw new Error(data.error||data.message||"Records endpoint returned an error for "+sheet);const arr=unwrapArray(data,["records","data","result","items"]);return arr.map(x=>normalizeRecord(x,sheet)).filter(r=>r.date||r.code||r.name)}
 async function loadAllRecords(){const all=[];const unique=[...new Set(months)];for(const sheet of unique){try{const list=await loadRecordsForSheet(sheet);all.push(...list)}catch(e){console.warn("Could not load "+sheet,e)}}records=all;}
 function setConnection(ok,message){connected=ok;$("statusDot").classList.toggle("online",ok);$("connectionText").textContent=message;$("setupStatus").textContent=message}
-async function testConnection(){if(!authToken)return setConnection(false,"Log in first before testing the connection.");setConnection(false,"Testing Google Sheets connection…");try{const d=await apiGet({action:"items"});if(d?.success===false)throw new Error(d.error||d.message||"Endpoint returned success:false");const a=unwrapArray(d,["items","data","result","records"]);if(!Array.isArray(a)||!a.length)throw new Error("Response arrived but item list was empty or in an unknown format.");setConnection(true,"Connected · "+a.length+" items returned");toast("Connection test passed: item master loaded.");return true}catch(e){setConnection(false,"Connection failed: "+e.message);toast("Connection test failed. Check deployment and Apps Script JSONP support.");return false}}
-async function refreshAll(showMessage=false){if(!authToken||!selectedStore)return;if(authRole==="store")selectedStore=authStore;try{setConnection(false,"Loading Google Sheets data…");const itemOK=await loadItemMaster();await loadMonths();await loadAllRecords();if(!itemOK)throw new Error("Item master could not be loaded.");lastRefresh=new Date();setConnection(true,`Loaded ${items.length} items · ${records.length} records`);renderAll();if(showMessage)toast("Sheets data refreshed. Check the records shown below.")}catch(e){setConnection(false,"Could not refresh: "+e.message);if(showMessage)toast(e.message)} }
+
+async function testConnection(){
+  if(!authToken)return setConnection(false,"Log in first before testing the connection.");
+  setConnection(false,"Testing "+selectedStore+" Google Sheet connection…");
+  try{
+    const d=await apiGet({action:"items"});
+    if(d?.success===false)throw new Error(d.error||d.message||"Endpoint returned success:false");
+    const a=unwrapArray(d,["items","data","result","records"]);
+    if(!Array.isArray(a)||!a.length)throw new Error("Response arrived but item list was empty or in an unknown format.");
+    setConnection(true,"Connected · "+a.length+" items returned for "+selectedStore);
+    toast("Connection test passed for "+selectedStore);
+    return true
+  }catch(e){
+    setConnection(false,"Connection failed for "+selectedStore+": "+e.message);
+    toast("Connection test failed.");
+    return false
+  }
+}
+
+async function refreshAll(showMessage=false){
+  if(!authToken||!selectedStore) return;
+  if(authRole==="store") selectedStore=authStore;
+  
+  try{
+    setConnection(false,"Loading Google Sheets data for "+selectedStore+"…");
+    $("statItems").textContent = "…";
+    $("statVariance").textContent = "…";
+    $("statTotalVar").textContent = "…";
+    $("statTotalWaste").textContent = "…";
+    $("statMissing").textContent = "…";
+    $("dashboardRows").innerHTML = '<tr><td colspan="6" class="empty">Loading data from Google Sheets for '+selectedStore+'…</td></tr>';
+
+    const itemOK=await loadItemMaster();
+    await loadMonths();
+    await loadAllRecords();
+    
+    if(!itemOK)throw new Error("Item master could not be loaded.");
+    lastRefresh=new Date();
+    setConnection(true,`Loaded ${items.length} items · ${records.length} records`);
+    renderAll();
+    if(showMessage)toast("Sheets data refreshed for "+selectedStore);
+  }catch(e){
+    setConnection(false,"Could not refresh: "+e.message);
+    if(showMessage)toast(e.message);
+  } 
+}
+
 function populateItemDatalist(){$("itemCodeList").innerHTML=items.map(i=>`<option value="${esc(i.code)}">${esc(i.name)}</option>`).join("")}
 function itemByCode(code){return items.find(i=>i.code.toLowerCase()===String(code).trim().toLowerCase())}
 $("itemCode").addEventListener("input",()=>{const item=itemByCode($("itemCode").value);if(item){$("itemName").value=item.name;updatePreview()}});
@@ -232,8 +362,8 @@ async function saveAndVerify(payload, sheetName) {
   throw new Error("Save not verified after 45s. " + (lastError || "Check the sheet."));
 }
 $("inventoryForm").addEventListener("submit",async event=>{event.preventDefault();const date=$("date").value,code=$("itemCode").value.trim(),name=$("itemName").value.trim();if(!date||!code||!name)return toast("Complete date, code and name.");const keys=["opening","receiving","transferIn","transferOut","waste","sold"],values={};for(const key of keys){values[key]=num(key)??0;if(!Number.isFinite(values[key])||values[key]<0)return toast("Enter valid non-negative quantities.")}const physical=num("physical");if(physical!==null&&(!Number.isFinite(physical)||physical<0))return toast("Physical must be ≥ 0.");const closing=values.opening+values.receiving+values.transferIn-values.transferOut-values.waste-values.sold;if(closing<0)return toast("Closing cannot be negative.");const sheetName=sheetNameForDate(date);if(months.length&&!months.includes(sheetName))return toast(`No sheet tab for ${date}: expected "${sheetName}".`);if(!itemByCode(code))return toast("Item not in Item Master.");const payload={token:authToken,storeName:selectedStore,sheetName,date,itemCode:code,opening:values.opening,receiving:values.receiving,transferIn:values.transferIn,transferOut:values.transferOut,waste:values.waste,sold:values.sold,physicalCount:physical};const btn=$("saveBtn");btn.disabled=true;btn.textContent="Saving…";$("formStatus").textContent=`Sending to ${sheetName}…`;try{const match=await saveAndVerify(payload,sheetName);records=records.filter(r=>!(r.date===date&&r.code.toLowerCase()===code.toLowerCase()&&r.sheetName===sheetName));records.push(match);renderAll();toast("Saved and verified.");resetForm()}catch(e){$("formStatus").textContent=e.message;toast("Save not verified: "+e.message)}finally{btn.disabled=false;btn.textContent="Save row"}});
+
 function renderAll(){
-  // Compute KPIs
   let varItems=0, totVar=0, totWaste=0, missing=0;
   records.forEach(r=>{
     if(r.variance!==null && Math.abs(r.variance)>0.0001) varItems++;
@@ -251,40 +381,68 @@ function renderAll(){
   renderDashboard();renderRecords();renderReports();renderItems();populateItemDatalist();renderCharts();
   if(window.gridOnDataChanged)window.gridOnDataChanged();
 }
+
 function varianceHTML(v){if(v===null||v===undefined)return"—";const cls=v<-.0001?"variance-neg":v>.0001?"variance-pos":"muted";return `<span class="${cls}">${v>0?"+":""}${esc(fmt(v))}</span>`}
 function renderDashboard(){
   const sorted = records.filter(r => r.variance !== null).sort((a,b)=>Math.abs(b.variance)-Math.abs(a.variance)).slice(0,8);
-  $("dashboardRows").innerHTML=sorted.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td></tr>`).join("")||'<tr><td colspan="6" class="empty">No variances found.</td></tr>';
+  $("dashboardRows").innerHTML=sorted.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td></tr>`).join("")||'<tr><td colspan="6" class="empty">No variances found for '+selectedStore+'.</td></tr>';
 }
 function filteredRecords(){const sheet=$("recordMonth").value,search=($("recordSearch").value||"").trim().toLowerCase();return records.filter(r=>(!sheet||r.sheetName===sheet)&&(!search||r.code.toLowerCase().includes(search)||r.name.toLowerCase().includes(search))).sort((a,b)=>(b.date||"").localeCompare(a.date||""))}
-function renderRecords(){const list=filteredRecords();$("recordsRows").innerHTML=list.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.opening))}</td><td>${esc(fmt(r.receiving))}</td><td>${esc(fmt(r.transferIn))}</td><td>${esc(fmt(r.transferOut))}</td><td>${esc(fmt(r.waste))}</td><td>${esc(fmt(r.sold))}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td><td><button class="btn-soft" onclick="editRecord('${esc(r.id)}')">Edit</button></td></tr>`).join("")||'<tr><td colspan="13" class="empty">No matching records.</td></tr>';$("recordsSummary").textContent=`Showing ${list.length} record(s).`}
+function renderRecords(){const list=filteredRecords();$("recordsRows").innerHTML=list.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.opening))}</td><td>${esc(fmt(r.receiving))}</td><td>${esc(fmt(r.transferIn))}</td><td>${esc(fmt(r.transferOut))}</td><td>${esc(fmt(r.waste))}</td><td>${esc(fmt(r.sold))}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td><td><button class="btn-soft" onclick="editRecord('${esc(r.id)}')">Edit</button></td></tr>`).join("")||'<tr><td colspan="13" class="empty">No matching records for '+selectedStore+'.</td></tr>';$("recordsSummary").textContent=`Showing ${list.length} record(s).`}
 function editRecord(id){const r=records.find(x=>x.id===id);if(!r)return toast("Record not found.");$("date").value=r.date;$("itemCode").value=r.code;$("itemName").value=r.name;["opening","receiving","transferIn","transferOut","waste","sold"].forEach(k=>$(k).value=r[k]??0);$("physical").value=r.physical??"";$("editId").value=r.id;$("formStatus").textContent=`Editing row in ${r.sheetName}.`;showPage("entry");document.getElementById("singleFormWrap").classList.remove("hide");toast("Loaded into single-item form (below the grid).")}
-function renderReports(){const sheet=$("reportMonth").value,filter=$("varianceFilter").value;let list=records.filter(r=>!sheet||r.sheetName===sheet).filter(r=>r.variance!==null);if(filter==="variance")list=list.filter(r=>Math.abs(r.variance)>.0001);if(filter==="shortage")list=list.filter(r=>r.variance<-.0001);if(filter==="excess")list=list.filter(r=>r.variance>.0001);$("reportCount").textContent=list.length;$("reportShortages").textContent=list.filter(r=>r.variance<-.0001).length;$("reportExcess").textContent=list.filter(r=>r.variance>.0001).length;$("reportNet").textContent=fmt(list.reduce((s,r)=>s+(r.variance||0),0));$("reportRows").innerHTML=list.sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td><td>${r.variance<-.0001?'<span class="badge badge-bad">Shortage</span>':r.variance>.0001?'<span class="badge badge-good">Excess</span>':'<span class="badge">Matched</span>'}</td></tr>`).join("")||'<tr><td colspan="7" class="empty">No records for this filter.</td></tr>'}
+function renderReports(){const sheet=$("reportMonth").value,filter=$("varianceFilter").value;let list=records.filter(r=>!sheet||r.sheetName===sheet).filter(r=>r.variance!==null);if(filter==="variance")list=list.filter(r=>Math.abs(r.variance)>.0001);if(filter==="shortage")list=list.filter(r=>r.variance<-.0001);if(filter==="excess")list=list.filter(r=>r.variance>.0001);$("reportCount").textContent=list.length;$("reportShortages").textContent=list.filter(r=>r.variance<-.0001).length;$("reportExcess").textContent=list.filter(r=>r.variance>.0001).length;$("reportNet").textContent=fmt(list.reduce((s,r)=>s+(r.variance||0),0));$("reportRows").innerHTML=list.sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td><td>${r.variance<-.0001?'<span class="badge badge-bad">Shortage</span>':r.variance>.0001?'<span class="badge badge-good">Excess</span>':'<span class="badge">Matched</span>'}</td></tr>`).join("")||'<tr><td colspan="7" class="empty">No records for this filter in '+selectedStore+'.</td></tr>'}
 function renderItems(){const search=($("itemSearch")?.value||"").trim().toLowerCase();const list=items.filter(i=>!search||i.code.toLowerCase().includes(search)||i.name.toLowerCase().includes(search));if($("itemsRows"))$("itemsRows").innerHTML=list.map((i,index)=>`<tr><td>${index+1}</td><td>${esc(i.code)}</td><td>${esc(i.name)}</td></tr>`).join("")||'<tr><td colspan="3" class="empty">No items.</td></tr>';if($("itemCount"))$("itemCount").textContent=`${list.length} item(s)`}
-function exportCSV(){const list=filteredRecords();const headers=["sheetName","date","code","name","opening","receiving","transferIn","transferOut","waste","sold","closing","physical","variance"];const cell=v=>'"'+String(v??"").replace(/"/g,'""')+'"';const csv=[headers.join(","),...list.map(r=>headers.map(k=>cell(r[k])).join(","))].join("\r\n");const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="stockwise-inventory-records.csv";a.click();URL.revokeObjectURL(a.href)}
+function exportCSV(){const list=filteredRecords();const headers=["sheetName","date","code","name","opening","receiving","transferIn","transferOut","waste","sold","closing","physical","variance"];const cell=v=>'"'+String(v??"").replace(/"/g,'""')+'"';const csv=[headers.join(","),...list.map(r=>headers.map(k=>cell(r[k])).join(","))].join("\r\n");const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="stockwise-"+selectedStore+"-inventory.csv";a.click();URL.revokeObjectURL(a.href)}
 $("recordSearch").addEventListener("input",renderRecords);$("recordMonth").addEventListener("change",renderRecords);$("reportMonth").addEventListener("change",renderReports);$("varianceFilter").addEventListener("change",renderReports);
 
-/******************** MULTI-STORE LOGIN ********************/
+/******************** MULTI-STORE LOGIN (HARDCODED CODES & ISOLATION) ********************/
 async function loginStockWise(loginCode){
- const response=await apiGet({action:"login",loginCode:String(loginCode||"").trim()});
- if(!response||response.success!==true) throw new Error(response?.error||"Login failed.");
- const data=response.data;
- if(!data||!data.token||!data.role) throw new Error("Server did not return a valid session.");
- authToken=data.token;authRole=data.role;authStore=data.storeName||"";
- const storeResponse=await apiGet({action:"stores"});
- if(!storeResponse||storeResponse.success!==true) throw new Error(storeResponse?.error||"Could not load permitted stores.");
- stores=Array.isArray(storeResponse.data)?storeResponse.data:[];
- if(!stores.length) throw new Error("No stores assigned to this login.");
- if(authRole==="store" && (stores.length!==1||stores[0]!==authStore)) throw new Error("Unexpected store permission.");
- selectedStore=authRole==="store"?authStore:stores[0];
- const select=$("storeSelect");
- select.innerHTML=stores.map(name=>`<option value="${esc(name)}">${esc(name)}</option>`).join("");
- select.value=selectedStore;select.disabled=authRole!=="area";
- $("loginScreen").hidden=true;$("appRoot").hidden=false;
- setConnection(false,"Logged in · loading "+selectedStore+"…");
- await refreshAll(false);
- toast(authRole==="area"?"Area Manager access granted.":"Logged in to "+authStore+".");
+  const code = String(loginCode || "").trim().toLowerCase();
+  
+  if (code === "000000") {
+    authRole = "area";
+    authStore = "";
+    stores = ["west walk", "iconic", "gate mall", "bani hajir", "al mashaf"];
+    selectedStore = stores[0];
+  } 
+  else if (code === "00west walk") { authRole = "store"; authStore = "west walk"; stores = ["west walk"]; selectedStore = "west walk"; }
+  else if (code === "00iconic") { authRole = "store"; authStore = "iconic"; stores = ["iconic"]; selectedStore = "iconic"; }
+  else if (code === "00gate mall") { authRole = "store"; authStore = "gate mall"; stores = ["gate mall"]; selectedStore = "gate mall"; }
+  else if (code === "00bani hajir") { authRole = "store"; authStore = "bani hajir"; stores = ["bani hajir"]; selectedStore = "bani hajir"; }
+  else if (code === "00al mashaf") { authRole = "store"; authStore = "al mashaf"; stores = ["al mashaf"]; selectedStore = "al mashaf"; }
+  else {
+    throw new Error("Invalid access code.");
+  }
+
+  // Load locally saved URLs if they exist
+  for (const s of stores) {
+    const savedUrl = localStorage.getItem("stockwise_script_url_"+s);
+    if (savedUrl) STORE_URLS[s] = savedUrl;
+  }
+
+  authToken = "session_" + Date.now();
+  const select = $("storeSelect");
+  select.innerHTML = stores.map(name => `<option value="${esc(name)}">${esc(name)}</option>`).join("");
+  select.value = selectedStore;
+  
+  if (authRole !== "area") {
+    select.disabled = true;
+    select.style.pointerEvents = "none";
+    select.style.opacity = "0.7";
+  } else {
+    select.disabled = false;
+    select.style.pointerEvents = "auto";
+    select.style.opacity = "1";
+  }
+  
+  $("loginScreen").hidden = true;
+  $("appRoot").hidden = false;
+  
+  setConnection(false, "Logged in · loading " + selectedStore + "…");
+  await refreshAll(false);
+  toast(authRole === "area" ? "Area Manager access granted." : "Logged in to " + authStore + ".");
 }
+
 function logoutStockWise(){
  authToken="";authRole="";authStore="";stores=[];selectedStore="";items=[...defaultItems];records=[];months=[];connected=false;
  if(window.gridResetState)window.gridResetState();
@@ -297,10 +455,16 @@ $("loginForm").addEventListener("submit",async function(event){
  catch(error){authToken="";authRole="";authStore="";selectedStore="";$("appRoot").hidden=true;$("loginScreen").hidden=false;$("loginStatus").textContent=error.message||"Login failed.";}
  finally{button.disabled=false;button.textContent="Login";}
 });
+
 $("storeSelect").addEventListener("change",async function(){
- if(authRole!=="area") {this.value=authStore;return;}
- if(!stores.includes(this.value)) {this.value=selectedStore;return;}
- selectedStore=this.value;records=[];items=[...defaultItems];months=[];
+ if(authRole!=="area") { 
+   this.value = authStore; 
+   return; 
+ }
+ if(!stores.includes(this.value)) { this.value=selectedStore; return; }
+ selectedStore=this.value;
+ // Clear current data and reload from the new store's URL
+ records=[];items=[...defaultItems];months=[];
  if(window.gridResetState)window.gridResetState();
  await refreshAll(true);
 });
