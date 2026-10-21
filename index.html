@@ -6,7 +6,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
-:root{--bg:#090d0c;--panel:#121917;--panel2:#18211d;--line:#28362f;--green:#53df91;--muted:#9aaba2;--text:#eef6f0;--red:#ff7777;--amber:#f5c96a;--blue:#53a5df}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}button,input,select,textarea{font:inherit}.app{min-height:100vh}.sidebar{background:#0d1310;border-right:1px solid var(--line);padding:22px 14px;min-height:100vh}.brand{font-size:21px;font-weight:800;letter-spacing:.3px}.brand span{color:var(--green)}.subbrand{font-size:11px;color:var(--muted);letter-spacing:1.5px}.navbtn{width:100%;text-align:left;color:#c2d0c7;background:transparent;border:1px solid transparent;border-radius:10px;padding:11px 12px;margin:3px 0}.navbtn:hover,.navbtn.active{background:#17251d;border-color:#294735;color:var(--green)}.main{padding:24px;max-width:1600px;margin:auto}.topline{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:22px}.eyebrow{color:var(--green);font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase}.muted{color:var(--muted)}.panel,.stat{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px}.stat{height:100%}.stat-label{color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}.stat-value{font-size:27px;font-weight:800;margin-top:7px}.stat-note{font-size:12px;color:var(--muted);margin-top:4px}h1{font-size:25px;font-weight:800;margin:3px 0 0}h2{font-size:17px;font-weight:750;margin:0 0 15px}.form-label{color:#c6d5cc;font-size:12px;font-weight:650}.form-control,.form-select{background:#0b100e;border:1px solid #334239;color:var(--text);border-radius:9px;min-height:41px}.form-control:focus,.form-select:focus{background:#0b100e;color:var(--text);border-color:var(--green);box-shadow:0 0 0 .2rem #53df9122}.form-control::placeholder{color:#68786f}.btn-green{background:var(--green);border:1px solid var(--green);color:#07110b;font-weight:800;border-radius:9px;padding:9px 14px}.btn-green:hover{background:#76f1a9;color:#07110b}.btn-soft{background:#1a2820;color:#d8e8dd;border:1px solid #34483b;border-radius:9px;padding:8px 12px}.btn-danger-soft{background:#321b1b;color:#ffb5b5;border:1px solid #633535;border-radius:8px;padding:6px 10px}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px}.table{--bs-table-bg:transparent;--bs-table-color:var(--text);--bs-table-border-color:var(--line);margin:0;white-space:nowrap}.table thead th{background:#19231d;color:#b7c8bd;font-size:11px;text-transform:uppercase;letter-spacing:.5px;position:sticky;top:0;z-index:1}.table td,.table th{padding:11px 12px;vertical-align:middle}.badge-good{color:var(--green);background:#183425}.badge-warn{color:var(--amber);background:#332b17}.badge-bad{color:var(--red);background:#351b1b}.page{display:none}.page.active{display:block}.toastbox{position:fixed;right:18px;bottom:18px;z-index:1000;background:#17251d;border:1px solid #385b45;color:#eaffef;border-radius:11px;padding:12px 16px;max-width:360px;box-shadow:0 10px 30px #0008;display:none}.statusdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--amber);margin-right:7px}.statusdot.online{background:var(--green)}.small-help{font-size:12px;color:var(--muted)}.quick{display:flex;gap:8px;flex-wrap:wrap}.empty{text-align:center;padding:30px;color:var(--muted)}.variance-pos{color:var(--green);font-weight:800}.variance-neg{color:var(--red);font-weight:800}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}.hide{display:none!important}footer{color:#6f8076;font-size:11px;text-align:center;padding:24px 0 8px}
+:root{--bg:#090d0c;--panel:#121917;--panel2:#18211d;--line:#28362f;--green:#53df91;--muted:#9aaba2;--text:#eef6f0;--red:#ff7777;--amber:#f5c96a;--blue:#53a5df}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}button,input,select,textarea{font:inherit}.app{min-height:100vh}.sidebar{background:#0d1310;border-right:1px solid var(--line);padding:22px 14px;min-height:100vh}.brand{font-size:21px;font-weight:800;letter-spacing:.3px}.brand span{color:var(--green)}.subbrand{font-size:11px;color:var(--muted);letter-spacing:1.5px}.navbtn{width:100%;text-align:left;color:#c2d0c7;background:transparent;border:1px solid transparent;border-radius:10px;padding:11px 12px;margin:3px 0}.navbtn:hover,.navbtn.active{background:#17251d;border-color:#294735;color:var(--green)}.main{padding:24px;max-width:1600px;margin:auto}.topline{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:22px}.eyebrow{color:var(--green);font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase}.muted{color:var(--muted)}.panel,.stat{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px}.stat{height:100%}.stat-label{color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}.stat-value{font-size:27px;font-weight:800;margin-top:7px}.stat-note{font-size:12px;color:var(--muted);margin-top:4px}h1{font-size:25px;font-weight:800;margin:3px 0 0}h2{font-size:17px;font-weight:750;margin:0 0 15px}.form-label{color:#c6d5cc;font-size:12px;font-weight:650}.form-control,.form-select{background:#0b100e;border:1px solid #334239;color:var(--text);border-radius:9px;min-height:41px}.form-control:focus,.form-select:focus{background:#0b100e;color:var(--text);border-color:var(--green);box-shadow:0 0 0 .2rem #53df9122}.form-control::placeholder{color:#68786f}.btn-green{background:var(--green);border:1px solid var(--green);color:#07110b;font-weight:800;border-radius:9px;padding:9px 14px;transition:transform 0.1s, background 0.2s}.btn-green:active{transform:scale(0.95)}.btn-green:hover{background:#76f1a9;color:#07110b}.btn-soft{background:#1a2820;color:#d8e8dd;border:1px solid #34483b;border-radius:9px;padding:8px 12px;transition:transform 0.1s, background 0.2s}.btn-soft:active{transform:scale(0.95)}.btn-danger-soft{background:#321b1b;color:#ffb5b5;border:1px solid #633535;border-radius:8px;padding:6px 10px}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px}.table{--bs-table-bg:transparent;--bs-table-color:var(--text);--bs-table-border-color:var(--line);margin:0;white-space:nowrap}.table thead th{background:#19231d;color:#b7c8bd;font-size:11px;text-transform:uppercase;letter-spacing:.5px;position:sticky;top:0;z-index:1}.table td,.table th{padding:11px 12px;vertical-align:middle}.badge-good{color:var(--green);background:#183425}.badge-warn{color:var(--amber);background:#332b17}.badge-bad{color:var(--red);background:#351b1b}.page{display:none}.page.active{display:block}.toastbox{position:fixed;right:18px;bottom:18px;z-index:1000;background:#17251d;border:1px solid #385b45;color:#eaffef;border-radius:11px;padding:12px 16px;max-width:360px;box-shadow:0 10px 30px #0008;display:none}.statusdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--amber);margin-right:7px}.statusdot.online{background:var(--green)}.small-help{font-size:12px;color:var(--muted)}.quick{display:flex;gap:8px;flex-wrap:wrap}.empty{text-align:center;padding:30px;color:var(--muted)}.variance-pos{color:var(--green);font-weight:800}.variance-neg{color:var(--red);font-weight:800}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}.hide{display:none!important}footer{color:#6f8076;font-size:11px;text-align:center;padding:24px 0 8px}
 .chart-panel{min-height:300px}.chart-wrap{position:relative;height:235px;width:100%}.chart-wrap canvas{max-width:100%}.toolbar-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.icon-btn{min-width:42px}.sidebar-collapsed aside.sidebar{display:none!important}.sidebar-collapsed main{width:100%;flex:0 0 100%;max-width:100%}.sidebar{transition:width .2s ease}.navbtn{transition:background .15s ease,border-color .15s ease}.light-mode{--bg:#f3f7f4;--panel:#ffffff;--panel2:#edf3ef;--line:#d7e2da;--green:#16834b;--muted:#64756a;--text:#17251c;--red:#c63838;--amber:#946300;--blue:#1d65a3}.light-mode .sidebar{background:#e8f0eb}.light-mode .navbtn{color:#34473a}.light-mode .navbtn:hover,.light-mode .navbtn.active{background:#d7e9dd;border-color:#b5d7c1;color:#126d3b}.light-mode .form-control,.light-mode .form-select{background:#fff;color:#17251c;border-color:#c8d6cd}.light-mode .form-control:focus,.light-mode .form-select:focus{background:#fff;color:#17251c}.light-mode .btn-soft{background:#edf4ef;color:#243b2d;border-color:#cbd9d0}.light-mode .table thead th{background:#eaf1ec;color:#354b3c}.light-mode .badge-good{color:#146b3c;background:#d8f1e1}.light-mode .badge-warn{color:#805700;background:#fff0c5}.light-mode .badge-bad{color:#a32222;background:#fde0e0}.light-mode .panel [style*="background:#0b100e"]{background:#f0f5f1!important}.light-mode .toastbox{background:#e8f5ec;color:#173d27;border-color:#b9dcc5}body[dir="rtl"]{font-family:Tahoma,Arial,sans-serif}body[dir="rtl"] .sidebar{border-right:0;border-left:1px solid var(--line)}body[dir="rtl"] .navbtn{text-align:right}body[dir="rtl"] .statusdot{margin-right:0;margin-left:7px}body[dir="rtl"] .table{text-align:right}body[dir="rtl"] .form-label{text-align:right}body[dir="rtl"] .topline,body[dir="rtl"] .section-head{direction:rtl}body[dir="rtl"] .quick,body[dir="rtl"] .toolbar-actions{direction:rtl}
 @media(max-width:767px){.chart-panel{min-height:275px}.chart-wrap{height:210px}.sidebar-collapsed aside.sidebar{display:block!important}.sidebar-collapsed .navstack{display:none}.sidebar-collapsed .sidebar{min-height:0}.toolbar-actions{justify-content:flex-start}}
 @media(max-width:767px){.sidebar{min-height:auto;border-right:0;border-bottom:1px solid var(--line);padding:12px}.navstack{display:flex;overflow:auto;gap:5px}.navbtn{white-space:nowrap;width:auto;padding:8px 10px;margin:0}.brandline{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.main{padding:16px 12px}.topline{align-items:flex-start;flex-direction:column}h1{font-size:22px}.stat-value{font-size:23px}.panel{padding:14px}}
@@ -19,8 +19,60 @@
 #page-entry tr.row-dirty td { background:#1c2a1f; }
 .light-mode #page-entry tr.row-dirty td { background:#e7f4ec; }
 #page-entry input.qty[readonly] { opacity:.65; cursor:not-allowed; }
+
+/* WELCOME POPUP */
+#welcomePopup{position:fixed;inset:0;z-index:4000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.78);backdrop-filter:blur(5px)}
+#welcomePopup.active{display:flex}
+.welcome-card{width:100%;max-width:460px;text-align:center;background:var(--panel);border:1px solid #365642;border-radius:20px;padding:30px 24px;box-shadow:0 24px 70px #0009;animation:welcomeIn .22s ease-out}
+.welcome-mark{width:62px;height:62px;margin:0 auto 16px;border-radius:18px;display:grid;place-items:center;background:#183425;color:var(--green);font-size:30px}
+.welcome-title{font-size:24px;font-weight:850;line-height:1.25;margin-bottom:9px;color:var(--text);overflow-wrap:anywhere}
+.welcome-subtitle{font-size:13px;color:var(--muted);margin-bottom:22px}
+@keyframes welcomeIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+/* MODAL CSS */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1050;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.active{display:flex}
+.modal-content{background:var(--panel);border:1px solid var(--line);border-radius:15px;width:100%;max-width:1100px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,0.5)}
+@media(max-width:767px){.modal-overlay{padding:8px}.modal-content{max-height:94vh;border-radius:12px}.modal-header,.modal-footer{padding:12px}.modal-body{padding:12px}.modal-header h3{font-size:16px}.table-wrap{max-width:100%}#page-analysis .table td,#page-analysis .table th{padding:8px 9px}}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;border-bottom:1px solid var(--line)}
+.modal-body{padding:20px;overflow-y:auto}
+.modal-footer{padding:15px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}
+
+/* CONNECTION GATE CSS */
+#connectionGate{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px}
+.gate-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:30px;width:100%;max-width:500px;text-align:center;box-shadow:0 18px 55px #0005}
+.gate-item{display:flex;justify-content:space-between;align-items:center;padding:10px 15px;background:var(--bg);border-radius:8px;margin-bottom:10px;border:1px solid var(--line);font-weight:600}
+.gate-status{font-size:12px;padding:4px 8px;border-radius:20px}
+.gate-status.success{background:#183425;color:var(--green)}
+.gate-status.error{background:#351b1b;color:var(--red)}
+.gate-status.waiting{background:#332b17;color:var(--amber)}
+
+/* LOADING CIRCLE CSS */
+#loadingOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(9,13,12,0.9);z-index:3000;display:none;flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.loader-circle{width:100px;height:100px;border-radius:50%;background:conic-gradient(var(--green) 0deg, var(--green) 0deg, rgba(83,223,145,0.1) 0deg);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:20px;transition:background 0.3s}
+.loader-circle::after{content:'';position:absolute;width:80px;height:80px;background:var(--bg);border-radius:50%}
+.loader-text{position:absolute;z-index:10;font-size:22px;font-weight:800;color:var(--green)}
 </style></head>
 <body>
+
+<!-- CONNECTION GATE OVERLAY -->
+<div id="connectionGate">
+  <div class="gate-card">
+    <div class="brand mb-2">Stock<span>Wise</span></div>
+    <h3 class="mb-4" id="gateTitle">Testing Connection...</h3>
+    <div id="gateStores" class="mb-4 text-start"></div>
+    <button class="btn-green w-100" id="gateProceedBtn" disabled onclick="proceedToApp()">Proceed to Dashboard</button>
+  </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay">
+  <div class="loader-circle" id="loaderCircle">
+    <span class="loader-text" id="loaderPercent">0%</span>
+  </div>
+  <h3 style="color:var(--text)" id="loaderMsg">Fetching Data...</h3>
+  <div class="muted" id="loaderStore"></div>
+</div>
+
 <section id="loginScreen" class="login-screen">
   <div class="login-card">
     <div class="brand mb-1">Stock<span>Wise</span></div>
@@ -33,12 +85,24 @@
     </form>
   </div>
 </section>
+
 <div id="appRoot" hidden><div class="container-fluid app"><div class="row g-0">
 <aside class="col-md-2 sidebar"><div class="brandline"><div><div class="brand">Stock<span>Wise</span></div><div class="subbrand" data-i18n="subtitle">RESTAURANT INVENTORY</div></div><span class="badge text-bg-dark border border-secondary">v1.3</span></div><div class="navstack mt-4">
-<button class="navbtn active" data-page="dashboard" data-i18n="navDashboard">▦ &nbsp; Dashboard</button><button class="navbtn" data-page="entry">▦ &nbsp; Stock Grid</button><button class="navbtn" data-page="records" data-i18n="navRecords">▤ &nbsp; Records</button><button class="navbtn" data-page="reports" data-i18n="navReports">▥ &nbsp; Reports</button><button class="navbtn" data-page="items" data-i18n="navItems">☷ &nbsp; Item Master</button><button class="navbtn" data-page="setup" data-i18n="navSetup">⚙ &nbsp; Setup</button></div><div class="mt-4 small-help"><div><span id="statusDot" class="statusdot"></span><span id="connectionText">Google Sheets not checked</span></div><div class="mt-2" data-i18n="dataSource">Data source: Google Sheets</div></div></aside>
+<button class="navbtn active" data-page="dashboard" data-i18n="navDashboard">▦ &nbsp; Dashboard</button>
+<button class="navbtn" data-page="entry">▦ &nbsp; Stock Grid</button>
+<button class="navbtn" data-page="analysis">📊 &nbsp; Item Analysis</button>
+<button class="navbtn" data-page="records" data-i18n="navRecords">▤ &nbsp; Records</button>
+<button class="navbtn" data-page="reports" data-i18n="navReports">▥ &nbsp; Reports</button>
+<button class="navbtn" data-page="items" data-i18n="navItems">☷ &nbsp; Item Master</button>
+<button class="navbtn" data-page="setup" data-i18n="navSetup">⚙ &nbsp; Setup</button>
+</div><div class="mt-4 small-help"><div><span id="statusDot" class="statusdot"></span><span id="connectionText">Google Sheets not checked</span></div><div class="mt-2" data-i18n="dataSource">Data source: Google Sheets</div></div></aside>
 <main class="col-md-10"><div class="main"><div class="topline"><div><div class="toolbar-actions mb-2"><button class="btn-soft icon-btn" onclick="toggleSidebar()" title="Expand or collapse menu" data-i18n="menuToggle">☰ Menu</button><button class="btn-soft" onclick="toggleTheme()" id="themeBtn" data-i18n="themeDark">☀ Light mode</button><button class="btn-soft" onclick="toggleLanguage()" id="languageBtn">العربية</button></div><div class="eyebrow" data-i18n="eyebrow">Operations control</div><h1 id="pageTitle">Dashboard</h1><div class="muted" data-i18n="pageSub">Daily stock control · actual vs theoretical · variance monitoring</div></div><div class="quick align-items-center"><label for="storeSelect" class="small-help mb-0">Store</label><select class="form-select store-picker" id="storeSelect" aria-label="Select store"></select><button class="btn-soft" onclick="refreshAll(true)" data-i18n="refresh">↻ Refresh data</button><button class="btn-green" onclick="showPage('entry')" data-i18n="newEntry">＋ New entry</button><button class="btn-soft" onclick="logoutStockWise()">Log out</button></div></div>
 
 <section id="page-dashboard" class="page active">
+  <div class="panel mb-3" style="background:linear-gradient(90deg, #17251d 0%, #121917 100%); border-color:#294735;">
+    <h2 class="mb-0" id="welcomeMessage" style="color:var(--green)">Welcome back</h2>
+  </div>
+  
 <div class="row g-3 mb-3">
 <div class="col-6 col-xl-2"><div class="stat"><div class="stat-label" data-i18n="itemsMaster">ACTIVE ITEMS</div><div class="stat-value" id="statItems">0</div><div class="stat-note" data-i18n="loadedItemMaster">Loaded master</div></div></div>
 <div class="col-6 col-xl-2"><div class="stat"><div class="stat-label" data-i18n="varianceItems">VARIANCE ITEMS</div><div class="stat-value" id="statVariance">0</div><div class="stat-note" data-i18n="physicalDiffers">Count ≠ Closing</div></div></div>
@@ -54,6 +118,54 @@
 </div>
 <div class="panel mb-3"><div class="section-head"><h2 class="mb-0">Attention Required (Largest Variances)</h2><button class="btn-soft" onclick="showPage('records')" data-i18n="viewAll">View all →</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Code</th><th>Item Name</th><th>Closing</th><th>Physical</th><th>Variance</th></tr></thead><tbody id="dashboardRows"></tbody></table></div></div>
 <div class="panel"><h2 data-i18n="inventoryFormula">Inventory formula</h2><div class="muted">Expected closing = Opening + Receiving + Transfer In − Transfer Out − Waste − Sold</div><div class="muted mt-2">Variance = Physical Count − Expected Closing. Positive variance means excess stock; negative variance means shortage.</div></div>
+</section>
+
+<section id="page-analysis" class="page">
+  <div class="panel mb-3">
+    <div class="section-head flex-wrap">
+      <div><h2 class="mb-1">Item Analysis</h2><div class="small-help">Store: <strong id="analysisStoreName">—</strong> · Totals are calculated for the selected period.</div></div>
+      <span class="badge badge-good" id="analysisPeriodBadge">Choose a period</span>
+    </div>
+    <div class="row g-2 mb-3 align-items-end">
+      <div class="col-12 col-md-3">
+        <label class="form-label" for="analysisMode">Analysis period</label>
+        <select class="form-select" id="analysisMode">
+          <option value="mtd">Month to date (current month)</option>
+          <option value="month">Full selected month</option>
+          <option value="single">Single date</option>
+          <option value="range" selected>Date to date range</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-3" id="analysisMonthWrap">
+        <label class="form-label" for="analysisMonth">Month</label>
+        <input class="form-control" type="month" id="analysisMonth">
+      </div>
+      <div class="col-12 col-md-3" id="analysisDateWrap">
+        <label class="form-label" for="analysisDate">Single date</label>
+        <input class="form-control" type="date" id="analysisDate">
+      </div>
+      <div class="col-6 col-md-3" id="analysisStartWrap">
+        <label class="form-label" for="analysisStart">From date</label>
+        <input class="form-control" type="date" id="analysisStart">
+      </div>
+      <div class="col-6 col-md-3" id="analysisEndWrap">
+        <label class="form-label" for="analysisEnd">To date</label>
+        <input class="form-control" type="date" id="analysisEnd">
+      </div>
+      <div class="col-12 col-md-3">
+        <button class="btn-green w-100" type="button" onclick="runItemAnalysis()">Run Analysis</button>
+      </div>
+    </div>
+    <div id="analysisSummary" class="small-help mb-3" aria-live="polite">Choose a period and run analysis.</div>
+    <div class="table-wrap" style="max-height:65vh">
+      <table class="table">
+        <thead><tr>
+          <th>Code</th><th>Item Name</th><th>Opening</th><th>Received</th><th>Transfer In</th><th>Transfer Out</th><th>Waste</th><th>Sold</th><th>Expected Closing</th><th>Actual Count</th><th>Variance</th><th>View</th>
+        </tr></thead>
+        <tbody id="analysisRows"><tr><td colspan="12" class="empty">Select a period and run analysis.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
 </section>
 
 <section id="page-entry" class="page">
@@ -128,7 +240,57 @@
 <section id="page-items" class="page"><div class="panel"><div class="section-head"><h2 class="mb-0">Item master</h2><button class="btn-soft" onclick="loadItemMaster()">↻ Reload items</button></div><p class="small-help">Items are loaded from your Google Sheet. To avoid accidental mismatches, add or edit official item codes in the Item Master sheet itself.</p><div class="row g-2 mb-3"><div class="col-12 col-md-6"><input class="form-control" id="itemSearch" placeholder="Search item code or name" oninput="renderItems()"></div><div class="col-12 col-md-6 text-md-end align-self-center"><span id="itemCount" class="small-help"></span></div></div><div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Item code</th><th>Item name</th></tr></thead><tbody id="itemsRows"></tbody></table></div></div></section>
 
 <section id="page-setup" class="page"><div class="panel mb-3"><h2>Google Apps Script connection</h2><p class="small-help">Paste your deployed Apps Script web app URL. The deployment must be accessible to the intended users and support the items, months, records and POST save actions.</p><label class="form-label" for="scriptUrl">Apps Script web app URL</label><input class="form-control" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec"><div class="quick mt-3"><button class="btn-green" onclick="saveScriptUrl()">Save URL</button><button class="btn-soft" onclick="testConnection()">Test connection</button><button class="btn-soft" onclick="refreshAll(true)">Load Sheets data</button></div><div id="setupStatus" class="small-help mt-3">Connection not tested.</div></div><div class="panel"><h2>Important notes</h2><ul class="muted mb-0"><li>Google Sheets is the shared source of truth; browser local storage is used only to remember this URL and temporary interface preferences.</li><li>Saving updates a matching date and item code row. If your backend only updates existing rows, the date/item row must already exist in the target tab.</li><li>Opening stock may be protected by sheet formulas. This page does not change sheet formulas or create missing rows.</li><li>Notes are kept in this browser only; the current Apps Script save endpoint does not store them.</li><li>Do not use this app for live stock until a test entry has been checked in the sheet.</li></ul></div></section>
-<footer>StockWise · Restaurant Inventory Manager · Google Sheets backend</footer></div></main></div></div><div id="toast" class="toastbox" role="status"></div>
+<footer>StockWise · Restaurant Inventory Manager · Google Sheets backend</footer></div></main></div></div>
+
+<!-- MODAL FOR ITEM DETAILS -->
+<div class="modal-overlay" id="itemModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="mb-0" id="modalTitle">Item Details</h3>
+      <button class="btn-soft" onclick="document.getElementById('itemModal').classList.remove('active')">✕ Close</button>
+    </div>
+    <div class="modal-body">
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3"><div class="stat-label">Total Opening</div><div class="stat-value" id="modTotalOpening">0</div></div>
+        <div class="col-6 col-md-3"><div class="stat-label">Total Received</div><div class="stat-value" id="modTotalReceiving">0</div></div>
+        <div class="col-6 col-md-3"><div class="stat-label">Total Waste</div><div class="stat-value" id="modTotalWaste">0</div></div>
+        <div class="col-6 col-md-3"><div class="stat-label">Total Sold</div><div class="stat-value" id="modTotalSold">0</div></div>
+        <div class="col-6 col-md-3"><div class="stat-label">Transfers In</div><div class="stat-value" id="modTotalTransferIn">0</div></div>
+        <div class="col-6 col-md-3"><div class="stat-label">Transfers Out</div><div class="stat-value" id="modTotalTransferOut">0</div></div>
+        <div class="col-6 col-md-3"><div class="stat-label">Expected On-Hand</div><div class="stat-value" id="modExpectedOnHand">0</div></div>
+        <div class="col-6 col-md-3"><div class="stat-label">Actual Count</div><div class="stat-value" id="modActualCount">0</div></div>
+      </div>
+      
+      <div class="panel mb-3" style="background:var(--bg); text-align:center;">
+        <div class="stat-label mb-2">PERIOD VARIANCE (Latest Actual - Expected Closing)</div>
+        <div class="stat-value" id="modVariance" style="font-size:36px;">0</div>
+      </div>
+
+      <h4 class="mb-3">Daily Breakdown</h4>
+      <div class="table-wrap" style="max-height:300px">
+        <table class="table">
+          <thead><tr>
+            <th>Date</th><th>Opening</th><th>Receiving</th><th>Transfer In</th><th>Transfer Out</th><th>Waste</th><th>Sold</th><th>Closing</th><th>Physical</th><th>Variance</th>
+          </tr></thead>
+          <tbody id="modalDetailRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN WELCOME POPUP -->
+<div id="welcomePopup" role="dialog" aria-modal="true" aria-labelledby="welcomePopupTitle">
+  <div class="welcome-card">
+    <div class="welcome-mark" aria-hidden="true">✓</div>
+    <div class="eyebrow mb-2">WITHSTAND INVENTORY</div>
+    <div class="welcome-title" id="welcomePopupTitle">Welcome</div>
+    <div class="welcome-subtitle" id="welcomePopupSubtitle">StockWise</div>
+    <button class="btn-green w-100" type="button" onclick="closeWelcomePopup()">Continue to Dashboard</button>
+  </div>
+</div>
+
+<div id="toast" class="toastbox" role="status"></div>
 
 <script>
 "use strict";
@@ -136,7 +298,6 @@ const $ = id => document.getElementById(id);
 
 /**
  * STORE MULTI-URL MAPPING
- * Exact Apps Script URLs for each store.
  */
 const STORE_URLS = {
   "west walk": "https://script.google.com/macros/s/AKfycbztbc2rtuc-xp7zQSDyeDpcMOeOFxmhdadm3seMB46LQOrNqAAKU1EZb5j3JLuR5GVA3A/exec",
@@ -149,7 +310,8 @@ const DEFAULT_URL = STORE_URLS["west walk"];
 
 let authToken="", authRole="", authStore="", stores=[], selectedStore="";
 const defaultItems=[{code:"W-0369",name:"Greek Yoghurt Dodoni",unit:"Kg"},{code:"W-0187",name:"Baladna Mozzarella",unit:"Kg"},{code:"W-0204",name:"Acqua Panna",unit:"pcs"},{code:"W-0218",name:"San Pellegrino",unit:"pcs"},{code:"W-0603",name:"Wrap & Co Swedish Bread",unit:"pcs"}];
-let items=[...defaultItems],records=[],months=[],connected=false,lastRefresh=null,toastTimer;
+let items=[...defaultItems],records=[],months=[],failedRecordSheets=[],connected=false,lastRefresh=null,toastTimer;
+let currentAnalysisDetails = []; 
 
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
 const n=v=>{if(v===null||v===undefined||v==="")return null;const x=Number(v);return Number.isFinite(x)?x:null};
@@ -157,13 +319,203 @@ const fmt=v=>v===null||v===undefined||v===""?"—":Number(v).toLocaleString(unde
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function toast(message){const el=$("toast");el.textContent=message;el.style.display="block";clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display="none",4200)}
 
+// SOUND & CLICK EFFECT
+const clickAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+function playClick() {
+  clickAudio.currentTime = 0;
+  clickAudio.volume = 0.3;
+  clickAudio.play().catch(e => {}); 
+}
+document.querySelectorAll('button').forEach(btn => {
+  btn.addEventListener('click', playClick);
+});
+
+// LOADING ANIMATION LOGIC
+function showLoading(show, storeName = "") {
+  if(show) {
+    $("loadingOverlay").style.display = "flex";
+    $("loaderStore").textContent = storeName ? `Loading data for ${storeName}...` : "";
+    $("loaderPercent").textContent = "0%";
+    let deg = 0;
+    let pct = 0;
+    clearInterval(window.loadInterval);
+    window.loadInterval = setInterval(() => {
+      deg += 9; // 360 / 4 seconds = 90 per second = 9 per 100ms
+      pct = Math.floor(deg / 3.6);
+      if(pct > 100) pct = 100;
+      $("loaderCircle").style.background = `conic-gradient(var(--green) ${deg}deg, rgba(83,223,145,0.1) ${deg}deg)`;
+      $("loaderPercent").textContent = pct + "%";
+      if (pct >= 100) clearInterval(window.loadInterval);
+    }, 100);
+  } else {
+    clearInterval(window.loadInterval);
+    $("loadingOverlay").style.display = "none";
+  }
+}
+
+// CONNECTION GATE LOGIC
+async function testConnections() {
+  $("connectionGate").style.display = "flex";
+  $("gateTitle").textContent = "Testing Connections...";
+  const container = $("gateStores");
+  container.innerHTML = "";
+  $("gateProceedBtn").disabled = true;
+
+  let allSuccess = true;
+
+  for (const store of stores) {
+    const row = document.createElement("div");
+    row.className = "gate-item";
+    row.innerHTML = `<span style="text-transform:capitalize">${store}</span> <span class="gate-status waiting" id="gate-${store}">Testing...</span>`;
+    container.appendChild(row);
+  }
+
+  for (const store of stores) {
+    const statusEl = $(`gate-${store}`);
+    try {
+      const url = STORE_URLS[store.toLowerCase()];
+      if(!url) throw new Error("No URL configured");
+      
+      const response = await new Promise((resolve, reject) => {
+        const cb = "swcb_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+        const script = document.createElement("script");
+        let timer = setTimeout(() => { cleanup(); reject(new Error("Timeout")); }, 10000);
+        function cleanup() { clearTimeout(timer); try{delete window[cb]}catch{} script.remove(); }
+        window[cb] = data => { cleanup(); resolve(data); };
+        script.onerror = () => { cleanup(); reject(new Error("Script error")); };
+        script.src = url + "?action=items&callback=" + cb;
+        document.head.appendChild(script);
+      });
+
+      if(response && response.success === true) {
+        statusEl.className = "gate-status success";
+        statusEl.textContent = "Connected ✓";
+      } else {
+        throw new Error("Invalid response");
+      }
+    } catch (e) {
+      statusEl.className = "gate-status error";
+      statusEl.textContent = "Failed ✕";
+      allSuccess = false;
+    }
+  }
+
+  if (allSuccess) {
+    $("gateTitle").textContent = "All Connections Verified!";
+    $("gateProceedBtn").disabled = false;
+  } else {
+    $("gateTitle").textContent = "Connection Errors Detected";
+    $("gateProceedBtn").disabled = false; // Allow proceed anyway, they can try refreshing
+  }
+}
+
+function showWelcomePopup() {
+  const title = $("welcomePopupTitle");
+  const subtitle = $("welcomePopupSubtitle");
+
+  if (authRole === "area") {
+    title.textContent = "Welcome, Anthony Sigfried Gatuz";
+    subtitle.textContent = "Brand Manager";
+    $("welcomeMessage").textContent = "Welcome back, Anthony Sigfried Gatuz";
+  } else {
+    // Store-manager popup intentionally displays the store name only.
+    title.textContent = authStore.toUpperCase();
+    subtitle.textContent = "";
+    $("welcomeMessage").textContent = authStore.toUpperCase();
+  }
+
+  $("welcomePopup").classList.add("active");
+}
+
+function closeWelcomePopup() {
+  $("welcomePopup").classList.remove("active");
+}
+
+function proceedToApp() {
+  playClick();
+  $("connectionGate").style.display = "none";
+
+  $("loginScreen").hidden = true;
+  $("appRoot").hidden = false;
+
+  // Trigger initial data load, then show the personalized welcome popup.
+  refreshAll(false);
+  window.setTimeout(showWelcomePopup, 250);
+}
+
+// LOGIN LOGIC
+async function loginStockWise(loginCode){
+  const code = String(loginCode || "").trim().toLowerCase();
+  
+  if (code === "000000") {
+    authRole = "area";
+    authStore = "";
+    stores = ["west walk", "iconic", "gate mall", "bani hajir", "al mashaf"];
+    selectedStore = stores[0];
+  } 
+  else if (code === "00west walk") { authRole = "store"; authStore = "west walk"; stores = ["west walk"]; selectedStore = "west walk"; }
+  else if (code === "00iconic") { authRole = "store"; authStore = "iconic"; stores = ["iconic"]; selectedStore = "iconic"; }
+  else if (code === "00gate mall") { authRole = "store"; authStore = "gate mall"; stores = ["gate mall"]; selectedStore = "gate mall"; }
+  else if (code === "00bani hajir") { authRole = "store"; authStore = "bani hajir"; stores = ["bani hajir"]; selectedStore = "bani hajir"; }
+  else if (code === "00al mashaf") { authRole = "store"; authStore = "al mashaf"; stores = ["al mashaf"]; selectedStore = "al mashaf"; }
+  else {
+    throw new Error("Invalid access code.");
+  }
+
+  authToken = "session_" + Date.now();
+  const select = $("storeSelect");
+  select.innerHTML = stores.map(name => `<option value="${esc(name)}">${esc(name)}</option>`).join("");
+  select.value = selectedStore;
+  
+  if (authRole !== "area") {
+    select.disabled = true;
+    select.style.pointerEvents = "none";
+    select.style.opacity = "0.7";
+  } else {
+    select.disabled = false;
+    select.style.pointerEvents = "auto";
+    select.style.opacity = "1";
+  }
+  
+  // Show Gate
+  testConnections();
+}
+
+function logoutStockWise(){
+ authToken="";authRole="";authStore="";stores=[];selectedStore="";items=[...defaultItems];records=[];months=[];connected=false;
+ if(window.gridResetState)window.gridResetState();
+ $("appRoot").hidden=true;$("loginScreen").hidden=false;$("loginCode").value="";$("loginStatus").textContent="You have logged out. Enter your access code to continue.";
+ setConnection(false,"Logged out");
+}
+
+$("loginForm").addEventListener("submit",async function(event){
+ event.preventDefault();const button=$("loginBtn");button.disabled=true;button.textContent="Signing in…";$("loginStatus").textContent="Checking access…";
+ try{await loginStockWise($("loginCode").value.trim());$("loginCode").value="";}
+ catch(error){authToken="";authRole="";authStore="";selectedStore="";$("appRoot").hidden=true;$("loginScreen").hidden=false;$("loginStatus").textContent=error.message||"Login failed.";}
+ finally{button.disabled=false;button.textContent="Login";}
+});
+
+$("storeSelect").addEventListener("change",async function(){
+ if(authRole!=="area") { 
+   this.value = authStore; 
+   return; 
+ }
+ if(!stores.includes(this.value)) { this.value=selectedStore; return; }
+ selectedStore=this.value;
+ records=[];items=[...defaultItems];months=[];
+ if(window.gridResetState)window.gridResetState();
+ await refreshAll(true);
+});
+
+
+// UTILS & API
 const i18n={
- en:{subtitle:"RESTAURANT INVENTORY",navDashboard:"▦  Dashboard",navRecords:"▤  Records",navReports:"▥  Reports",navItems:"☷  Item Master",navSetup:"⚙  Setup",dataSource:"Data source: Google Sheets",menuToggle:"☰ Menu",themeDark:"☀ Light mode",themeLight:"☾ Dark mode",eyebrow:"Operations control",pageSub:"Daily stock control · actual vs theoretical · variance monitoring",refresh:"↻ Refresh data",newEntry:"＋ New entry",itemsMaster:"ACTIVE ITEMS",stockRecords:"STOCK RECORDS",varianceItems:"VARIANCE ITEMS",lastRefresh:"LAST REFRESH",loadedItemMaster:"Loaded master",acrossTabs:"Across loaded inventory tabs",physicalDiffers:"Count ≠ Closing",browserSession:"Session",recentRecords:"Attention Required (Largest Variances)",viewAll:"View all →",inventoryFormula:"Inventory formula",varianceOverview:"Variance Overview",varianceOverviewNote:"Matched, shortage and excess records",topVariance:"Largest variance items",topVarianceNote:"Top items by absolute variance",varianceTrend:"Variance Trend",varianceTrendNote:"Daily net variance for the loaded records",titleDashboard:"Dashboard",titleEntry:"Stock Grid",titleRecords:"Inventory Records",titleReports:"Reports",titleItems:"Item Master",titleSetup:"Setup"},
- ar:{subtitle:"مخزون المطعم",navDashboard:"▦  لوحة المعلومات",navRecords:"▤  السجلات",navReports:"▥  التقارير",navItems:"☷  دليل الأصناف",navSetup:"⚙  الإعدادات",dataSource:"مصدر البيانات: جداول Google",menuToggle:"☰ القائمة",themeDark:"☀ الوضع الفاتح",themeLight:"☾ الوضع الداكن",eyebrow:"مراقبة العمليات",pageSub:"مراقبة المخزون اليومي · الفعلي مقابل النظري · متابعة الفروقات",refresh:"↻ تحديث البيانات",newEntry:"＋ إدخال جديد",itemsMaster:"الأصناف النشطة",stockRecords:"سجلات المخزون",varianceItems:"أصناف بها فروقات",lastRefresh:"آخر تحديث",loadedItemMaster:"تم التحميل من دليل الأصناف",acrossTabs:"في جميع أوراق المخزون المحمّلة",physicalDiffers:"العد الفعلي يختلف عن الرصيد المتوقع",browserSession:"جلسة المتصفح الحالية",recentRecords:"يتطلب الانتباه (أكبر الفروقات)",viewAll:"عرض الكل ←",inventoryFormula:"معادلة المخزون",varianceOverview:"ملخص الفروقات",varianceOverviewNote:"مطابق، عجز، وزيادة في المخزون",topVariance:"أكبر فروقات الأصناف",topVarianceNote:"أعلى الأصناف حسب قيمة الفرق المطلقة",varianceTrend:"اتجاه الفروقات",varianceTrendNote:"صافي الفروقات اليومية للسجلات المحمّلة",titleDashboard:"لوحة المعلومات",titleEntry:"شبكة المخزون",titleRecords:"سجلات المخزون",titleReports:"التقارير",titleItems:"دليل الأصناف",titleSetup:"الإعدادات"}
+ en:{subtitle:"RESTAURANT INVENTORY",navDashboard:"▦  Dashboard",navRecords:"▤  Records",navReports:"▥  Reports",navItems:"☷  Item Master",navSetup:"⚙  Setup",dataSource:"Data source: Google Sheets",menuToggle:"☰ Menu",themeDark:"☀ Light mode",themeLight:"☾ Dark mode",eyebrow:"Operations control",pageSub:"Daily stock control · actual vs theoretical · variance monitoring",refresh:"↻ Refresh data",newEntry:"＋ New entry",itemsMaster:"ACTIVE ITEMS",stockRecords:"STOCK RECORDS",varianceItems:"VARIANCE ITEMS",lastRefresh:"LAST REFRESH",loadedItemMaster:"Loaded master",acrossTabs:"Across loaded inventory tabs",physicalDiffers:"Count ≠ Closing",browserSession:"Session",recentRecords:"Attention Required (Largest Variances)",viewAll:"View all →",inventoryFormula:"Inventory formula",varianceOverview:"Variance Overview",varianceOverviewNote:"Matched, shortage and excess records",topVariance:"Largest variance items",topVarianceNote:"Top items by absolute variance",varianceTrend:"Variance Trend",varianceTrendNote:"Daily net variance for the loaded records",titleDashboard:"Dashboard",titleEntry:"Stock Grid",titleRecords:"Inventory Records",titleReports:"Reports",titleItems:"Item Master",titleSetup:"Setup",titleAnalysis:"Item Analysis"},
+ ar:{subtitle:"مخزون المطعم",navDashboard:"▦  لوحة المعلومات",navRecords:"▤  السجلات",navReports:"▥  التقارير",navItems:"☷  دليل الأصناف",navSetup:"⚙  الإعدادات",dataSource:"مصدر البيانات: جداول Google",menuToggle:"☰ القائمة",themeDark:"☀ الوضع الفاتح",themeLight:"☾ الوضع الداكن",eyebrow:"مراقبة العمليات",pageSub:"مراقبة المخزون اليومي · الفعلي مقابل النظري · متابعة الفروقات",refresh:"↻ تحديث البيانات",newEntry:"＋ إدخال جديد",itemsMaster:"الأصناف النشطة",stockRecords:"سجلات المخزون",varianceItems:"أصناف بها فروقات",lastRefresh:"آخر تحديث",loadedItemMaster:"تم التحميل من دليل الأصناف",acrossTabs:"في جميع أوراق المخزون المحمّلة",physicalDiffers:"العد الفعلي يختلف عن الرصيد المتوقع",browserSession:"جلسة المتصفح الحالية",recentRecords:"يتطلب الانتباه (أكبر الفروقات)",viewAll:"عرض الكل ←",inventoryFormula:"معادلة المخزون",varianceOverview:"ملخص الفروقات",varianceOverviewNote:"مطابق، عجز، وزيادة في المخزون",topVariance:"أكبر فروقات الأصناف",topVarianceNote:"أعلى الأصناف حسب قيمة الفرق المطلقة",varianceTrend:"اتجاه الفروقات",varianceTrendNote:"صافي الفروقات اليومية للسجلات المحمّلة",titleDashboard:"لوحة المعلومات",titleEntry:"شبكة المخزون",titleRecords:"سجلات المخزون",titleReports:"التقارير",titleItems:"دليل الأصناف",titleSetup:"الإعدادات",titleAnalysis:"تحليل الأصناف"}
 };
 let currentLanguage=localStorage.getItem("stockwise_language")||"en";
 let chartInstances={};
-function applyLanguage(){const dict=i18n[currentLanguage]||i18n.en;document.documentElement.lang=currentLanguage;document.body.dir=currentLanguage==="ar"?"rtl":"ltr";document.querySelectorAll("[data-i18n]").forEach(el=>{const key=el.dataset.i18n;if(dict[key])el.textContent=dict[key]});const titles={dashboard:dict.titleDashboard,entry:dict.titleEntry,records:dict.titleRecords,reports:dict.titleReports,items:dict.titleItems,setup:dict.titleSetup};const active=document.querySelector(".navbtn.active")?.dataset.page||"dashboard";$("pageTitle").textContent=titles[active]||dict.titleDashboard;$("languageBtn").textContent=currentLanguage==="ar"?"English":"العربية";$("themeBtn").textContent=document.body.classList.contains("light-mode")?dict.themeLight:dict.themeDark;}
+function applyLanguage(){const dict=i18n[currentLanguage]||i18n.en;document.documentElement.lang=currentLanguage;document.body.dir=currentLanguage==="ar"?"rtl":"ltr";document.querySelectorAll("[data-i18n]").forEach(el=>{const key=el.dataset.i18n;if(dict[key])el.textContent=dict[key]});const titles={dashboard:dict.titleDashboard,entry:dict.titleEntry,analysis:dict.titleAnalysis,records:dict.titleRecords,reports:dict.titleReports,items:dict.titleItems,setup:dict.titleSetup};const active=document.querySelector(".navbtn.active")?.dataset.page||"dashboard";$("pageTitle").textContent=titles[active]||dict.titleDashboard;$("languageBtn").textContent=currentLanguage==="ar"?"English":"العربية";$("themeBtn").textContent=document.body.classList.contains("light-mode")?dict.themeLight:dict.themeDark;}
 function toggleLanguage(){currentLanguage=currentLanguage==="en"?"ar":"en";localStorage.setItem("stockwise_language",currentLanguage);applyLanguage();renderCharts()}
 function toggleTheme(){document.body.classList.toggle("light-mode");localStorage.setItem("stockwise_theme",document.body.classList.contains("light-mode")?"light":"dark");applyLanguage();renderCharts()}
 function toggleSidebar(){document.querySelector(".app").classList.toggle("sidebar-collapsed");localStorage.setItem("stockwise_sidebar_collapsed",document.querySelector(".app").classList.contains("sidebar-collapsed")?"1":"0");setTimeout(()=>Object.values(chartInstances).forEach(c=>c.resize()),220)}
@@ -181,10 +533,8 @@ function renderCharts(){
     chartInstances[id]=new Chart(canvas,config)
   };
  
-  // 1. Variance Donut
   upsert("varianceDonut",{type:"doughnut",data:{labels:currentLanguage==="ar"?["عجز","زيادة","مطابق"]:["Shortage","Excess","Matched"],datasets:[{data:[shortages,excess,matched],backgroundColor:["#ff7777","#53df91","#78958a"],borderWidth:0,hoverOffset:7}]},options:{...base,cutout:"68%",plugins:{...base.plugins,legend:{position:"bottom",labels:{color:textColor,boxWidth:10,usePointStyle:true,padding:14}}}}});
  
-  // 2. Variance Trend
   const byDate={};
   valid.forEach(r=>{
     const d=r.date||"Unknown";
@@ -209,7 +559,6 @@ function renderCharts(){
     options:{...base,scales:{x:{grid:{color:gridColor},ticks:{color:textColor,maxRotation:45,minRotation:0}},y:{grid:{color:gridColor},ticks:{color:textColor}}},plugins:{...base.plugins,legend:{display:false}}}
   });
 
-  // 3. Waste Chart
   const wasteList=valid.filter(r=>r.waste>0).sort((a,b)=>b.waste-a.waste).slice(0,5);
   upsert("wasteChart",{
     type:"bar",
@@ -225,7 +574,7 @@ function showPage(page){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   $("page-"+page).classList.add("active");
   document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
-  const titles={dashboard:"Dashboard",entry:"Stock Grid",records:"Inventory Records",reports:"Reports",items:"Item Master",setup:"Setup"};
+  const titles={dashboard:"Dashboard",entry:"Stock Grid",analysis:"Item Analysis",records:"Inventory Records",reports:"Reports",items:"Item Master",setup:"Setup"};
   $("pageTitle").textContent=titles[page]||"StockWise";applyLanguage();
   if(page==="dashboard")renderCharts();
   if(page==="records")renderRecords();
@@ -236,7 +585,6 @@ function showPage(page){
 }
 document.querySelectorAll(".navbtn").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
 
-// DYNAMIC URL SWITCHING BASED ON STORE
 function getAppsScriptUrl(){
   if(selectedStore && STORE_URLS[selectedStore.toLowerCase()]){
     return STORE_URLS[selectedStore.toLowerCase()];
@@ -280,7 +628,7 @@ async function loadItemMaster(){if(!authToken||!selectedStore)throw new Error("P
 async function loadMonths(){if(!authToken||!selectedStore)throw new Error("Please log in and select a store first.");try{const data=await apiGet({action:"months"});if(data?.success===false)throw new Error(data.error||data.message||"Months endpoint returned an error.");let arr=unwrapArray(data,["months","sheets","data","result"]);if(!arr.length&&Array.isArray(data?.data?.months))arr=data.data.months;months=arr.map(x=>typeof x==="string"?x:String(getField(x,"name","sheetName","sheet","title")??"")).filter(Boolean);if(!months.length)months=["Daily Inventory","November 2026","December 2026","January 2027","February 2027","March 2027","April 2027","May 2027","June 2027","July 2027"];populateMonthSelects();return true}catch(e){console.warn(e);months=["Daily Inventory","November 2026","December 2026","January 2027","February 2027","March 2027","April 2027","May 2027","June 2027","July 2027"];populateMonthSelects();return false}}
 function populateMonthSelects(){["recordMonth","reportMonth"].forEach(id=>{const sel=$(id),old=sel.value;sel.innerHTML='<option value="">All loaded sheets</option>'+months.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("");if(months.includes(old))sel.value=old})}
 async function loadRecordsForSheet(sheet){if(!authToken||!selectedStore)throw new Error("Please log in and select a store first.");const data=await apiGet({action:"records",sheetName:sheet});if(data?.success===false)throw new Error(data.error||data.message||"Records endpoint returned an error for "+sheet);const arr=unwrapArray(data,["records","data","result","items"]);return arr.map(x=>normalizeRecord(x,sheet)).filter(r=>r.date||r.code||r.name)}
-async function loadAllRecords(){const all=[];const unique=[...new Set(months)];for(const sheet of unique){try{const list=await loadRecordsForSheet(sheet);all.push(...list)}catch(e){console.warn("Could not load "+sheet,e)}}records=all;}
+async function loadAllRecords(){const all=[];failedRecordSheets=[];const unique=[...new Set(months)];for(const sheet of unique){try{const list=await loadRecordsForSheet(sheet);all.push(...list)}catch(e){console.warn("Could not load "+sheet,e);failedRecordSheets.push(sheet)}}records=all;}
 function setConnection(ok,message){connected=ok;$("statusDot").classList.toggle("online",ok);$("connectionText").textContent=message;$("setupStatus").textContent=message}
 
 async function testConnection(){
@@ -305,15 +653,11 @@ async function refreshAll(showMessage=false){
   if(!authToken||!selectedStore) return;
   if(authRole==="store") selectedStore=authStore;
   
+  showLoading(true, selectedStore.toUpperCase());
+  
   try{
     setConnection(false,"Loading Google Sheets data for "+selectedStore+"…");
-    $("statItems").textContent = "…";
-    $("statVariance").textContent = "…";
-    $("statTotalVar").textContent = "…";
-    $("statTotalWaste").textContent = "…";
-    $("statMissing").textContent = "…";
-    $("dashboardRows").innerHTML = '<tr><td colspan="6" class="empty">Loading data from Google Sheets for '+selectedStore+'…</td></tr>';
-
+    
     const itemOK=await loadItemMaster();
     await loadMonths();
     await loadAllRecords();
@@ -326,7 +670,9 @@ async function refreshAll(showMessage=false){
   }catch(e){
     setConnection(false,"Could not refresh: "+e.message);
     if(showMessage)toast(e.message);
-  } 
+  } finally {
+    setTimeout(() => showLoading(false), 800); // Small delay so the user sees the 100%
+  }
 }
 
 function populateItemDatalist(){$("itemCodeList").innerHTML=items.map(i=>`<option value="${esc(i.code)}">${esc(i.name)}</option>`).join("")}
@@ -395,79 +741,116 @@ function renderItems(){const search=($("itemSearch")?.value||"").trim().toLowerC
 function exportCSV(){const list=filteredRecords();const headers=["sheetName","date","code","name","opening","receiving","transferIn","transferOut","waste","sold","closing","physical","variance"];const cell=v=>'"'+String(v??"").replace(/"/g,'""')+'"';const csv=[headers.join(","),...list.map(r=>headers.map(k=>cell(r[k])).join(","))].join("\r\n");const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="stockwise-"+selectedStore+"-inventory.csv";a.click();URL.revokeObjectURL(a.href)}
 $("recordSearch").addEventListener("input",renderRecords);$("recordMonth").addEventListener("change",renderRecords);$("reportMonth").addEventListener("change",renderReports);$("varianceFilter").addEventListener("change",renderReports);
 
-/******************** MULTI-STORE LOGIN (HARDCODED CODES & ISOLATION) ********************/
-async function loginStockWise(loginCode){
-  const code = String(loginCode || "").trim().toLowerCase();
-  
-  if (code === "000000") {
-    authRole = "area";
-    authStore = "";
-    stores = ["west walk", "iconic", "gate mall", "bani hajir", "al mashaf"];
-    selectedStore = stores[0];
-  } 
-  else if (code === "00west walk") { authRole = "store"; authStore = "west walk"; stores = ["west walk"]; selectedStore = "west walk"; }
-  else if (code === "00iconic") { authRole = "store"; authStore = "iconic"; stores = ["iconic"]; selectedStore = "iconic"; }
-  else if (code === "00gate mall") { authRole = "store"; authStore = "gate mall"; stores = ["gate mall"]; selectedStore = "gate mall"; }
-  else if (code === "00bani hajir") { authRole = "store"; authStore = "bani hajir"; stores = ["bani hajir"]; selectedStore = "bani hajir"; }
-  else if (code === "00al mashaf") { authRole = "store"; authStore = "al mashaf"; stores = ["al mashaf"]; selectedStore = "al mashaf"; }
-  else {
-    throw new Error("Invalid access code.");
+function getAnalysisPeriod(){
+  const mode=$("analysisMode").value;
+  const now=new Date();
+  const isoDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  if(mode==="mtd"){
+    const start=isoDate(new Date(now.getFullYear(),now.getMonth(),1));
+    return {start,end:today(),label:`Month to date · ${start} to ${today()}`};
   }
-
-  // Load locally saved URLs if they exist
-  for (const s of stores) {
-    const savedUrl = localStorage.getItem("stockwise_script_url_"+s);
-    if (savedUrl) STORE_URLS[s] = savedUrl;
+  if(mode==="month"){
+    const value=$("analysisMonth").value;
+    if(!value) throw new Error("Choose a month.");
+    const [y,m]=value.split("-").map(Number);
+    return {start:`${value}-01`,end:isoDate(new Date(y,m,0)),label:`Full month · ${value}`};
   }
-
-  authToken = "session_" + Date.now();
-  const select = $("storeSelect");
-  select.innerHTML = stores.map(name => `<option value="${esc(name)}">${esc(name)}</option>`).join("");
-  select.value = selectedStore;
-  
-  if (authRole !== "area") {
-    select.disabled = true;
-    select.style.pointerEvents = "none";
-    select.style.opacity = "0.7";
-  } else {
-    select.disabled = false;
-    select.style.pointerEvents = "auto";
-    select.style.opacity = "1";
+  if(mode==="single"){
+    const date=$("analysisDate").value;
+    if(!date) throw new Error("Choose a date.");
+    return {start:date,end:date,label:`Single date · ${date}`};
   }
-  
-  $("loginScreen").hidden = true;
-  $("appRoot").hidden = false;
-  
-  setConnection(false, "Logged in · loading " + selectedStore + "…");
-  await refreshAll(false);
-  toast(authRole === "area" ? "Area Manager access granted." : "Logged in to " + authStore + ".");
+  const start=$("analysisStart").value,end=$("analysisEnd").value;
+  if(!start||!end) throw new Error("Choose both From and To dates.");
+  if(start>end) throw new Error("From date cannot be after To date.");
+  return {start,end,label:`Date range · ${start} to ${end}`};
 }
-
-function logoutStockWise(){
- authToken="";authRole="";authStore="";stores=[];selectedStore="";items=[...defaultItems];records=[];months=[];connected=false;
- if(window.gridResetState)window.gridResetState();
- $("appRoot").hidden=true;$("loginScreen").hidden=false;$("loginCode").value="";$("loginStatus").textContent="You have logged out. Enter your access code to continue.";
- setConnection(false,"Logged out");
+function updateAnalysisControls(){
+  const mode=$("analysisMode").value;
+  $("analysisMonthWrap").classList.toggle("hide",mode!=="month");
+  $("analysisDateWrap").classList.toggle("hide",mode!=="single");
+  $("analysisStartWrap").classList.toggle("hide",mode!=="range");
+  $("analysisEndWrap").classList.toggle("hide",mode!=="range");
 }
-$("loginForm").addEventListener("submit",async function(event){
- event.preventDefault();const button=$("loginBtn");button.disabled=true;button.textContent="Signing in…";$("loginStatus").textContent="Checking access…";
- try{await loginStockWise($("loginCode").value.trim());$("loginCode").value="";}
- catch(error){authToken="";authRole="";authStore="";selectedStore="";$("appRoot").hidden=true;$("loginScreen").hidden=false;$("loginStatus").textContent=error.message||"Login failed.";}
- finally{button.disabled=false;button.textContent="Login";}
-});
-
-$("storeSelect").addEventListener("change",async function(){
- if(authRole!=="area") { 
-   this.value = authStore; 
-   return; 
- }
- if(!stores.includes(this.value)) { this.value=selectedStore; return; }
- selectedStore=this.value;
- // Clear current data and reload from the new store's URL
- records=[];items=[...defaultItems];months=[];
- if(window.gridResetState)window.gridResetState();
- await refreshAll(true);
-});
+function calcRowVariance(r){
+  if(r.physical===null||r.physical===undefined) return null;
+  const expected=(r.opening||0)+(r.receiving||0)+(r.transferIn||0)-(r.transferOut||0)-(r.waste||0)-(r.sold||0);
+  return r.physical-expected;
+}
+function runItemAnalysis(){
+  let period;
+  try{period=getAnalysisPeriod()}catch(e){return toast(e.message)}
+  const filtered=records.filter(r=>r.date&&r.date>=period.start&&r.date<=period.end)
+    .sort((a,b)=>(a.date||"").localeCompare(b.date||"")||a.code.localeCompare(b.code));
+  $("analysisStoreName").textContent=(selectedStore||"No store selected").toUpperCase();
+  $("analysisPeriodBadge").textContent=period.label;
+  if(!filtered.length){
+    currentAnalysisDetails=[];
+    $("analysisRows").innerHTML=`<tr><td colspan="12" class="empty">No records found for ${esc(selectedStore)} between ${esc(period.start)} and ${esc(period.end)}. Confirm that the selected store's month tabs contain these dates, then refresh data.</td></tr>`;
+    $("analysisSummary").textContent=`0 records loaded for ${period.label}.`;
+    return;
+  }
+  const aggregated={};
+  filtered.forEach(r=>{
+    if(!r.code)return;
+    const key=r.code.toLowerCase();
+    if(!aggregated[key]) aggregated[key]={code:r.code,name:r.name,opening:r.opening||0,receiving:0,transferIn:0,transferOut:0,waste:0,sold:0,actualCount:null,actualDate:"",expectedOnHand:0,variance:null,days:0,records:[]};
+    const a=aggregated[key];
+    if(a.days===0)a.opening=r.opening||0;
+    a.receiving+=r.receiving||0;a.transferIn+=r.transferIn||0;a.transferOut+=r.transferOut||0;
+    a.waste+=r.waste||0;a.sold+=r.sold||0;a.days++;a.records.push(r);
+    if(r.physical!==null&&r.physical!==undefined&&(!a.actualDate||r.date>=a.actualDate)){
+      a.actualCount=r.physical;a.actualDate=r.date;
+    }
+  });
+  Object.values(aggregated).forEach(a=>{
+    a.expectedOnHand=a.opening+a.receiving+a.transferIn-a.transferOut-a.waste-a.sold;
+    a.variance=a.actualCount===null?null:a.actualCount-a.expectedOnHand;
+  });
+  const list=Object.values(aggregated).sort((a,b)=>a.code.localeCompare(b.code));
+  currentAnalysisDetails=filtered;
+  $("analysisRows").innerHTML=list.map(item=>`
+    <tr><td>${esc(item.code)}</td><td>${esc(item.name)}</td>
+    <td>${esc(fmt(item.opening))}</td><td>${esc(fmt(item.receiving))}</td>
+    <td>${esc(fmt(item.transferIn))}</td><td>${esc(fmt(item.transferOut))}</td>
+    <td>${esc(fmt(item.waste))}</td><td>${esc(fmt(item.sold))}</td>
+    <td>${esc(fmt(item.expectedOnHand))}</td><td>${item.actualCount!==null?esc(fmt(item.actualCount)):"—"}${item.actualDate?`<div class="small-help">${esc(item.actualDate)}</div>`:""}</td>
+    <td>${varianceHTML(item.variance)}</td>
+    <td><button class="btn-green" style="padding:5px 9px;font-size:12px" onclick="openItemModal('${esc(item.code)}')">View</button></td></tr>`).join("");
+  $("analysisSummary").textContent=`${list.length} item(s) · ${filtered.length} daily record(s) · ${period.label} · ${selectedStore.toUpperCase()}. Positive variance = excess; negative variance = shortage.`+(failedRecordSheets.length?` WARNING: some sheets could not be loaded (${failedRecordSheets.join(", ")}); results may be incomplete.`:"");
+}
+function openItemModal(code){
+  const details=currentAnalysisDetails.filter(r=>r.code.toLowerCase()===code.toLowerCase())
+    .sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  if(!details.length)return toast("No detail rows found for this item in the selected period.");
+  const first=details[0],totals={opening:first.opening||0,receiving:0,transferIn:0,transferOut:0,waste:0,sold:0};
+  let latestActual=null,latestActualDate="";
+  details.forEach(r=>{
+    totals.receiving+=r.receiving||0;totals.transferIn+=r.transferIn||0;totals.transferOut+=r.transferOut||0;
+    totals.waste+=r.waste||0;totals.sold+=r.sold||0;
+    if(r.physical!==null&&r.physical!==undefined&&(!latestActualDate||r.date>=latestActualDate)){latestActual=r.physical;latestActualDate=r.date}
+  });
+  const expected=totals.opening+totals.receiving+totals.transferIn-totals.transferOut-totals.waste-totals.sold;
+  const variance=latestActual===null?null:latestActual-expected;
+  $("modalTitle").textContent=`${first.name||"Item"} (${code}) · ${selectedStore.toUpperCase()}`;
+  $("modTotalOpening").textContent=fmt(totals.opening);$("modTotalReceiving").textContent=fmt(totals.receiving);
+  $("modTotalTransferIn").textContent=fmt(totals.transferIn);$("modTotalTransferOut").textContent=fmt(totals.transferOut);
+  $("modTotalWaste").textContent=fmt(totals.waste);$("modTotalSold").textContent=fmt(totals.sold);
+  $("modExpectedOnHand").textContent=fmt(expected);
+  $("modActualCount").textContent=latestActual===null?"—":`${fmt(latestActual)}${latestActualDate?` · ${latestActualDate}`:""}`;
+  $("modVariance").innerHTML=variance===null?"—":`${varianceHTML(variance)}<div class="small-help">${variance>0?"Excess stock":variance<0?"Shortage":"Matched"}</div>`;
+  $("modalDetailRows").innerHTML=details.map(r=>`<tr>
+    <td>${esc(r.date)}</td><td>${esc(fmt(r.opening))}</td><td>${esc(fmt(r.receiving))}</td>
+    <td>${esc(fmt(r.transferIn))}</td><td>${esc(fmt(r.transferOut))}</td><td>${esc(fmt(r.waste))}</td>
+    <td>${esc(fmt(r.sold))}</td><td>${esc(fmt(r.closing))}</td><td>${r.physical!==null?esc(fmt(r.physical)):"—"}</td>
+    <td>${varianceHTML(calcRowVariance(r))}</td></tr>`).join("");
+  $("itemModal").classList.add("active");
+}
+$("analysisMode").addEventListener("change",updateAnalysisControls);
+$("analysisMonth").addEventListener("change",()=>{if($("analysisMode").value==="month")runItemAnalysis()});
+$("analysisDate").addEventListener("change",()=>{if($("analysisMode").value==="single")runItemAnalysis()});
+$("analysisStart").addEventListener("change",()=>{if($("analysisMode").value==="range"&&$("analysisEnd").value)runItemAnalysis()});
+$("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="range"&&$("analysisStart").value)runItemAnalysis()});
 
 /* ============================================================
    STOCK GRID module — additive only.
@@ -630,7 +1013,6 @@ $("storeSelect").addEventListener("change",async function(){
       console.warn("Bulk POST slow; assuming success as configured.", err);
     }
 
-    // IMMEDIATELY MARK AS SAVED AND SHOW SUCCESS MESSAGE
     dirty.forEach(r=>{ 
       r.existing = true; 
       r.dirty = false; 
@@ -681,5 +1063,26 @@ $("storeSelect").addEventListener("change",async function(){
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", bind); else bind();
 })();
 
-(function init(){ $("date").value=today();$("gridDate").value=today();$("gridSheetBadge").textContent=sheetNameForDate(today());$("scriptUrl").value=localStorage.getItem("stockwise_script_url")||DEFAULT_URL;if(localStorage.getItem("stockwise_theme")==="light")document.body.classList.add("light-mode");if(localStorage.getItem("stockwise_sidebar_collapsed")==="1")document.querySelector(".app").classList.add("sidebar-collapsed");applyLanguage();populateItemDatalist();renderAll();setConnection(false,"Please log in to load store data."); })();
+(function init(){ 
+  $("date").value=today();
+  $("gridDate").value=today();
+  $("gridSheetBadge").textContent=sheetNameForDate(today());
+  
+  const d = new Date();
+  const firstDay = new Date(d.getFullYear(), d.getMonth(), 1);
+  const localISO = date => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+  $("analysisStart").value = localISO(firstDay);
+  $("analysisEnd").value = today();
+  $("analysisDate").value = today();
+  $("analysisMonth").value = today().slice(0,7);
+  updateAnalysisControls();
+  
+  $("scriptUrl").value=localStorage.getItem("stockwise_script_url")||DEFAULT_URL;
+  if(localStorage.getItem("stockwise_theme")==="light")document.body.classList.add("light-mode");
+  if(localStorage.getItem("stockwise_sidebar_collapsed")==="1")document.querySelector(".app").classList.add("sidebar-collapsed");
+  applyLanguage();
+  populateItemDatalist();
+  renderAll();
+  setConnection(false,"Please log in to load store data."); 
+})();
 </script></div></body></html>
