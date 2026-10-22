@@ -51,6 +51,13 @@
 .loader-circle{width:100px;height:100px;border-radius:50%;background:conic-gradient(var(--green) 0deg, var(--green) 0deg, rgba(83,223,145,0.1) 0deg);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:20px;transition:background 0.3s}
 .loader-circle::after{content:'';position:absolute;width:80px;height:80px;background:var(--bg);border-radius:50%}
 .loader-text{position:absolute;z-index:10;font-size:22px;font-weight:800;color:var(--green)}
+
+/* Non-blocking background load indicator */
+#bgLoadStatus{font-size:12px;color:var(--muted);margin-top:6px;min-height:16px;transition:opacity .25s;pointer-events:none}
+#bgLoadStatus .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--amber);margin-right:6px;vertical-align:middle;animation:bgPulse 1.4s infinite ease-in-out}
+#bgLoadStatus.done{opacity:.7}
+#bgLoadStatus.error{color:var(--red)}
+@keyframes bgPulse{0%,100%{opacity:.35}50%{opacity:1}}
 </style></head>
 <body>
 
@@ -79,7 +86,7 @@
     <div class="subbrand mb-4">WITHSTAND INVENTORY · SECURE LOGIN</div>
     <form id="loginForm">
       <label class="form-label" for="loginCode">Access code</label>
-      <input class="form-control mb-3" id="loginCode" type="password" autocomplete="current-password" placeholder="Enter your assigned access code" required>
+      <input class="form-control mb-3" id="loginCode" type="text" inputmode="text" autocapitalize="off" spellcheck="false" autocomplete="current-password" placeholder="Enter your assigned access code" required>
       <button class="btn-green w-100" id="loginBtn" type="submit">Login</button>
       <div id="loginStatus" class="login-help mt-3">Area Manager and store managers: enter your assigned code.</div>
     </form>
@@ -111,6 +118,10 @@
 <div class="col-6 col-xl-2"><div class="stat"><div class="stat-label">MISSING COUNTS</div><div class="stat-value" id="statMissing">0</div><div class="stat-note">Physical not entered</div></div></div>
 <div class="col-6 col-xl-2"><div class="stat"><div class="stat-label" data-i18n="lastRefresh">LAST REFRESH</div><div class="stat-value" style="font-size:18px" id="statRefresh">—</div><div class="stat-note" data-i18n="browserSession">Session</div></div></div>
 </div>
+
+<!-- Non-blocking background load indicator -->
+<div id="bgLoadStatus" aria-live="polite"></div>
+
 <div class="row g-3 mb-3">
 <div class="col-12 col-xl-3"><div class="panel chart-panel"><h2 data-i18n="varianceOverview">Variance Overview</h2><div class="chart-wrap"><canvas id="varianceDonut"></canvas></div></div></div>
 <div class="col-12 col-xl-5"><div class="panel chart-panel"><h2 data-i18n="varianceTrend">Variance Trend</h2><div class="chart-wrap"><canvas id="varianceTrendChart"></canvas></div></div></div>
@@ -313,11 +324,42 @@ const defaultItems=[{code:"W-0369",name:"Greek Yoghurt Dodoni",unit:"Kg"},{code:
 let items=[...defaultItems],records=[],months=[],failedRecordSheets=[],connected=false,lastRefresh=null,toastTimer;
 let currentAnalysisDetails = []; 
 
+/* cache + background load state */
+const sheetCache = {};
+const sheetInflight = {};
+let bgLoadState = { total:0, done:0, failed:0, running:false };
+
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
 const n=v=>{if(v===null||v===undefined||v==="")return null;const x=Number(v);return Number.isFinite(x)?x:null};
 const fmt=v=>v===null||v===undefined||v===""?"—":Number(v).toLocaleString(undefined,{maximumFractionDigits:3});
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function toast(message){const el=$("toast");el.textContent=message;el.style.display="block";clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display="none",4200)}
+
+/* non-blocking background status */
+function setBgStatus(state, extra){
+  const el = $("bgLoadStatus");
+  if(!el) return;
+  if(state === "hidden"){ el.className=""; el.innerHTML=""; return; }
+  if(state === "loading"){
+    const remaining = Math.max(0, bgLoadState.total - bgLoadState.done - bgLoadState.failed);
+    el.className="";
+    el.innerHTML = `<span class="dot"></span>Loading background months… ${bgLoadState.done}/${bgLoadState.total}` +
+      (bgLoadState.failed ? ` · ${bgLoadState.failed} failed` : "") +
+      (remaining ? "" : " · finalizing");
+    return;
+  }
+  if(state === "done"){
+    el.className="done";
+    el.textContent = bgLoadState.failed
+      ? `Background load finished · ${bgLoadState.failed} sheet(s) failed: ${extra||""}`
+      : `All months loaded · ${records.length} record(s)`;
+    return;
+  }
+  if(state === "error"){
+    el.className="error";
+    el.textContent = extra || "Background load failed.";
+  }
+}
 
 // SOUND & CLICK EFFECT
 const clickAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
@@ -340,7 +382,7 @@ function showLoading(show, storeName = "") {
     let pct = 0;
     clearInterval(window.loadInterval);
     window.loadInterval = setInterval(() => {
-      deg += 9; // 360 / 4 seconds = 90 per second = 9 per 100ms
+      deg += 9;
       pct = Math.floor(deg / 3.6);
       if(pct > 100) pct = 100;
       $("loaderCircle").style.background = `conic-gradient(var(--green) ${deg}deg, rgba(83,223,145,0.1) ${deg}deg)`;
@@ -405,7 +447,7 @@ async function testConnections() {
     $("gateProceedBtn").disabled = false;
   } else {
     $("gateTitle").textContent = "Connection Errors Detected";
-    $("gateProceedBtn").disabled = false; // Allow proceed anyway, they can try refreshing
+    $("gateProceedBtn").disabled = false;
   }
 }
 
@@ -418,7 +460,6 @@ function showWelcomePopup() {
     subtitle.textContent = "Brand Manager";
     $("welcomeMessage").textContent = "Welcome back, Anthony Sigfried Gatuz";
   } else {
-    // Store-manager popup intentionally displays the store name only.
     title.textContent = authStore.toUpperCase();
     subtitle.textContent = "";
     $("welcomeMessage").textContent = authStore.toUpperCase();
@@ -438,7 +479,6 @@ function proceedToApp() {
   $("loginScreen").hidden = true;
   $("appRoot").hidden = false;
 
-  // Trigger initial data load, then show the personalized welcome popup.
   refreshAll(false);
   window.setTimeout(showWelcomePopup, 250);
 }
@@ -477,12 +517,15 @@ async function loginStockWise(loginCode){
     select.style.opacity = "1";
   }
   
-  // Show Gate
   testConnections();
 }
 
 function logoutStockWise(){
  authToken="";authRole="";authStore="";stores=[];selectedStore="";items=[...defaultItems];records=[];months=[];connected=false;
+ Object.keys(sheetCache).forEach(k=>delete sheetCache[k]);
+ Object.keys(sheetInflight).forEach(k=>delete sheetInflight[k]);
+ bgLoadState={total:0,done:0,failed:0,running:false};
+ setBgStatus("hidden");
  if(window.gridResetState)window.gridResetState();
  $("appRoot").hidden=true;$("loginScreen").hidden=false;$("loginCode").value="";$("loginStatus").textContent="You have logged out. Enter your access code to continue.";
  setConnection(false,"Logged out");
@@ -503,6 +546,10 @@ $("storeSelect").addEventListener("change",async function(){
  if(!stores.includes(this.value)) { this.value=selectedStore; return; }
  selectedStore=this.value;
  records=[];items=[...defaultItems];months=[];
+ Object.keys(sheetCache).forEach(k=>delete sheetCache[k]);
+ Object.keys(sheetInflight).forEach(k=>delete sheetInflight[k]);
+ bgLoadState={total:0,done:0,failed:0,running:false};
+ setBgStatus("hidden");
  if(window.gridResetState)window.gridResetState();
  await refreshAll(true);
 });
@@ -626,9 +673,157 @@ function sheetNameForDate(date){const [y,m]=date.split("-").map(Number);if(y===2
 
 async function loadItemMaster(){if(!authToken||!selectedStore)throw new Error("Please log in and select a store first.");try{const data=await apiGet({action:"items"});if(data?.success===false)throw new Error(data.error||data.message||"Items endpoint returned an error.");const arr=unwrapArray(data,["items","data","result","records"]);if(!arr.length)throw new Error("Item endpoint returned no item list. Check the Apps Script response format.");items=arr.map(normalizeItem).filter(x=>x.code||x.name);renderItems();populateItemDatalist();$("statItems").textContent=items.length;return true}catch(e){console.error(e);toast("Could not load items: "+e.message);return false}}
 async function loadMonths(){if(!authToken||!selectedStore)throw new Error("Please log in and select a store first.");try{const data=await apiGet({action:"months"});if(data?.success===false)throw new Error(data.error||data.message||"Months endpoint returned an error.");let arr=unwrapArray(data,["months","sheets","data","result"]);if(!arr.length&&Array.isArray(data?.data?.months))arr=data.data.months;months=arr.map(x=>typeof x==="string"?x:String(getField(x,"name","sheetName","sheet","title")??"")).filter(Boolean);if(!months.length)months=["Daily Inventory","November 2026","December 2026","January 2027","February 2027","March 2027","April 2027","May 2027","June 2027","July 2027"];populateMonthSelects();return true}catch(e){console.warn(e);months=["Daily Inventory","November 2026","December 2026","January 2027","February 2027","March 2027","April 2027","May 2027","June 2027","July 2027"];populateMonthSelects();return false}}
-function populateMonthSelects(){["recordMonth","reportMonth"].forEach(id=>{const sel=$(id),old=sel.value;sel.innerHTML='<option value="">All loaded sheets</option>'+months.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("");if(months.includes(old))sel.value=old})}
+function populateMonthSelects(){["recordMonth","reportMonth"].forEach(id=>{const sel=$(id),old=sel.value;sel.innerHTML='<option value="">All loaded sheets</option>'+months.map(m=>{let tag="";if(failedRecordSheets.indexOf(m)!==-1)tag=" (failed)";else if(!sheetCache[m])tag=" (not loaded yet)";return `<option value="${esc(m)}">${esc(m)}${tag}</option>`}).join("");if(months.includes(old))sel.value=old})}
 async function loadRecordsForSheet(sheet){if(!authToken||!selectedStore)throw new Error("Please log in and select a store first.");const data=await apiGet({action:"records",sheetName:sheet});if(data?.success===false)throw new Error(data.error||data.message||"Records endpoint returned an error for "+sheet);const arr=unwrapArray(data,["records","data","result","items"]);return arr.map(x=>normalizeRecord(x,sheet)).filter(r=>r.date||r.code||r.name)}
-async function loadAllRecords(){const all=[];failedRecordSheets=[];const unique=[...new Set(months)];for(const sheet of unique){try{const list=await loadRecordsForSheet(sheet);all.push(...list)}catch(e){console.warn("Could not load "+sheet,e);failedRecordSheets.push(sheet)}}records=all;}
+
+/* Serialize all record fetches: one at a time, small gap, with retry.
+   Prevents Apps Script concurrency-limit failures when several months
+   are requested in a burst. */
+let _fetchQueue = Promise.resolve();
+function _sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+function fetchSheet(sheet, attempt){
+  attempt = attempt || 1;
+  if(sheetCache[sheet]) return Promise.resolve(sheetCache[sheet]);
+  if(sheetInflight[sheet]) return sheetInflight[sheet];
+
+  const p = _fetchQueue.then(() => _sleep(150)).then(() => loadRecordsForSheet(sheet))
+    .then(list => { sheetCache[sheet] = list; return list; })
+    .catch(async err => {
+      if(attempt < 3){
+        console.warn("Retrying " + sheet + " (attempt " + (attempt+1) + ") after: " + err.message);
+        await _sleep(800 * attempt);
+        return fetchSheet(sheet, attempt + 1);
+      }
+      if(failedRecordSheets.indexOf(sheet) === -1) failedRecordSheets.push(sheet);
+      throw err;
+    })
+    .finally(() => { delete sheetInflight[sheet]; });
+
+  _fetchQueue = p.catch(() => {});
+  sheetInflight[sheet] = p;
+  return p;
+}
+
+/**
+ * Guarantee that every sheet covering [start, end] has been loaded.
+ * Uses month tab names: "Daily Inventory" is October 2026, others are "<Month> <Year>".
+ */
+async function ensureSheetsLoadedForRange(start, end, opts){
+  if(!start || !end) return;
+  const wantSheets = new Set();
+  const cursor = new Date(start + "T00:00:00");
+  const stop   = new Date(end   + "T00:00:00");
+  if(isNaN(cursor) || isNaN(stop)) return;
+  while(cursor <= stop){
+    const iso = `${cursor.getFullYear()}-${String(cursor.getMonth()+1).padStart(2,"0")}-${String(cursor.getDate()).padStart(2,"0")}`;
+    const sn = sheetNameForDate(iso);
+    if(months.indexOf(sn) !== -1) wantSheets.add(sn);
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  const pending = [...wantSheets].filter(s => !sheetCache[s]);
+  if(!pending.length) return;
+  if(opts && opts.showToast){
+    toast("Loading " + pending.length + " month(s) needed for this view…");
+  }
+  const failedNames = [];
+  for(const s of pending){
+    try {
+      await fetchSheet(s);   // serialized by the shared queue, retries built in
+    } catch (e) {
+      failedNames.push(s);
+    }
+  }
+  const merged = [];
+  months.forEach(sn => { if(sheetCache[sn]) merged.push(...sheetCache[sn]); });
+  records = merged;
+  renderAll();
+  if(failedNames.length){
+    toast("Some months could not be loaded after retries: " + failedNames.join(", "));
+  }
+}
+
+async function ensureSheetLoaded(sheet, opts){
+  if(!sheet || sheet === "") return;
+  if(sheetCache[sheet]) return;
+  if(opts && opts.showToast) toast("Loading " + sheet + "…");
+  try{
+    await fetchSheet(sheet);
+    const merged = [];
+    months.forEach(sn => { if(sheetCache[sn]) merged.push(...sheetCache[sn]); });
+    records = merged;
+    renderAll();
+  } catch(e){
+    toast("Could not load " + sheet + ": " + e.message);
+  }
+}
+
+async function loadAllRecords(){
+  /* Progressive loading. Current month is BLOCKING and MUST succeed;
+     the rest load in the background, serialized, with retries. */
+  failedRecordSheets = [];
+  const unique = [...new Set(months)];
+  if(!unique.length){ records = []; return; }
+
+  const now = new Date();
+  const currentIso = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-01`;
+  const prioritySheet = sheetNameForDate(currentIso);
+  const rest = unique.filter(s => s !== prioritySheet);
+  const ordered = [prioritySheet, ...rest];
+
+  bgLoadState = { total: ordered.length, done: 0, failed: 0, running: true };
+  setBgStatus("loading");
+
+  // 1. Priority month: blocking, retried up to 5 times. If it still fails,
+  //    abort the refresh rather than painting a dashboard without current-month data.
+  let priorityList;
+  let lastPriorityErr;
+  for(let attempt = 1; attempt <= 5; attempt++){
+    try {
+      priorityList = await loadRecordsForSheet(prioritySheet);
+      sheetCache[prioritySheet] = priorityList;
+      bgLoadState.done++;
+      lastPriorityErr = null;
+      break;
+    } catch(e) {
+      lastPriorityErr = e;
+      console.warn("Priority sheet attempt " + attempt + " failed:", prioritySheet, e);
+      await _sleep(700 * attempt);
+    }
+  }
+  if(lastPriorityErr){
+    if(failedRecordSheets.indexOf(prioritySheet) === -1) failedRecordSheets.push(prioritySheet);
+    bgLoadState.running = false;
+    setBgStatus("error", "Current month (" + prioritySheet + ") failed to load: " + lastPriorityErr.message);
+    throw new Error("Current month could not be loaded: " + prioritySheet + " — " + lastPriorityErr.message);
+  }
+  const mergedAfterPriority = [];
+  months.forEach(sn => { if(sheetCache[sn]) mergedAfterPriority.push(...sheetCache[sn]); });
+  records = mergedAfterPriority;
+  renderAll();
+  setBgStatus("loading");
+
+  // 2. Remaining months, one at a time via the shared queue.
+  (async () => {
+    for(const sheet of rest){
+      try {
+        await fetchSheet(sheet);
+        bgLoadState.done++;
+      } catch (err) {
+        console.warn("Background sheet failed after retries:", sheet, err);
+        bgLoadState.failed++;
+      }
+      const merged = [];
+      months.forEach(sn => { if(sheetCache[sn]) merged.push(...sheetCache[sn]); });
+      records = merged;
+      renderAll();
+      setBgStatus("loading");
+    }
+    bgLoadState.running = false;
+    setBgStatus("done", failedRecordSheets.join(", "));
+  })();
+}
+
 function setConnection(ok,message){connected=ok;$("statusDot").classList.toggle("online",ok);$("connectionText").textContent=message;$("setupStatus").textContent=message}
 
 async function testConnection(){
@@ -658,20 +853,25 @@ async function refreshAll(showMessage=false){
   try{
     setConnection(false,"Loading Google Sheets data for "+selectedStore+"…");
     
+    Object.keys(sheetCache).forEach(k=>delete sheetCache[k]);
+    Object.keys(sheetInflight).forEach(k=>delete sheetInflight[k]);
+    bgLoadState = { total:0, done:0, failed:0, running:false };
+    setBgStatus("loading");
+
     const itemOK=await loadItemMaster();
     await loadMonths();
-    await loadAllRecords();
-    
+    await loadAllRecords();   // paints current month, backgrounds the rest
+
     if(!itemOK)throw new Error("Item master could not be loaded.");
     lastRefresh=new Date();
-    setConnection(true,`Loaded ${items.length} items · ${records.length} records`);
+    setConnection(true,`Loaded ${items.length} items · ${records.length} records (background loading continues)`);
     renderAll();
     if(showMessage)toast("Sheets data refreshed for "+selectedStore);
   }catch(e){
     setConnection(false,"Could not refresh: "+e.message);
-    if(showMessage)toast(e.message);
+    toast(e.message);
   } finally {
-    setTimeout(() => showLoading(false), 800); // Small delay so the user sees the 100%
+    setTimeout(() => showLoading(false), 400);
   }
 }
 
@@ -691,7 +891,9 @@ async function saveAndVerify(payload, sheetName) {
   const started = Date.now(); let lastError = "";
   while (Date.now() - started < 45000) {
     try {
+      delete sheetCache[sheetName];
       const latest = await loadRecordsForSheet(sheetName);
+      sheetCache[sheetName] = latest;
       const match = latest.find(r => r.date === payload.date && r.code.toLowerCase() === payload.itemCode.toLowerCase());
       if (match) {
         const fields = ["receiving", "transferIn", "transferOut", "waste", "sold"];
@@ -725,6 +927,7 @@ function renderAll(){
   $("statRefresh").textContent=lastRefresh?lastRefresh.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}):"—";
 
   renderDashboard();renderRecords();renderReports();renderItems();populateItemDatalist();renderCharts();
+  if(bgLoadState.running) setBgStatus("loading");
   if(window.gridOnDataChanged)window.gridOnDataChanged();
 }
 
@@ -734,9 +937,36 @@ function renderDashboard(){
   $("dashboardRows").innerHTML=sorted.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td></tr>`).join("")||'<tr><td colspan="6" class="empty">No variances found for '+selectedStore+'.</td></tr>';
 }
 function filteredRecords(){const sheet=$("recordMonth").value,search=($("recordSearch").value||"").trim().toLowerCase();return records.filter(r=>(!sheet||r.sheetName===sheet)&&(!search||r.code.toLowerCase().includes(search)||r.name.toLowerCase().includes(search))).sort((a,b)=>(b.date||"").localeCompare(a.date||""))}
-function renderRecords(){const list=filteredRecords();$("recordsRows").innerHTML=list.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.opening))}</td><td>${esc(fmt(r.receiving))}</td><td>${esc(fmt(r.transferIn))}</td><td>${esc(fmt(r.transferOut))}</td><td>${esc(fmt(r.waste))}</td><td>${esc(fmt(r.sold))}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td><td><button class="btn-soft" onclick="editRecord('${esc(r.id)}')">Edit</button></td></tr>`).join("")||'<tr><td colspan="13" class="empty">No matching records for '+selectedStore+'.</td></tr>';$("recordsSummary").textContent=`Showing ${list.length} record(s).`}
+
+function renderRecords(){
+  const sheet = $("recordMonth").value;
+  if(sheet && !sheetCache[sheet]){
+    $("recordsRows").innerHTML = `<tr><td colspan="13" class="empty">Loading ${esc(sheet)}…</td></tr>`;
+    $("recordsSummary").textContent = `Fetching ${sheet} from Google Sheets…`;
+    ensureSheetLoaded(sheet, {showToast:false});
+    return;
+  }
+  const list=filteredRecords();
+  $("recordsRows").innerHTML=list.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.opening))}</td><td>${esc(fmt(r.receiving))}</td><td>${esc(fmt(r.transferIn))}</td><td>${esc(fmt(r.transferOut))}</td><td>${esc(fmt(r.waste))}</td><td>${esc(fmt(r.sold))}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td><td><button class="btn-soft" onclick="editRecord('${esc(r.id)}')">Edit</button></td></tr>`).join("")||'<tr><td colspan="13" class="empty">No matching records for '+selectedStore+'.</td></tr>';
+  $("recordsSummary").textContent=`Showing ${list.length} record(s).`
+}
 function editRecord(id){const r=records.find(x=>x.id===id);if(!r)return toast("Record not found.");$("date").value=r.date;$("itemCode").value=r.code;$("itemName").value=r.name;["opening","receiving","transferIn","transferOut","waste","sold"].forEach(k=>$(k).value=r[k]??0);$("physical").value=r.physical??"";$("editId").value=r.id;$("formStatus").textContent=`Editing row in ${r.sheetName}.`;showPage("entry");document.getElementById("singleFormWrap").classList.remove("hide");toast("Loaded into single-item form (below the grid).")}
-function renderReports(){const sheet=$("reportMonth").value,filter=$("varianceFilter").value;let list=records.filter(r=>!sheet||r.sheetName===sheet).filter(r=>r.variance!==null);if(filter==="variance")list=list.filter(r=>Math.abs(r.variance)>.0001);if(filter==="shortage")list=list.filter(r=>r.variance<-.0001);if(filter==="excess")list=list.filter(r=>r.variance>.0001);$("reportCount").textContent=list.length;$("reportShortages").textContent=list.filter(r=>r.variance<-.0001).length;$("reportExcess").textContent=list.filter(r=>r.variance>.0001).length;$("reportNet").textContent=fmt(list.reduce((s,r)=>s+(r.variance||0),0));$("reportRows").innerHTML=list.sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td><td>${r.variance<-.0001?'<span class="badge badge-bad">Shortage</span>':r.variance>.0001?'<span class="badge badge-good">Excess</span>':'<span class="badge">Matched</span>'}</td></tr>`).join("")||'<tr><td colspan="7" class="empty">No records for this filter in '+selectedStore+'.</td></tr>'}
+
+function renderReports(){
+  const sheet=$("reportMonth").value;
+  if(sheet && !sheetCache[sheet]){
+    $("reportRows").innerHTML = `<tr><td colspan="7" class="empty">Loading ${esc(sheet)}…</td></tr>`;
+    ensureSheetLoaded(sheet, {showToast:false});
+    return;
+  }
+  const filter=$("varianceFilter").value;
+  let list=records.filter(r=>!sheet||r.sheetName===sheet).filter(r=>r.variance!==null);
+  if(filter==="variance")list=list.filter(r=>Math.abs(r.variance)>.0001);
+  if(filter==="shortage")list=list.filter(r=>r.variance<-.0001);
+  if(filter==="excess")list=list.filter(r=>r.variance>.0001);
+  $("reportCount").textContent=list.length;$("reportShortages").textContent=list.filter(r=>r.variance<-.0001).length;$("reportExcess").textContent=list.filter(r=>r.variance>.0001).length;$("reportNet").textContent=fmt(list.reduce((s,r)=>s+(r.variance||0),0));
+  $("reportRows").innerHTML=list.sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td><td>${r.variance<-.0001?'<span class="badge badge-bad">Shortage</span>':r.variance>.0001?'<span class="badge badge-good">Excess</span>':'<span class="badge">Matched</span>'}</td></tr>`).join("")||'<tr><td colspan="7" class="empty">No records for this filter in '+selectedStore+'.</td></tr>'
+}
 function renderItems(){const search=($("itemSearch")?.value||"").trim().toLowerCase();const list=items.filter(i=>!search||i.code.toLowerCase().includes(search)||i.name.toLowerCase().includes(search));if($("itemsRows"))$("itemsRows").innerHTML=list.map((i,index)=>`<tr><td>${index+1}</td><td>${esc(i.code)}</td><td>${esc(i.name)}</td></tr>`).join("")||'<tr><td colspan="3" class="empty">No items.</td></tr>';if($("itemCount"))$("itemCount").textContent=`${list.length} item(s)`}
 function exportCSV(){const list=filteredRecords();const headers=["sheetName","date","code","name","opening","receiving","transferIn","transferOut","waste","sold","closing","physical","variance"];const cell=v=>'"'+String(v??"").replace(/"/g,'""')+'"';const csv=[headers.join(","),...list.map(r=>headers.map(k=>cell(r[k])).join(","))].join("\r\n");const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="stockwise-"+selectedStore+"-inventory.csv";a.click();URL.revokeObjectURL(a.href)}
 $("recordSearch").addEventListener("input",renderRecords);$("recordMonth").addEventListener("change",renderRecords);$("reportMonth").addEventListener("change",renderReports);$("varianceFilter").addEventListener("change",renderReports);
@@ -777,9 +1007,12 @@ function calcRowVariance(r){
   const expected=(r.opening||0)+(r.receiving||0)+(r.transferIn||0)-(r.transferOut||0)-(r.waste||0)-(r.sold||0);
   return r.physical-expected;
 }
-function runItemAnalysis(){
+
+async function runItemAnalysis(){
   let period;
   try{period=getAnalysisPeriod()}catch(e){return toast(e.message)}
+  await ensureSheetsLoadedForRange(period.start, period.end, {showToast:true});
+
   const filtered=records.filter(r=>r.date&&r.date>=period.start&&r.date<=period.end)
     .sort((a,b)=>(a.date||"").localeCompare(b.date||"")||a.code.localeCompare(b.code));
   $("analysisStoreName").textContent=(selectedStore||"No store selected").toUpperCase();
@@ -1012,6 +1245,8 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
     } catch (err) {
       console.warn("Bulk POST slow; assuming success as configured.", err);
     }
+
+    delete sheetCache[G.sheet];
 
     dirty.forEach(r=>{ 
       r.existing = true; 
