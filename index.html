@@ -6,38 +6,139 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
-:root{--bg:#090d0c;--panel:#121917;--panel2:#18211d;--line:#28362f;--green:#53df91;--muted:#9aaba2;--text:#eef6f0;--red:#ff7777;--amber:#f5c96a;--blue:#53a5df}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}button,input,select,textarea{font:inherit}.app{min-height:100vh}.sidebar{background:#0d1310;border-right:1px solid var(--line);padding:22px 14px;min-height:100vh}.brand{font-size:21px;font-weight:800;letter-spacing:.3px}.brand span{color:var(--green)}.subbrand{font-size:11px;color:var(--muted);letter-spacing:1.5px}.navbtn{width:100%;text-align:left;color:#c2d0c7;background:transparent;border:1px solid transparent;border-radius:10px;padding:11px 12px;margin:3px 0}.navbtn:hover,.navbtn.active{background:#17251d;border-color:#294735;color:var(--green)}.main{padding:24px;max-width:1600px;margin:auto}.topline{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:22px}.eyebrow{color:var(--green);font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase}.muted{color:var(--muted)}.panel,.stat{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px}.stat{height:100%}.stat-label{color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}.stat-value{font-size:27px;font-weight:800;margin-top:7px}.stat-note{font-size:12px;color:var(--muted);margin-top:4px}h1{font-size:25px;font-weight:800;margin:3px 0 0}h2{font-size:17px;font-weight:750;margin:0 0 15px}.form-label{color:#c6d5cc;font-size:12px;font-weight:650}.form-control,.form-select{background:#0b100e;border:1px solid #334239;color:var(--text);border-radius:9px;min-height:41px}.form-control:focus,.form-select:focus{background:#0b100e;color:var(--text);border-color:var(--green);box-shadow:0 0 0 .2rem #53df9122}.form-control::placeholder{color:#68786f}.btn-green{background:var(--green);border:1px solid var(--green);color:#07110b;font-weight:800;border-radius:9px;padding:9px 14px;transition:transform 0.1s, background 0.2s}.btn-green:active{transform:scale(0.95)}.btn-green:hover{background:#76f1a9;color:#07110b}.btn-soft{background:#1a2820;color:#d8e8dd;border:1px solid #34483b;border-radius:9px;padding:8px 12px;transition:transform 0.1s, background 0.2s}.btn-soft:active{transform:scale(0.95)}.btn-danger-soft{background:#321b1b;color:#ffb5b5;border:1px solid #633535;border-radius:8px;padding:6px 10px}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px}.table{--bs-table-bg:transparent;--bs-table-color:var(--text);--bs-table-border-color:var(--line);margin:0;white-space:nowrap}.table thead th{background:#19231d;color:#b7c8bd;font-size:11px;text-transform:uppercase;letter-spacing:.5px;position:sticky;top:0;z-index:1}.table td,.table th{padding:11px 12px;vertical-align:middle}.badge-good{color:var(--green);background:#183425}.badge-warn{color:var(--amber);background:#332b17}.badge-bad{color:var(--red);background:#351b1b}.page{display:none}.page.active{display:block}.toastbox{position:fixed;right:18px;bottom:18px;z-index:1000;background:#17251d;border:1px solid #385b45;color:#eaffef;border-radius:11px;padding:12px 16px;max-width:360px;box-shadow:0 10px 30px #0008;display:none}.statusdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--amber);margin-right:7px}.statusdot.online{background:var(--green)}.small-help{font-size:12px;color:var(--muted)}.quick{display:flex;gap:8px;flex-wrap:wrap}.empty{text-align:center;padding:30px;color:var(--muted)}.variance-pos{color:var(--green);font-weight:800}.variance-neg{color:var(--red);font-weight:800}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}.hide{display:none!important}footer{color:#6f8076;font-size:11px;text-align:center;padding:24px 0 8px}
-.chart-panel{min-height:300px}.chart-wrap{position:relative;height:235px;width:100%}.chart-wrap canvas{max-width:100%}.toolbar-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.icon-btn{min-width:42px}.sidebar-collapsed aside.sidebar{display:none!important}.sidebar-collapsed main{width:100%;flex:0 0 100%;max-width:100%}.sidebar{transition:width .2s ease}.navbtn{transition:background .15s ease,border-color .15s ease}.light-mode{--bg:#f3f7f4;--panel:#ffffff;--panel2:#edf3ef;--line:#d7e2da;--green:#16834b;--muted:#64756a;--text:#17251c;--red:#c63838;--amber:#946300;--blue:#1d65a3}.light-mode .sidebar{background:#e8f0eb}.light-mode .navbtn{color:#34473a}.light-mode .navbtn:hover,.light-mode .navbtn.active{background:#d7e9dd;border-color:#b5d7c1;color:#126d3b}.light-mode .form-control,.light-mode .form-select{background:#fff;color:#17251c;border-color:#c8d6cd}.light-mode .form-control:focus,.light-mode .form-select:focus{background:#fff;color:#17251c}.light-mode .btn-soft{background:#edf4ef;color:#243b2d;border-color:#cbd9d0}.light-mode .table thead th{background:#eaf1ec;color:#354b3c}.light-mode .badge-good{color:#146b3c;background:#d8f1e1}.light-mode .badge-warn{color:#805700;background:#fff0c5}.light-mode .badge-bad{color:#a32222;background:#fde0e0}.light-mode .panel [style*="background:#0b100e"]{background:#f0f5f1!important}.light-mode .toastbox{background:#e8f5ec;color:#173d27;border-color:#b9dcc5}body[dir="rtl"]{font-family:Tahoma,Arial,sans-serif}body[dir="rtl"] .sidebar{border-right:0;border-left:1px solid var(--line)}body[dir="rtl"] .navbtn{text-align:right}body[dir="rtl"] .statusdot{margin-right:0;margin-left:7px}body[dir="rtl"] .table{text-align:right}body[dir="rtl"] .form-label{text-align:right}body[dir="rtl"] .topline,body[dir="rtl"] .section-head{direction:rtl}body[dir="rtl"] .quick,body[dir="rtl"] .toolbar-actions{direction:rtl}
-@media(max-width:767px){.chart-panel{min-height:275px}.chart-wrap{height:210px}.sidebar-collapsed aside.sidebar{display:block!important}.sidebar-collapsed .navstack{display:none}.sidebar-collapsed .sidebar{min-height:0}.toolbar-actions{justify-content:flex-start}}
-@media(max-width:767px){.sidebar{min-height:auto;border-right:0;border-bottom:1px solid var(--line);padding:12px}.navstack{display:flex;overflow:auto;gap:5px}.navbtn{white-space:nowrap;width:auto;padding:8px 10px;margin:0}.brandline{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.main{padding:16px 12px}.topline{align-items:flex-start;flex-direction:column}h1{font-size:22px}.stat-value{font-size:23px}.panel{padding:14px}}
+:root{--bg:#090d0c;--panel:#121917;--panel2:#18211d;--line:#28362f;--green:#53df91;--muted:#9aaba2;--text:#eef6f0;--red:#ff7777;--amber:#f5c96a;--blue:#53a5df}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button,input,select,textarea{font:inherit}
+.app{min-height:100vh}
+.sidebar{background:#0d1310;border-right:1px solid var(--line);padding:22px 14px;min-height:100vh;transition:width .2s ease}
+.brand{font-size:21px;font-weight:800;letter-spacing:.3px}
+.brand span{color:var(--green)}
+.subbrand{font-size:11px;color:var(--muted);letter-spacing:1.5px}
+.navbtn{width:100%;text-align:left;color:#c2d0c7;background:transparent;border:1px solid transparent;border-radius:10px;padding:11px 12px;margin:3px 0;transition:background .15s ease,border-color .15s ease}
+.navbtn:hover,.navbtn.active{background:#17251d;border-color:#294735;color:var(--green)}
+.main{padding:24px;max-width:1600px;margin:auto}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:22px}
+.eyebrow{color:var(--green);font-size:11px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase}
+.muted{color:var(--muted)}
+.panel,.stat{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px;box-shadow:0 1px 0 rgba(255,255,255,0.02), 0 8px 24px rgba(0,0,0,0.18)}
+.stat{height:100%;border-left:3px solid var(--green);transition:transform .12s ease}
+.stat:hover{transform:translateY(-1px)}
+.stat-label{color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.stat-value{font-size:27px;font-weight:800;margin-top:7px}
+.stat-note{font-size:12px;color:var(--muted);margin-top:4px}
+h1{font-size:25px;font-weight:800;margin:3px 0 0;letter-spacing:-.3px}
+h2{font-size:17px;font-weight:750;margin:0 0 15px}
+.form-label{color:#c6d5cc;font-size:12px;font-weight:650}
+.form-control,.form-select{background:#0b100e;border:1px solid #334239;color:var(--text);border-radius:9px;min-height:41px}
+.form-control:focus,.form-select:focus{background:#0b100e;color:var(--text);border-color:var(--green);box-shadow:0 0 0 .2rem #53df9122}
+.form-control::placeholder{color:#68786f}
+.btn-green{background:var(--green);border:1px solid var(--green);color:#07110b;font-weight:800;border-radius:9px;padding:9px 14px;transition:transform 0.1s, background 0.2s;box-shadow:0 4px 14px rgba(83,223,145,.18)}
+.btn-green:active{transform:scale(0.95)}
+.btn-green:hover{background:#76f1a9;color:#07110b;box-shadow:0 6px 18px rgba(83,223,145,.28)}
+.btn-soft{background:#1a2820;color:#d8e8dd;border:1px solid #34483b;border-radius:9px;padding:8px 12px;transition:transform 0.1s, background 0.2s}
+.btn-soft:active{transform:scale(0.95)}
+.btn-soft:hover{background:#213227;border-color:#3f5a49}
+.btn-danger-soft{background:#321b1b;color:#ffb5b5;border:1px solid #633535;border-radius:8px;padding:6px 10px}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px}
+.table{--bs-table-bg:transparent;--bs-table-color:var(--text);--bs-table-border-color:var(--line);margin:0;white-space:nowrap}
+.table thead th{background:#19231d;color:#b7c8bd;font-size:11px;text-transform:uppercase;letter-spacing:.7px;font-weight:750;position:sticky;top:0;z-index:1}
+.table td,.table th{padding:11px 12px;vertical-align:middle}
+.badge-good{color:var(--green);background:#183425;border-radius:6px;font-weight:700;letter-spacing:.2px}
+.badge-warn{color:var(--amber);background:#332b17;border-radius:6px;font-weight:700;letter-spacing:.2px}
+.badge-bad{color:var(--red);background:#351b1b;border-radius:6px;font-weight:700;letter-spacing:.2px}
+.page{display:none}
+.page.active{display:block}
+.toastbox{position:fixed;right:18px;bottom:18px;z-index:1000;background:#17251d;border:1px solid #385b45;color:#eaffef;border-radius:11px;padding:12px 16px;max-width:360px;box-shadow:0 10px 30px #0008;display:none}
+.statusdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--amber);margin-right:7px}
+.statusdot.online{background:var(--green)}
+.small-help{font-size:12px;color:var(--muted)}
+.quick{display:flex;gap:8px;flex-wrap:wrap}
+.empty{text-align:center;padding:30px;color:var(--muted)}
+.variance-pos{color:var(--green);font-weight:800}
+.variance-neg{color:var(--red);font-weight:800}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}
+.hide{display:none!important}
+footer{color:#6f8076;font-size:11px;text-align:center;padding:24px 0 8px}
+.chart-panel{min-height:300px}
+.chart-panel h2{font-size:13px;color:var(--muted);font-weight:750;letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px}
+.chart-wrap{position:relative;height:235px;width:100%}
+.chart-wrap canvas{max-width:100%}
+.toolbar-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.icon-btn{min-width:42px}
+.sidebar-collapsed aside.sidebar{display:none!important}
+.sidebar-collapsed main{width:100%;flex:0 0 100%;max-width:100%}
+.light-mode{--bg:#f3f7f4;--panel:#ffffff;--panel2:#edf3ef;--line:#d7e2da;--green:#16834b;--muted:#64756a;--text:#17251c;--red:#c63838;--amber:#946300;--blue:#1d65a3}
+.light-mode .sidebar{background:#e8f0eb}
+.light-mode .navbtn{color:#34473a}
+.light-mode .navbtn:hover,.light-mode .navbtn.active{background:#d7e9dd;border-color:#b5d7c1;color:#126d3b}
+.light-mode .form-control,.light-mode .form-select{background:#fff;color:#17251c;border-color:#c8d6cd}
+.light-mode .form-control:focus,.light-mode .form-select:focus{background:#fff;color:#17251c}
+.light-mode .btn-soft{background:#edf4ef;color:#243b2d;border-color:#cbd9d0}
+.light-mode .btn-soft:hover{background:#e2ecdf}
+.light-mode .table thead th{background:#eaf1ec;color:#354b3c}
+.light-mode .badge-good{color:#146b3c;background:#d8f1e1}
+.light-mode .badge-warn{color:#805700;background:#fff0c5}
+.light-mode .badge-bad{color:#a32222;background:#fde0e0}
+.light-mode .panel [style*="background:#0b100e"]{background:#f0f5f1!important}
+.light-mode .toastbox{background:#e8f5ec;color:#173d27;border-color:#b9dcc5}
+.light-mode .panel{box-shadow:0 1px 0 rgba(0,0,0,0.02), 0 8px 24px rgba(0,0,0,0.06)}
+body[dir="rtl"]{font-family:Tahoma,Arial,sans-serif}
+body[dir="rtl"] .sidebar{border-right:0;border-left:1px solid var(--line)}
+body[dir="rtl"] .navbtn{text-align:right}
+body[dir="rtl"] .statusdot{margin-right:0;margin-left:7px}
+body[dir="rtl"] .table{text-align:right}
+body[dir="rtl"] .form-label{text-align:right}
+body[dir="rtl"] .topline,body[dir="rtl"] .section-head{direction:rtl}
+body[dir="rtl"] .quick,body[dir="rtl"] .toolbar-actions{direction:rtl}
+@media(max-width:767px){
+  .chart-panel{min-height:275px}
+  .chart-wrap{height:210px}
+  .sidebar-collapsed aside.sidebar{display:block!important}
+  .sidebar-collapsed .navstack{display:none}
+  .sidebar-collapsed .sidebar{min-height:0}
+  .toolbar-actions{justify-content:flex-start}
+  .sidebar{min-height:auto;border-right:0;border-bottom:1px solid var(--line);padding:12px}
+  .navstack{display:flex;overflow:auto;gap:5px}
+  .navbtn{white-space:nowrap;width:auto;padding:8px 10px;margin:0}
+  .brandline{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .main{padding:16px 12px}
+  .topline{align-items:flex-start;flex-direction:column}
+  h1{font-size:22px}
+  .stat-value{font-size:23px}
+  .panel{padding:14px}
+  .modal-overlay{padding:8px}
+  .modal-content{max-height:94vh;border-radius:12px}
+  .modal-header,.modal-footer{padding:12px}
+  .modal-body{padding:12px}
+  .modal-header h3{font-size:16px}
+  .table-wrap{max-width:100%}
+  #page-analysis .table td,#page-analysis .table th{padding:8px 9px}
+}
 .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg)}
 .login-card{width:100%;max-width:430px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px;box-shadow:0 18px 55px #0005}
-.login-card .brand{font-size:30px}.login-help{color:var(--muted);font-size:12px}.store-picker{min-width:170px;max-width:240px}
+.login-card .brand{font-size:30px}
+.login-help{color:var(--muted);font-size:12px}
+.store-picker{min-width:170px;max-width:240px}
 #appRoot[hidden],#loginScreen[hidden]{display:none!important}
-#page-entry .table td, #page-entry .table th { padding:6px 8px; }
-#page-entry input.qty { padding:4px 6px; min-height:32px; }
-#page-entry tr.row-dirty td { background:#1c2a1f; }
-.light-mode #page-entry tr.row-dirty td { background:#e7f4ec; }
-#page-entry input.qty[readonly] { opacity:.65; cursor:not-allowed; }
-
-/* WELCOME POPUP */
+#page-entry .table td,#page-entry .table th{padding:6px 8px}
+#page-entry input.qty{padding:4px 6px;min-height:32px}
+#page-entry tr.row-dirty td{background:#1c2a1f}
+.light-mode #page-entry tr.row-dirty td{background:#e7f4ec}
+#page-entry input.qty[readonly]{opacity:.65;cursor:not-allowed}
 #welcomePopup{position:fixed;inset:0;z-index:4000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.78);backdrop-filter:blur(5px)}
 #welcomePopup.active{display:flex}
 .welcome-card{width:100%;max-width:460px;text-align:center;background:var(--panel);border:1px solid #365642;border-radius:20px;padding:30px 24px;box-shadow:0 24px 70px #0009;animation:welcomeIn .22s ease-out}
-.welcome-mark{width:62px;height:62px;margin:0 auto 16px;border-radius:18px;display:grid;place-items:center;background:#183425;color:var(--green);font-size:30px}
+.welcome-mark{width:62px;height:62px;margin:0 auto 16px;border-radius:18px;display:grid;place-items:center;background:#183425;color:var(--green);font-size:30px;box-shadow:0 8px 24px rgba(83,223,145,.18)}
 .welcome-title{font-size:24px;font-weight:850;line-height:1.25;margin-bottom:9px;color:var(--text);overflow-wrap:anywhere}
 .welcome-subtitle{font-size:13px;color:var(--muted);margin-bottom:22px}
 @keyframes welcomeIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
-/* MODAL CSS */
 .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1050;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.active{display:flex}
 .modal-content{background:var(--panel);border:1px solid var(--line);border-radius:15px;width:100%;max-width:1100px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,0.5)}
-@media(max-width:767px){.modal-overlay{padding:8px}.modal-content{max-height:94vh;border-radius:12px}.modal-header,.modal-footer{padding:12px}.modal-body{padding:12px}.modal-header h3{font-size:16px}.table-wrap{max-width:100%}#page-analysis .table td,#page-analysis .table th{padding:8px 9px}}
 .modal-header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;border-bottom:1px solid var(--line)}
 .modal-body{padding:20px;overflow-y:auto}
 .modal-footer{padding:15px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}
-
-/* CONNECTION GATE CSS */
 #connectionGate{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px}
 .gate-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:30px;width:100%;max-width:500px;text-align:center;box-shadow:0 18px 55px #0005}
 .gate-item{display:flex;justify-content:space-between;align-items:center;padding:10px 15px;background:var(--bg);border-radius:8px;margin-bottom:10px;border:1px solid var(--line);font-weight:600}
@@ -45,19 +146,18 @@
 .gate-status.success{background:#183425;color:var(--green)}
 .gate-status.error{background:#351b1b;color:var(--red)}
 .gate-status.waiting{background:#332b17;color:var(--amber)}
-
-/* LOADING CIRCLE CSS */
 #loadingOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(9,13,12,0.9);z-index:3000;display:none;flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .loader-circle{width:100px;height:100px;border-radius:50%;background:conic-gradient(var(--green) 0deg, var(--green) 0deg, rgba(83,223,145,0.1) 0deg);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:20px;transition:background 0.3s}
 .loader-circle::after{content:'';position:absolute;width:80px;height:80px;background:var(--bg);border-radius:50%}
 .loader-text{position:absolute;z-index:10;font-size:22px;font-weight:800;color:var(--green)}
-
-/* Non-blocking background load indicator */
 #bgLoadStatus{font-size:12px;color:var(--muted);margin-top:6px;min-height:16px;transition:opacity .25s;pointer-events:none}
 #bgLoadStatus .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--amber);margin-right:6px;vertical-align:middle;animation:bgPulse 1.4s infinite ease-in-out}
 #bgLoadStatus.done{opacity:.7}
 #bgLoadStatus.error{color:var(--red)}
 @keyframes bgPulse{0%,100%{opacity:.35}50%{opacity:1}}
+#welcomeMessage{letter-spacing:-.3px}
+#aiInsightsPanel{border-left:3px solid var(--blue)}
+#aiInsightsPanel h2{font-size:13px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
 </style></head>
 <body>
 
@@ -94,7 +194,7 @@
 </section>
 
 <div id="appRoot" hidden><div class="container-fluid app"><div class="row g-0">
-<aside class="col-md-2 sidebar"><div class="brandline"><div><div class="brand">Stock<span>Wise</span></div><div class="subbrand" data-i18n="subtitle">RESTAURANT INVENTORY</div></div><span class="badge text-bg-dark border border-secondary">v1.3</span></div><div class="navstack mt-4">
+<aside class="col-md-2 sidebar"><div class="brandline"><div><div class="brand">Stock<span>Wise</span></div><div class="subbrand" data-i18n="subtitle">RESTAURANT INVENTORY</div></div><span class="badge text-bg-dark border border-secondary">v1.4</span></div><div class="navstack mt-4">
 <button class="navbtn active" data-page="dashboard" data-i18n="navDashboard">▦ &nbsp; Dashboard</button>
 <button class="navbtn" data-page="entry">▦ &nbsp; Stock Grid</button>
 <button class="navbtn" data-page="analysis">📊 &nbsp; Item Analysis</button>
@@ -109,7 +209,7 @@
   <div class="panel mb-3" style="background:linear-gradient(90deg, #17251d 0%, #121917 100%); border-color:#294735;">
     <h2 class="mb-0" id="welcomeMessage" style="color:var(--green)">Welcome back</h2>
   </div>
-  
+
 <div class="row g-3 mb-3">
 <div class="col-6 col-xl-2"><div class="stat"><div class="stat-label" data-i18n="itemsMaster">ACTIVE ITEMS</div><div class="stat-value" id="statItems">0</div><div class="stat-note" data-i18n="loadedItemMaster">Loaded master</div></div></div>
 <div class="col-6 col-xl-2"><div class="stat"><div class="stat-label" data-i18n="varianceItems">VARIANCE ITEMS</div><div class="stat-value" id="statVariance">0</div><div class="stat-note" data-i18n="physicalDiffers">Count ≠ Closing</div></div></div>
@@ -119,14 +219,20 @@
 <div class="col-6 col-xl-2"><div class="stat"><div class="stat-label" data-i18n="lastRefresh">LAST REFRESH</div><div class="stat-value" style="font-size:18px" id="statRefresh">—</div><div class="stat-note" data-i18n="browserSession">Session</div></div></div>
 </div>
 
-<!-- Non-blocking background load indicator -->
 <div id="bgLoadStatus" aria-live="polite"></div>
 
 <div class="row g-3 mb-3">
-<div class="col-12 col-xl-3"><div class="panel chart-panel"><h2 data-i18n="varianceOverview">Variance Overview</h2><div class="chart-wrap"><canvas id="varianceDonut"></canvas></div></div></div>
-<div class="col-12 col-xl-5"><div class="panel chart-panel"><h2 data-i18n="varianceTrend">Variance Trend</h2><div class="chart-wrap"><canvas id="varianceTrendChart"></canvas></div></div></div>
-<div class="col-12 col-xl-4"><div class="panel chart-panel"><h2>Waste Analysis (Top 5)</h2><div class="chart-wrap"><canvas id="wasteChart"></canvas></div></div></div>
+<div class="col-12 col-xl-2"><div class="panel chart-panel"><h2 data-i18n="varianceOverview">Variance Overview</h2><div class="chart-wrap"><canvas id="varianceDonut"></canvas></div></div></div>
+<div class="col-12 col-xl-4"><div class="panel chart-panel"><h2 data-i18n="varianceTrend">Variance Trend</h2><div class="chart-wrap"><canvas id="varianceTrendChart"></canvas></div></div></div>
+<div class="col-12 col-xl-3"><div class="panel chart-panel"><h2>Waste Analysis (Top 5)</h2><div class="chart-wrap"><canvas id="wasteChart"></canvas></div></div></div>
+<div class="col-12 col-xl-3"><div class="panel chart-panel"><h2>Movement Classes</h2><div class="chart-wrap"><canvas id="movementChart"></canvas></div><div class="small-help mt-1">Fast (top 20%) · Moderate · Slow (bottom 40%)</div></div></div>
 </div>
+
+<div class="panel mb-3" id="aiInsightsPanel">
+  <h2>✦ AI Insights (on-device)</h2>
+  <div id="aiInsights" class="small-help">Waiting for data…</div>
+</div>
+
 <div class="panel mb-3"><div class="section-head"><h2 class="mb-0">Attention Required (Largest Variances)</h2><button class="btn-soft" onclick="showPage('records')" data-i18n="viewAll">View all →</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Code</th><th>Item Name</th><th>Closing</th><th>Physical</th><th>Variance</th></tr></thead><tbody id="dashboardRows"></tbody></table></div></div>
 <div class="panel"><h2 data-i18n="inventoryFormula">Inventory formula</h2><div class="muted">Expected closing = Opening + Receiving + Transfer In − Transfer Out − Waste − Sold</div><div class="muted mt-2">Variance = Physical Count − Expected Closing. Positive variance means excess stock; negative variance means shortage.</div></div>
 </section>
@@ -271,7 +377,7 @@
         <div class="col-6 col-md-3"><div class="stat-label">Expected On-Hand</div><div class="stat-value" id="modExpectedOnHand">0</div></div>
         <div class="col-6 col-md-3"><div class="stat-label">Actual Count</div><div class="stat-value" id="modActualCount">0</div></div>
       </div>
-      
+
       <div class="panel mb-3" style="background:var(--bg); text-align:center;">
         <div class="stat-label mb-2">PERIOD VARIANCE (Latest Actual - Expected Closing)</div>
         <div class="stat-value" id="modVariance" style="font-size:36px;">0</div>
@@ -322,12 +428,12 @@ const DEFAULT_URL = STORE_URLS["west walk"];
 let authToken="", authRole="", authStore="", stores=[], selectedStore="";
 const defaultItems=[{code:"W-0369",name:"Greek Yoghurt Dodoni",unit:"Kg"},{code:"W-0187",name:"Baladna Mozzarella",unit:"Kg"},{code:"W-0204",name:"Acqua Panna",unit:"pcs"},{code:"W-0218",name:"San Pellegrino",unit:"pcs"},{code:"W-0603",name:"Wrap & Co Swedish Bread",unit:"pcs"}];
 let items=[...defaultItems],records=[],months=[],failedRecordSheets=[],connected=false,lastRefresh=null,toastTimer;
-let currentAnalysisDetails = []; 
+let currentAnalysisDetails = [];
 
 /* cache + background load state */
 const sheetCache = {};
 const sheetInflight = {};
-let bgLoadState = { total:0, done:0, failed:0, running:false };
+let bgLoadState = { total:0, done:0, failed:0, running:false, current:"", history:[] };
 
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
 const n=v=>{if(v===null||v===undefined||v==="")return null;const x=Number(v);return Number.isFinite(x)?x:null};
@@ -343,34 +449,27 @@ function setBgStatus(state, extra){
   if(state === "loading"){
     const remaining = Math.max(0, bgLoadState.total - bgLoadState.done - bgLoadState.failed);
     el.className="";
-    el.innerHTML = `<span class="dot"></span>Loading background months… ${bgLoadState.done}/${bgLoadState.total}` +
+    el.innerHTML = `<span class="dot"></span>Loading months… ${bgLoadState.done}/${bgLoadState.total}` +
+      (bgLoadState.current ? ` · <b>${esc(bgLoadState.current)}</b>` : "") +
       (bgLoadState.failed ? ` · ${bgLoadState.failed} failed` : "") +
       (remaining ? "" : " · finalizing");
     return;
   }
   if(state === "done"){
-    el.className="done";
-    el.textContent = bgLoadState.failed
-      ? `Background load finished · ${bgLoadState.failed} sheet(s) failed: ${extra||""}`
-      : `All months loaded · ${records.length} record(s)`;
+    el.className = "done";
+    if(!bgLoadState.failed){
+      el.textContent = `All ${bgLoadState.total} month(s) loaded · ${records.length} record(s)`;
+    }else{
+      el.innerHTML = `Finished · ${bgLoadState.failed} sheet(s) failed: ${esc(failedRecordSheets.join(", "))} ` +
+        `— try <b>↻ Refresh data</b> in the dashboard, <b>Test connection</b> in Setup, or reload the page.`;
+    }
     return;
   }
   if(state === "error"){
-    el.className="error";
-    el.textContent = extra || "Background load failed.";
+    el.className = "error";
+    el.innerHTML = `${esc(extra||"Background load failed.")} — try <b>↻ Refresh data</b>, <b>Setup → Test connection</b>, or reload the page.`;
   }
 }
-
-// SOUND & CLICK EFFECT
-const clickAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
-function playClick() {
-  clickAudio.currentTime = 0;
-  clickAudio.volume = 0.3;
-  clickAudio.play().catch(e => {}); 
-}
-document.querySelectorAll('button').forEach(btn => {
-  btn.addEventListener('click', playClick);
-});
 
 // LOADING ANIMATION LOGIC
 function showLoading(show, storeName = "") {
@@ -395,60 +494,80 @@ function showLoading(show, storeName = "") {
   }
 }
 
-// CONNECTION GATE LOGIC
-async function testConnections() {
+/* ============================================================
+   CONNECTION GATE — blocks entry until every store passes
+   ============================================================ */
+async function testStoreConnection(store, rowEl, statusEl){
+  try{
+    const url = STORE_URLS[store.toLowerCase()];
+    if(!url) throw new Error("No URL configured");
+    const data = await new Promise((resolve, reject)=>{
+      const cb = "swcb_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+      const script = document.createElement("script");
+      const timer = setTimeout(()=>{ cleanup(); reject(new Error("Timeout")); }, 10000);
+      function cleanup(){ clearTimeout(timer); try{delete window[cb];}catch{} script.remove(); }
+      window[cb] = d => { cleanup(); resolve(d); };
+      script.onerror = ()=>{ cleanup(); reject(new Error("Script error")); };
+      script.src = url + "?action=items&callback=" + cb;
+      document.head.appendChild(script);
+    });
+    if(data && data.success === true){
+      statusEl.className = "gate-status success";
+      statusEl.textContent = "Connected ✓";
+      return true;
+    }
+    throw new Error("Invalid response");
+  }catch(e){
+    statusEl.className = "gate-status error";
+    statusEl.textContent = "Failed ✕ (" + (e.message||"error") + ")";
+    if(!rowEl.querySelector(".gate-retry")){
+      const btn = document.createElement("button");
+      btn.className = "btn-soft gate-retry";
+      btn.style.marginLeft = "8px";
+      btn.textContent = "Retry";
+      btn.onclick = async ()=>{
+        btn.disabled = true; btn.textContent = "Retrying…";
+        statusEl.className = "gate-status waiting";
+        statusEl.textContent = "Testing…";
+        const ok = await testStoreConnection(store, rowEl, statusEl);
+        if(ok) btn.remove(); else btn.disabled = false;
+        btn.textContent = "Retry";
+        evaluateGateState();
+      };
+      rowEl.appendChild(btn);
+    }
+    return false;
+  }
+}
+
+async function testConnections(){
   $("connectionGate").style.display = "flex";
-  $("gateTitle").textContent = "Testing Connections...";
+  $("gateTitle").textContent = "Testing Store Connections…";
   const container = $("gateStores");
   container.innerHTML = "";
   $("gateProceedBtn").disabled = true;
 
-  let allSuccess = true;
-
-  for (const store of stores) {
+  const results = [];
+  for (const store of stores){
     const row = document.createElement("div");
     row.className = "gate-item";
-    row.innerHTML = `<span style="text-transform:capitalize">${store}</span> <span class="gate-status waiting" id="gate-${store}">Testing...</span>`;
+    row.dataset.store = store;
+    row.innerHTML = `<span style="text-transform:capitalize">${esc(store)}</span>
+                     <span class="gate-status waiting" id="gate-${esc(store)}">Testing…</span>`;
     container.appendChild(row);
+    results.push(await testStoreConnection(store, row, $(`gate-${store}`)));
   }
 
-  for (const store of stores) {
-    const statusEl = $(`gate-${store}`);
-    try {
-      const url = STORE_URLS[store.toLowerCase()];
-      if(!url) throw new Error("No URL configured");
-      
-      const response = await new Promise((resolve, reject) => {
-        const cb = "swcb_" + Date.now() + "_" + Math.random().toString(36).slice(2);
-        const script = document.createElement("script");
-        let timer = setTimeout(() => { cleanup(); reject(new Error("Timeout")); }, 10000);
-        function cleanup() { clearTimeout(timer); try{delete window[cb]}catch{} script.remove(); }
-        window[cb] = data => { cleanup(); resolve(data); };
-        script.onerror = () => { cleanup(); reject(new Error("Script error")); };
-        script.src = url + "?action=items&callback=" + cb;
-        document.head.appendChild(script);
-      });
+  evaluateGateState(results);
+}
 
-      if(response && response.success === true) {
-        statusEl.className = "gate-status success";
-        statusEl.textContent = "Connected ✓";
-      } else {
-        throw new Error("Invalid response");
-      }
-    } catch (e) {
-      statusEl.className = "gate-status error";
-      statusEl.textContent = "Failed ✕";
-      allSuccess = false;
-    }
-  }
-
-  if (allSuccess) {
-    $("gateTitle").textContent = "All Connections Verified!";
-    $("gateProceedBtn").disabled = false;
-  } else {
-    $("gateTitle").textContent = "Connection Errors Detected";
-    $("gateProceedBtn").disabled = false;
-  }
+function evaluateGateState(results){
+  const statuses = Array.from(document.querySelectorAll("#gateStores .gate-status"));
+  const allOk = statuses.length > 0 && statuses.every(s=>s.classList.contains("success"));
+  $("gateProceedBtn").disabled = !allOk;
+  $("gateTitle").textContent = allOk
+    ? "All Connections Verified — You May Enter"
+    : "One or More Stores Failed — Retry Before Continuing";
 }
 
 function showWelcomePopup() {
@@ -472,13 +591,12 @@ function closeWelcomePopup() {
   $("welcomePopup").classList.remove("active");
 }
 
-function proceedToApp() {
-  playClick();
+function proceedToApp(){
+  const statuses = Array.from(document.querySelectorAll("#gateStores .gate-status"));
+  if(!statuses.length || !statuses.every(s=>s.classList.contains("success"))) return;
   $("connectionGate").style.display = "none";
-
   $("loginScreen").hidden = true;
   $("appRoot").hidden = false;
-
   refreshAll(false);
   window.setTimeout(showWelcomePopup, 250);
 }
@@ -486,13 +604,13 @@ function proceedToApp() {
 // LOGIN LOGIC
 async function loginStockWise(loginCode){
   const code = String(loginCode || "").trim().toLowerCase();
-  
+
   if (code === "000000") {
     authRole = "area";
     authStore = "";
     stores = ["west walk", "iconic", "gate mall", "bani hajir", "al mashaf"];
     selectedStore = stores[0];
-  } 
+  }
   else if (code === "00west walk") { authRole = "store"; authStore = "west walk"; stores = ["west walk"]; selectedStore = "west walk"; }
   else if (code === "00iconic") { authRole = "store"; authStore = "iconic"; stores = ["iconic"]; selectedStore = "iconic"; }
   else if (code === "00gate mall") { authRole = "store"; authStore = "gate mall"; stores = ["gate mall"]; selectedStore = "gate mall"; }
@@ -506,7 +624,7 @@ async function loginStockWise(loginCode){
   const select = $("storeSelect");
   select.innerHTML = stores.map(name => `<option value="${esc(name)}">${esc(name)}</option>`).join("");
   select.value = selectedStore;
-  
+
   if (authRole !== "area") {
     select.disabled = true;
     select.style.pointerEvents = "none";
@@ -516,7 +634,7 @@ async function loginStockWise(loginCode){
     select.style.pointerEvents = "auto";
     select.style.opacity = "1";
   }
-  
+
   testConnections();
 }
 
@@ -524,7 +642,7 @@ function logoutStockWise(){
  authToken="";authRole="";authStore="";stores=[];selectedStore="";items=[...defaultItems];records=[];months=[];connected=false;
  Object.keys(sheetCache).forEach(k=>delete sheetCache[k]);
  Object.keys(sheetInflight).forEach(k=>delete sheetInflight[k]);
- bgLoadState={total:0,done:0,failed:0,running:false};
+ bgLoadState={total:0,done:0,failed:0,running:false,current:"",history:[]};
  setBgStatus("hidden");
  if(window.gridResetState)window.gridResetState();
  $("appRoot").hidden=true;$("loginScreen").hidden=false;$("loginCode").value="";$("loginStatus").textContent="You have logged out. Enter your access code to continue.";
@@ -539,16 +657,16 @@ $("loginForm").addEventListener("submit",async function(event){
 });
 
 $("storeSelect").addEventListener("change",async function(){
- if(authRole!=="area") { 
-   this.value = authStore; 
-   return; 
+ if(authRole!=="area") {
+   this.value = authStore;
+   return;
  }
  if(!stores.includes(this.value)) { this.value=selectedStore; return; }
  selectedStore=this.value;
  records=[];items=[...defaultItems];months=[];
  Object.keys(sheetCache).forEach(k=>delete sheetCache[k]);
  Object.keys(sheetInflight).forEach(k=>delete sheetInflight[k]);
- bgLoadState={total:0,done:0,failed:0,running:false};
+ bgLoadState={total:0,done:0,failed:0,running:false,current:"",history:[]};
  setBgStatus("hidden");
  if(window.gridResetState)window.gridResetState();
  await refreshAll(true);
@@ -563,57 +681,118 @@ const i18n={
 let currentLanguage=localStorage.getItem("stockwise_language")||"en";
 let chartInstances={};
 function applyLanguage(){const dict=i18n[currentLanguage]||i18n.en;document.documentElement.lang=currentLanguage;document.body.dir=currentLanguage==="ar"?"rtl":"ltr";document.querySelectorAll("[data-i18n]").forEach(el=>{const key=el.dataset.i18n;if(dict[key])el.textContent=dict[key]});const titles={dashboard:dict.titleDashboard,entry:dict.titleEntry,analysis:dict.titleAnalysis,records:dict.titleRecords,reports:dict.titleReports,items:dict.titleItems,setup:dict.titleSetup};const active=document.querySelector(".navbtn.active")?.dataset.page||"dashboard";$("pageTitle").textContent=titles[active]||dict.titleDashboard;$("languageBtn").textContent=currentLanguage==="ar"?"English":"العربية";$("themeBtn").textContent=document.body.classList.contains("light-mode")?dict.themeLight:dict.themeDark;}
-function toggleLanguage(){currentLanguage=currentLanguage==="en"?"ar":"en";localStorage.setItem("stockwise_language",currentLanguage);applyLanguage();renderCharts()}
-function toggleTheme(){document.body.classList.toggle("light-mode");localStorage.setItem("stockwise_theme",document.body.classList.contains("light-mode")?"light":"dark");applyLanguage();renderCharts()}
+function toggleLanguage(){currentLanguage=currentLanguage==="en"?"ar":"en";localStorage.setItem("stockwise_language",currentLanguage);applyLanguage();scheduleCharts()}
+function toggleTheme(){document.body.classList.toggle("light-mode");localStorage.setItem("stockwise_theme",document.body.classList.contains("light-mode")?"light":"dark");applyLanguage();scheduleCharts()}
 function toggleSidebar(){document.querySelector(".app").classList.toggle("sidebar-collapsed");localStorage.setItem("stockwise_sidebar_collapsed",document.querySelector(".app").classList.contains("sidebar-collapsed")?"1":"0");setTimeout(()=>Object.values(chartInstances).forEach(c=>c.resize()),220)}
 
+/* ============================================================
+   CHARTS — corporate style, animation:false for speed
+   ============================================================ */
+let _renderChartsTimer = null;
+function scheduleCharts(){
+  clearTimeout(_renderChartsTimer);
+  _renderChartsTimer = setTimeout(()=>{ try{ renderCharts(); }catch(e){ console.warn(e); } }, 120);
+}
+
 function renderCharts(){
-  if(typeof Chart==="undefined")return;
-  const valid=records.filter(r=>r.variance!==null&&Number.isFinite(r.variance));
-  const shortages=valid.filter(r=>r.variance<-.0001).length,excess=valid.filter(r=>r.variance>.0001).length,matched=valid.length-shortages-excess;
-  const light=document.body.classList.contains("light-mode"),textColor=light?"#425449":"#b7c8bd",gridColor=light?"#dce6df":"#2b3b32";
-  const base={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:textColor,boxWidth:12,usePointStyle:true}}}};
-  
-  const upsert=(id,config)=>{
-    const canvas=$(id);if(!canvas)return;
-    if(chartInstances[id]){chartInstances[id].destroy()}
-    chartInstances[id]=new Chart(canvas,config)
+  if(typeof Chart === "undefined") return;
+  const valid = records.filter(r=>r.variance!==null && Number.isFinite(r.variance));
+  const light = document.body.classList.contains("light-mode");
+  const textColor = light ? "#425449" : "#b7c8bd";
+  const gridColor = light ? "#dce6df" : "#2b3b32";
+
+  const base = {
+    responsive:true,
+    maintainAspectRatio:false,
+    animation:false,
+    plugins:{
+      legend:{ labels:{ color:textColor, boxWidth:12, usePointStyle:true, font:{size:11} } },
+      tooltip:{ intersect:false, mode:"index" }
+    }
   };
- 
-  upsert("varianceDonut",{type:"doughnut",data:{labels:currentLanguage==="ar"?["عجز","زيادة","مطابق"]:["Shortage","Excess","Matched"],datasets:[{data:[shortages,excess,matched],backgroundColor:["#ff7777","#53df91","#78958a"],borderWidth:0,hoverOffset:7}]},options:{...base,cutout:"68%",plugins:{...base.plugins,legend:{position:"bottom",labels:{color:textColor,boxWidth:10,usePointStyle:true,padding:14}}}}});
- 
-  const byDate={};
-  valid.forEach(r=>{
-    const d=r.date||"Unknown";
-    byDate[d]=(byDate[d]||0)+r.variance
-  });
-  const trend=Object.entries(byDate).sort((a,b)=>a[0].localeCompare(b[0])).slice(-14);
-  upsert("varianceTrendChart",{
-    type:"line",
-    data:{
-      labels:trend.map(x=>x[0]),
-      datasets:[{
-        label:currentLanguage==="ar"?"صافي الفرق":"Net variance",
-        data:trend.map(x=>x[1]),
-        borderColor:"#53df91",
-        backgroundColor:"#53df9128",
-        fill:true,
-        tension:.35,
-        pointRadius:3,
-        pointHoverRadius:5
-      }]
-    },
-    options:{...base,scales:{x:{grid:{color:gridColor},ticks:{color:textColor,maxRotation:45,minRotation:0}},y:{grid:{color:gridColor},ticks:{color:textColor}}},plugins:{...base.plugins,legend:{display:false}}}
+  const upsert = (id, config)=>{
+    const canvas = $(id); if(!canvas) return;
+    if(chartInstances[id]) chartInstances[id].destroy();
+    chartInstances[id] = new Chart(canvas, config);
+  };
+
+  /* 1. Variance overview — donut */
+  const shortages = valid.filter(r=>r.variance < -0.0001).length;
+  const excess    = valid.filter(r=>r.variance >  0.0001).length;
+  const matched   = valid.length - shortages - excess;
+  upsert("varianceDonut", {
+    type:"doughnut",
+    data:{ labels:["Shortage","Excess","Matched"],
+           datasets:[{ data:[shortages,excess,matched],
+             backgroundColor:["#ff7777","#53df91","#78958a"],
+             borderWidth:0, hoverOffset:6 }] },
+    options:{ ...base, cutout:"66%",
+      plugins:{ ...base.plugins,
+        legend:{ position:"bottom",
+          labels:{ color:textColor, boxWidth:10, usePointStyle:true, padding:12, font:{size:11} } } } }
   });
 
-  const wasteList=valid.filter(r=>r.waste>0).sort((a,b)=>b.waste-a.waste).slice(0,5);
-  upsert("wasteChart",{
+  /* 2. Variance trend — line */
+  const byDate = {};
+  valid.forEach(r=>{ const d = r.date || "Unknown"; byDate[d] = (byDate[d]||0) + r.variance; });
+  const trend = Object.entries(byDate).sort((a,b)=>a[0].localeCompare(b[0])).slice(-14);
+  upsert("varianceTrendChart", {
+    type:"line",
+    data:{ labels: trend.map(x=>x[0]),
+      datasets:[{ label:"Net variance",
+        data: trend.map(x=>x[1]),
+        borderColor:"#53df91", backgroundColor:"#53df9122",
+        fill:true, tension:.3, pointRadius:2.5, pointHoverRadius:5, borderWidth:2 }] },
+    options:{ ...base,
+      scales:{
+        x:{ grid:{color:gridColor}, ticks:{ color:textColor, maxRotation:45, minRotation:0, font:{size:10} } },
+        y:{ grid:{color:gridColor}, ticks:{ color:textColor, font:{size:10} } } },
+      plugins:{ ...base.plugins, legend:{ display:false } } }
+  });
+
+  /* 3. Waste Top 5 — bar */
+  const wasteTop = valid.filter(r=>r.waste>0).sort((a,b)=>b.waste-a.waste).slice(0,5);
+  upsert("wasteChart", {
     type:"bar",
-    data:{
-      labels:wasteList.map(r=>r.code),
-      datasets:[{label:"Waste Qty",data:wasteList.map(r=>r.waste),backgroundColor:"#f5c96a",borderRadius:6}]
-    },
-    options:{...base,plugins:{...base.plugins,legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:textColor}},y:{grid:{color:gridColor},ticks:{color:textColor}}}}
+    data:{ labels: wasteTop.map(r=>r.code),
+      datasets:[{ label:"Waste qty", data: wasteTop.map(r=>r.waste),
+        backgroundColor:"#f5c96a", borderRadius:6, maxBarThickness:34 }] },
+    options:{ ...base,
+      scales:{
+        x:{ grid:{display:false}, ticks:{ color:textColor, font:{size:10} } },
+        y:{ grid:{color:gridColor}, ticks:{ color:textColor, font:{size:10} } } },
+      plugins:{ ...base.plugins, legend:{ display:false } } }
+  });
+
+  /* 4. Movement classes — horizontal bar (fast / moderate / slow) */
+  const byItem = {};
+  valid.forEach(r=>{
+    const k = r.code; if(!k) return;
+    byItem[k] = byItem[k] || { sold:0 };
+    byItem[k].sold += r.sold || 0;
+  });
+  const sorted = Object.entries(byItem).map(([code,v])=>({code, sold:v.sold})).sort((a,b)=>b.sold-a.sold);
+  const n = sorted.length;
+  const fastCut = Math.max(1, Math.ceil(n * 0.20));
+  const slowCut = Math.max(fastCut+1, Math.floor(n * 0.60));
+  const classOf = (i)=> i < fastCut ? "Fast" : i < slowCut ? "Moderate" : "Slow";
+  const colors = { Fast:"#53df91", Moderate:"#53a5df", Slow:"#f5c96a" };
+  const rows = [...sorted.slice(0,4), ...sorted.slice(fastCut, fastCut+4)].slice(0,8);
+  upsert("movementChart", {
+    type:"bar",
+    data:{ labels: rows.map(r=>r.code),
+      datasets:[{ label:"Sold",
+        data: rows.map(r=>r.sold),
+        backgroundColor: rows.map((r)=>{
+          const idx = sorted.findIndex(x=>x.code===r.code);
+          return colors[classOf(idx)];
+        }),
+        borderRadius:5, maxBarThickness:22 }] },
+    options:{ ...base, indexAxis:"y",
+      scales:{
+        x:{ grid:{color:gridColor}, ticks:{ color:textColor, font:{size:10} } },
+        y:{ grid:{display:false},       ticks:{ color:textColor, font:{size:10} } } },
+      plugins:{ ...base.plugins, legend:{ display:false } } }
   });
 }
 
@@ -623,7 +802,7 @@ function showPage(page){
   document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
   const titles={dashboard:"Dashboard",entry:"Stock Grid",analysis:"Item Analysis",records:"Inventory Records",reports:"Reports",items:"Item Master",setup:"Setup"};
   $("pageTitle").textContent=titles[page]||"StockWise";applyLanguage();
-  if(page==="dashboard")renderCharts();
+  if(page==="dashboard"){ renderDashboard(); scheduleCharts(); }
   if(page==="records")renderRecords();
   if(page==="reports")renderReports();
   if(page==="items")renderItems();
@@ -676,9 +855,7 @@ async function loadMonths(){if(!authToken||!selectedStore)throw new Error("Pleas
 function populateMonthSelects(){["recordMonth","reportMonth"].forEach(id=>{const sel=$(id),old=sel.value;sel.innerHTML='<option value="">All loaded sheets</option>'+months.map(m=>{let tag="";if(failedRecordSheets.indexOf(m)!==-1)tag=" (failed)";else if(!sheetCache[m])tag=" (not loaded yet)";return `<option value="${esc(m)}">${esc(m)}${tag}</option>`}).join("");if(months.includes(old))sel.value=old})}
 async function loadRecordsForSheet(sheet){if(!authToken||!selectedStore)throw new Error("Please log in and select a store first.");const data=await apiGet({action:"records",sheetName:sheet});if(data?.success===false)throw new Error(data.error||data.message||"Records endpoint returned an error for "+sheet);const arr=unwrapArray(data,["records","data","result","items"]);return arr.map(x=>normalizeRecord(x,sheet)).filter(r=>r.date||r.code||r.name)}
 
-/* Serialize all record fetches: one at a time, small gap, with retry.
-   Prevents Apps Script concurrency-limit failures when several months
-   are requested in a burst. */
+/* Serialize all record fetches: one at a time, small gap, with retry. */
 let _fetchQueue = Promise.resolve();
 function _sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
@@ -705,10 +882,6 @@ function fetchSheet(sheet, attempt){
   return p;
 }
 
-/**
- * Guarantee that every sheet covering [start, end] has been loaded.
- * Uses month tab names: "Daily Inventory" is October 2026, others are "<Month> <Year>".
- */
 async function ensureSheetsLoadedForRange(start, end, opts){
   if(!start || !end) return;
   const wantSheets = new Set();
@@ -729,9 +902,12 @@ async function ensureSheetsLoadedForRange(start, end, opts){
   const failedNames = [];
   for(const s of pending){
     try {
-      await fetchSheet(s);   // serialized by the shared queue, retries built in
+      bgLoadState.current = s;
+      await fetchSheet(s);
+      bgLoadState.current = "";
     } catch (e) {
       failedNames.push(s);
+      bgLoadState.current = "";
     }
   }
   const merged = [];
@@ -771,18 +947,19 @@ async function loadAllRecords(){
   const rest = unique.filter(s => s !== prioritySheet);
   const ordered = [prioritySheet, ...rest];
 
-  bgLoadState = { total: ordered.length, done: 0, failed: 0, running: true };
+  bgLoadState = { total: ordered.length, done: 0, failed: 0, running: true, current: "", history: [] };
   setBgStatus("loading");
 
-  // 1. Priority month: blocking, retried up to 5 times. If it still fails,
-  //    abort the refresh rather than painting a dashboard without current-month data.
+  // 1. Priority month: blocking, retried up to 5 times.
   let priorityList;
   let lastPriorityErr;
   for(let attempt = 1; attempt <= 5; attempt++){
     try {
+      bgLoadState.current = prioritySheet;
       priorityList = await loadRecordsForSheet(prioritySheet);
       sheetCache[prioritySheet] = priorityList;
       bgLoadState.done++;
+      bgLoadState.current = "";
       lastPriorityErr = null;
       break;
     } catch(e) {
@@ -807,11 +984,14 @@ async function loadAllRecords(){
   (async () => {
     for(const sheet of rest){
       try {
+        bgLoadState.current = sheet;
         await fetchSheet(sheet);
         bgLoadState.done++;
+        bgLoadState.current = "";
       } catch (err) {
         console.warn("Background sheet failed after retries:", sheet, err);
         bgLoadState.failed++;
+        bgLoadState.current = "";
       }
       const merged = [];
       months.forEach(sn => { if(sheetCache[sn]) merged.push(...sheetCache[sn]); });
@@ -847,20 +1027,20 @@ async function testConnection(){
 async function refreshAll(showMessage=false){
   if(!authToken||!selectedStore) return;
   if(authRole==="store") selectedStore=authStore;
-  
+
   showLoading(true, selectedStore.toUpperCase());
-  
+
   try{
     setConnection(false,"Loading Google Sheets data for "+selectedStore+"…");
-    
+
     Object.keys(sheetCache).forEach(k=>delete sheetCache[k]);
     Object.keys(sheetInflight).forEach(k=>delete sheetInflight[k]);
-    bgLoadState = { total:0, done:0, failed:0, running:false };
+    bgLoadState = { total:0, done:0, failed:0, running:false, current:"", history:[] };
     setBgStatus("loading");
 
     const itemOK=await loadItemMaster();
     await loadMonths();
-    await loadAllRecords();   // paints current month, backgrounds the rest
+    await loadAllRecords();
 
     if(!itemOK)throw new Error("Item master could not be loaded.");
     lastRefresh=new Date();
@@ -926,15 +1106,40 @@ function renderAll(){
   $("statMissing").textContent=missing;
   $("statRefresh").textContent=lastRefresh?lastRefresh.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}):"—";
 
-  renderDashboard();renderRecords();renderReports();renderItems();populateItemDatalist();renderCharts();
+  const active = document.querySelector(".page.active")?.id.replace("page-","") || "dashboard";
+  if(active==="dashboard") renderDashboard();
+  if(active==="records")  renderRecords();
+  if(active==="reports")  renderReports();
+  if(active==="items")    renderItems();
+  populateItemDatalist();
+  scheduleCharts();
   if(bgLoadState.running) setBgStatus("loading");
   if(window.gridOnDataChanged)window.gridOnDataChanged();
 }
 
 function varianceHTML(v){if(v===null||v===undefined)return"—";const cls=v<-.0001?"variance-neg":v>.0001?"variance-pos":"muted";return `<span class="${cls}">${v>0?"+":""}${esc(fmt(v))}</span>`}
+
+function renderInsights(){
+  const el = $("aiInsights"); if(!el) return;
+  const valid = records.filter(r=>r.variance!==null);
+  if(!valid.length){ el.textContent = "No counted records yet for the current month."; return; }
+  const shortages = valid.filter(r=>r.variance < -0.0001);
+  const excess    = valid.filter(r=>r.variance >  0.0001);
+  const worst     = valid.slice().sort((a,b)=>a.variance-b.variance)[0];
+  const wasteTop  = valid.filter(r=>r.waste>0).sort((a,b)=>b.waste-a.waste)[0];
+  const lines = [];
+  lines.push(`• ${shortages.length} shortage(s) and ${excess.length} excess record(s) detected in loaded data.`);
+  if(worst) lines.push(`• Largest shortage: <b>${esc(worst.name||worst.code)}</b> on ${esc(worst.date)} (${fmt(worst.variance)}).`);
+  if(wasteTop) lines.push(`• Highest waste: <b>${esc(wasteTop.name||wasteTop.code)}</b> (${fmt(wasteTop.waste)} units).`);
+  if(shortages.length > excess.length * 2) lines.push("• Pattern suggests systematic under-counting — recheck receiving logs.");
+  else if(excess.length > shortages.length * 2) lines.push("• Pattern suggests unrecorded sales or transfers out — verify daily transfers.");
+  el.innerHTML = lines.join("<br>");
+}
+
 function renderDashboard(){
   const sorted = records.filter(r => r.variance !== null).sort((a,b)=>Math.abs(b.variance)-Math.abs(a.variance)).slice(0,8);
   $("dashboardRows").innerHTML=sorted.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td></tr>`).join("")||'<tr><td colspan="6" class="empty">No variances found for '+selectedStore+'.</td></tr>';
+  renderInsights();
 }
 function filteredRecords(){const sheet=$("recordMonth").value,search=($("recordSearch").value||"").trim().toLowerCase();return records.filter(r=>(!sheet||r.sheetName===sheet)&&(!search||r.code.toLowerCase().includes(search)||r.name.toLowerCase().includes(search))).sort((a,b)=>(b.date||"").localeCompare(a.date||""))}
 
@@ -1013,6 +1218,16 @@ async function runItemAnalysis(){
   try{period=getAnalysisPeriod()}catch(e){return toast(e.message)}
   await ensureSheetsLoadedForRange(period.start, period.end, {showToast:true});
 
+  if(failedRecordSheets.length){
+    const retry = confirm("Some month sheets failed to load (" +
+      failedRecordSheets.join(", ") + ").\n\nRetry now?\n\n" +
+      "Cancel = run analysis with partial data.");
+    if(retry){
+      failedRecordSheets = [];
+      await ensureSheetsLoadedForRange(period.start, period.end, {showToast:false});
+    }
+  }
+
   const filtered=records.filter(r=>r.date&&r.date>=period.start&&r.date<=period.end)
     .sort((a,b)=>(a.date||"").localeCompare(b.date||"")||a.code.localeCompare(b.code));
   $("analysisStoreName").textContent=(selectedStore||"No store selected").toUpperCase();
@@ -1050,7 +1265,12 @@ async function runItemAnalysis(){
     <td>${esc(fmt(item.expectedOnHand))}</td><td>${item.actualCount!==null?esc(fmt(item.actualCount)):"—"}${item.actualDate?`<div class="small-help">${esc(item.actualDate)}</div>`:""}</td>
     <td>${varianceHTML(item.variance)}</td>
     <td><button class="btn-green" style="padding:5px 9px;font-size:12px" onclick="openItemModal('${esc(item.code)}')">View</button></td></tr>`).join("");
-  $("analysisSummary").textContent=`${list.length} item(s) · ${filtered.length} daily record(s) · ${period.label} · ${selectedStore.toUpperCase()}. Positive variance = excess; negative variance = shortage.`+(failedRecordSheets.length?` WARNING: some sheets could not be loaded (${failedRecordSheets.join(", ")}); results may be incomplete.`:"");
+
+  const sheetSet = new Set(filtered.map(r=>r.sheetName));
+  const accurateMsg = `✓ Analysis accurate · ${list.length} item(s) · ${filtered.length} daily record(s) · ${sheetSet.size} sheet(s) · ${period.label}`;
+  toast(accurateMsg);
+  $("analysisSummary").textContent = accurateMsg + ` · ${selectedStore.toUpperCase()}. Positive variance = excess; negative = shortage.` +
+    (failedRecordSheets.length ? ` ⚠ Some sheets could not be loaded (${failedRecordSheets.join(", ")}); refresh or retry via Setup.` : "");
 }
 function openItemModal(code){
   const details=currentAnalysisDetails.filter(r=>r.code.toLowerCase()===code.toLowerCase())
@@ -1086,7 +1306,7 @@ $("analysisStart").addEventListener("change",()=>{if($("analysisMode").value==="
 $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="range"&&$("analysisStart").value)runItemAnalysis()});
 
 /* ============================================================
-   STOCK GRID module — additive only.
+   STOCK GRID module
    ============================================================ */
 (function () {
   "use strict";
@@ -1239,7 +1459,7 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
 
     try {
       await Promise.race([
-        saveToSheet(payload), 
+        saveToSheet(payload),
         sleep(5000).then(()=>{ throw new Error("Request timed out"); })
       ]);
     } catch (err) {
@@ -1248,16 +1468,16 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
 
     delete sheetCache[G.sheet];
 
-    dirty.forEach(r=>{ 
-      r.existing = true; 
-      r.dirty = false; 
-      r.status = "saved"; 
+    dirty.forEach(r=>{
+      r.existing = true;
+      r.dirty = false;
+      r.status = "saved";
     });
 
     G.saving = false;
     $("gridSaveBtn").disabled = false;
     renderAll();
-    
+
     const msg = `Saved in Google Sheet`;
     $("gridStatus").textContent = msg;
     toast(msg);
@@ -1298,11 +1518,11 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", bind); else bind();
 })();
 
-(function init(){ 
+(function init(){
   $("date").value=today();
   $("gridDate").value=today();
   $("gridSheetBadge").textContent=sheetNameForDate(today());
-  
+
   const d = new Date();
   const firstDay = new Date(d.getFullYear(), d.getMonth(), 1);
   const localISO = date => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
@@ -1311,13 +1531,13 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
   $("analysisDate").value = today();
   $("analysisMonth").value = today().slice(0,7);
   updateAnalysisControls();
-  
+
   $("scriptUrl").value=localStorage.getItem("stockwise_script_url")||DEFAULT_URL;
   if(localStorage.getItem("stockwise_theme")==="light")document.body.classList.add("light-mode");
   if(localStorage.getItem("stockwise_sidebar_collapsed")==="1")document.querySelector(".app").classList.add("sidebar-collapsed");
   applyLanguage();
   populateItemDatalist();
   renderAll();
-  setConnection(false,"Please log in to load store data."); 
+  setConnection(false,"Please log in to load store data.");
 })();
 </script></div></body></html>
