@@ -36,11 +36,13 @@ h2{font-size:17px;font-weight:750;margin:0 0 15px}
 .btn-green{background:var(--green);border:1px solid var(--green);color:#07110b;font-weight:800;border-radius:9px;padding:9px 14px;transition:transform 0.1s, background 0.2s;box-shadow:0 4px 14px rgba(83,223,145,.18)}
 .btn-green:active{transform:scale(0.95)}
 .btn-green:hover{background:#76f1a9;color:#07110b;box-shadow:0 6px 18px rgba(83,223,145,.28)}
+.btn-green:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
 .btn-soft{background:#1a2820;color:#d8e8dd;border:1px solid #34483b;border-radius:9px;padding:8px 12px;transition:transform 0.1s, background 0.2s}
 .btn-soft:active{transform:scale(0.95)}
 .btn-soft:hover{background:#213227;border-color:#3f5a49}
+.btn-soft:disabled{opacity:.55;cursor:not-allowed;transform:none}
 .btn-danger-soft{background:#321b1b;color:#ffb5b5;border:1px solid #633535;border-radius:8px;padding:6px 10px}
-.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px;-webkit-overflow-scrolling:touch}
 .table{--bs-table-bg:transparent;--bs-table-color:var(--text);--bs-table-border-color:var(--line);margin:0;white-space:nowrap}
 .table thead th{background:#19231d;color:#b7c8bd;font-size:11px;text-transform:uppercase;letter-spacing:.7px;font-weight:750;position:sticky;top:0;z-index:1}
 .table td,.table th{padding:11px 12px;vertical-align:middle}
@@ -55,9 +57,11 @@ h2{font-size:17px;font-weight:750;margin:0 0 15px}
 .small-help{font-size:12px;color:var(--muted)}
 .quick{display:flex;gap:8px;flex-wrap:wrap}
 .empty{text-align:center;padding:30px;color:var(--muted)}
-.variance-pos{color:var(--green);font-weight:800}
+/* Variance colours — RED = shortage, GREEN = tally, YELLOW = excess */
+.variance-pos{color:var(--amber);font-weight:800}
 .variance-neg{color:var(--red);font-weight:800}
-.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}
+.variance-zero{color:var(--green);font-weight:800}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px;flex-wrap:wrap}
 .hide{display:none!important}
 footer{color:#6f8076;font-size:11px;text-align:center;padding:24px 0 8px}
 .chart-panel{min-height:300px}
@@ -83,14 +87,6 @@ footer{color:#6f8076;font-size:11px;text-align:center;padding:24px 0 8px}
 .light-mode .panel [style*="background:#0b100e"]{background:#f0f5f1!important}
 .light-mode .toastbox{background:#e8f5ec;color:#173d27;border-color:#b9dcc5}
 .light-mode .panel{box-shadow:0 1px 0 rgba(0,0,0,0.02), 0 8px 24px rgba(0,0,0,0.06)}
-body[dir="rtl"]{font-family:Tahoma,Arial,sans-serif}
-body[dir="rtl"] .sidebar{border-right:0;border-left:1px solid var(--line)}
-body[dir="rtl"] .navbtn{text-align:right}
-body[dir="rtl"] .statusdot{margin-right:0;margin-left:7px}
-body[dir="rtl"] .table{text-align:right}
-body[dir="rtl"] .form-label{text-align:right}
-body[dir="rtl"] .topline,body[dir="rtl"] .section-head{direction:rtl}
-body[dir="rtl"] .quick,body[dir="rtl"] .toolbar-actions{direction:rtl}
 @media(max-width:767px){
   .chart-panel{min-height:275px}
   .chart-wrap{height:210px}
@@ -158,6 +154,32 @@ body[dir="rtl"] .quick,body[dir="rtl"] .toolbar-actions{direction:rtl}
 #welcomeMessage{letter-spacing:-.3px}
 #aiInsightsPanel{border-left:3px solid var(--blue)}
 #aiInsightsPanel h2{font-size:13px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
+
+/* ---------- Records page: month status bar ---------- */
+.month-status{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.month-chip{font-size:11px;padding:4px 9px;border-radius:20px;border:1px solid var(--line);background:var(--bg);color:var(--muted);display:inline-flex;align-items:center;gap:5px}
+.month-chip.loaded{color:var(--green);border-color:#294735}
+.month-chip.loading{color:var(--amber);border-color:#4a3d1d}
+.month-chip.failed{color:var(--red);border-color:#4a2323}
+.month-chip .dot{width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block}
+
+/* ---------- Reports page ---------- */
+.report-actions{display:flex;gap:8px;flex-wrap:wrap}
+.report-meter{height:8px;border-radius:5px;background:#1d2a23;overflow:hidden;margin:12px 0 6px}
+.report-meter .fill{height:100%;width:0;background:linear-gradient(90deg,#53df91,#53a5df);transition:width .25s ease}
+.report-meter-text{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:10px}
+.report-meter-text b{color:var(--text)}
+.report-status{padding:10px 13px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-size:13px;margin-bottom:12px}
+.report-status.running{border-color:#4a3d1d;color:var(--amber)}
+.report-status.done{border-color:#294735;color:var(--green)}
+.report-status.error{border-color:#4a2323;color:var(--red)}
+.export-btns{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:767px){
+  .report-actions{flex-direction:column}
+  .report-actions .btn-green,.report-actions .btn-soft{width:100%}
+  .export-btns .btn-soft{width:100%}
+  #page-reports .stat-value{font-size:20px}
+}
 </style></head>
 <body>
 
@@ -194,16 +216,16 @@ body[dir="rtl"] .quick,body[dir="rtl"] .toolbar-actions{direction:rtl}
 </section>
 
 <div id="appRoot" hidden><div class="container-fluid app"><div class="row g-0">
-<aside class="col-md-2 sidebar"><div class="brandline"><div><div class="brand">Stock<span>Wise</span></div><div class="subbrand" data-i18n="subtitle">RESTAURANT INVENTORY</div></div><span class="badge text-bg-dark border border-secondary">v1.4</span></div><div class="navstack mt-4">
-<button class="navbtn active" data-page="dashboard" data-i18n="navDashboard">▦ &nbsp; Dashboard</button>
+<aside class="col-md-2 sidebar"><div class="brandline"><div><div class="brand">Stock<span>Wise</span></div><div class="subbrand">RESTAURANT INVENTORY</div></div><span class="badge text-bg-dark border border-secondary">v1.9</span></div><div class="navstack mt-4">
+<button class="navbtn active" data-page="dashboard">▦ &nbsp; Dashboard</button>
 <button class="navbtn" data-page="entry">▦ &nbsp; Stock Grid</button>
 <button class="navbtn" data-page="analysis">📊 &nbsp; Item Analysis</button>
-<button class="navbtn" data-page="records" data-i18n="navRecords">▤ &nbsp; Records</button>
-<button class="navbtn" data-page="reports" data-i18n="navReports">▥ &nbsp; Reports</button>
-<button class="navbtn" data-page="items" data-i18n="navItems">☷ &nbsp; Item Master</button>
-<button class="navbtn" data-page="setup" data-i18n="navSetup">⚙ &nbsp; Setup</button>
-</div><div class="mt-4 small-help"><div><span id="statusDot" class="statusdot"></span><span id="connectionText">Google Sheets not checked</span></div><div class="mt-2" data-i18n="dataSource">Data source: Google Sheets</div></div></aside>
-<main class="col-md-10"><div class="main"><div class="topline"><div><div class="toolbar-actions mb-2"><button class="btn-soft icon-btn" onclick="toggleSidebar()" title="Expand or collapse menu" data-i18n="menuToggle">☰ Menu</button><button class="btn-soft" onclick="toggleTheme()" id="themeBtn" data-i18n="themeDark">☀ Light mode</button><button class="btn-soft" onclick="toggleLanguage()" id="languageBtn">العربية</button></div><div class="eyebrow" data-i18n="eyebrow">Operations control</div><h1 id="pageTitle">Dashboard</h1><div class="muted" data-i18n="pageSub">Daily stock control · actual vs theoretical · variance monitoring</div></div><div class="quick align-items-center"><label for="storeSelect" class="small-help mb-0">Store</label><select class="form-select store-picker" id="storeSelect" aria-label="Select store"></select><button class="btn-soft" onclick="refreshAll(true)" data-i18n="refresh">↻ Refresh data</button><button class="btn-green" onclick="showPage('entry')" data-i18n="newEntry">＋ New entry</button><button class="btn-soft" onclick="logoutStockWise()">Log out</button></div></div>
+<button class="navbtn" data-page="records">▤ &nbsp; Records</button>
+<button class="navbtn" data-page="reports">▥ &nbsp; Reports</button>
+<button class="navbtn" data-page="items">☷ &nbsp; Item Master</button>
+<button class="navbtn" data-page="setup">⚙ &nbsp; Setup</button>
+</div><div class="mt-4 small-help"><div><span id="statusDot" class="statusdot"></span><span id="connectionText">Google Sheets not checked</span></div><div class="mt-2">Data source: Google Sheets</div></div></aside>
+<main class="col-md-10"><div class="main"><div class="topline"><div><div class="toolbar-actions mb-2"><button class="btn-soft icon-btn" onclick="toggleSidebar()" title="Expand or collapse menu">☰ Menu</button><button class="btn-soft" onclick="toggleTheme()" id="themeBtn">☀ Light mode</button></div><div class="eyebrow">Operations control</div><h1 id="pageTitle">Dashboard</h1><div class="muted">Daily stock control · actual vs theoretical · variance monitoring</div></div><div class="quick align-items-center"><label for="storeSelect" class="small-help mb-0">Store</label><select class="form-select store-picker" id="storeSelect" aria-label="Select store"></select><button class="btn-soft" onclick="refreshAll(true)">↻ Refresh data</button><button class="btn-green" onclick="showPage('entry')">＋ New entry</button><button class="btn-soft" onclick="logoutStockWise()">Log out</button></div></div>
 
 <section id="page-dashboard" class="page active">
   <div class="panel mb-3" style="background:linear-gradient(90deg, #17251d 0%, #121917 100%); border-color:#294735;">
@@ -211,19 +233,19 @@ body[dir="rtl"] .quick,body[dir="rtl"] .toolbar-actions{direction:rtl}
   </div>
 
 <div class="row g-3 mb-3">
-<div class="col-6 col-xl-2"><div class="stat"><div class="stat-label" data-i18n="itemsMaster">ACTIVE ITEMS</div><div class="stat-value" id="statItems">0</div><div class="stat-note" data-i18n="loadedItemMaster">Loaded master</div></div></div>
-<div class="col-6 col-xl-2"><div class="stat"><div class="stat-label" data-i18n="varianceItems">VARIANCE ITEMS</div><div class="stat-value" id="statVariance">0</div><div class="stat-note" data-i18n="physicalDiffers">Count ≠ Closing</div></div></div>
+<div class="col-6 col-xl-2"><div class="stat"><div class="stat-label">ACTIVE ITEMS</div><div class="stat-value" id="statItems">0</div><div class="stat-note">Loaded master</div></div></div>
+<div class="col-6 col-xl-2"><div class="stat"><div class="stat-label">VARIANCE ITEMS</div><div class="stat-value" id="statVariance">0</div><div class="stat-note">Count ≠ Closing</div></div></div>
 <div class="col-6 col-xl-2"><div class="stat"><div class="stat-label">TOTAL VARIANCE</div><div class="stat-value" id="statTotalVar">0</div><div class="stat-note">Absolute units</div></div></div>
 <div class="col-6 col-xl-2"><div class="stat"><div class="stat-label">TOTAL WASTE</div><div class="stat-value" id="statTotalWaste">0</div><div class="stat-note">Units wasted</div></div></div>
 <div class="col-6 col-xl-2"><div class="stat"><div class="stat-label">MISSING COUNTS</div><div class="stat-value" id="statMissing">0</div><div class="stat-note">Physical not entered</div></div></div>
-<div class="col-6 col-xl-2"><div class="stat"><div class="stat-label" data-i18n="lastRefresh">LAST REFRESH</div><div class="stat-value" style="font-size:18px" id="statRefresh">—</div><div class="stat-note" data-i18n="browserSession">Session</div></div></div>
+<div class="col-6 col-xl-2"><div class="stat"><div class="stat-label">LAST REFRESH</div><div class="stat-value" style="font-size:18px" id="statRefresh">—</div><div class="stat-note">Session</div></div></div>
 </div>
 
 <div id="bgLoadStatus" aria-live="polite"></div>
 
 <div class="row g-3 mb-3">
-<div class="col-12 col-xl-2"><div class="panel chart-panel"><h2 data-i18n="varianceOverview">Variance Overview</h2><div class="chart-wrap"><canvas id="varianceDonut"></canvas></div></div></div>
-<div class="col-12 col-xl-4"><div class="panel chart-panel"><h2 data-i18n="varianceTrend">Variance Trend</h2><div class="chart-wrap"><canvas id="varianceTrendChart"></canvas></div></div></div>
+<div class="col-12 col-xl-2"><div class="panel chart-panel"><h2>Variance Overview</h2><div class="chart-wrap"><canvas id="varianceDonut"></canvas></div></div></div>
+<div class="col-12 col-xl-4"><div class="panel chart-panel"><h2>Variance Trend</h2><div class="chart-wrap"><canvas id="varianceTrendChart"></canvas></div></div></div>
 <div class="col-12 col-xl-3"><div class="panel chart-panel"><h2>Waste Analysis (Top 5)</h2><div class="chart-wrap"><canvas id="wasteChart"></canvas></div></div></div>
 <div class="col-12 col-xl-3"><div class="panel chart-panel"><h2>Movement Classes</h2><div class="chart-wrap"><canvas id="movementChart"></canvas></div><div class="small-help mt-1">Fast (top 20%) · Moderate · Slow (bottom 40%)</div></div></div>
 </div>
@@ -233,8 +255,8 @@ body[dir="rtl"] .quick,body[dir="rtl"] .toolbar-actions{direction:rtl}
   <div id="aiInsights" class="small-help">Waiting for data…</div>
 </div>
 
-<div class="panel mb-3"><div class="section-head"><h2 class="mb-0">Attention Required (Largest Variances)</h2><button class="btn-soft" onclick="showPage('records')" data-i18n="viewAll">View all →</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Code</th><th>Item Name</th><th>Closing</th><th>Physical</th><th>Variance</th></tr></thead><tbody id="dashboardRows"></tbody></table></div></div>
-<div class="panel"><h2 data-i18n="inventoryFormula">Inventory formula</h2><div class="muted">Expected closing = Opening + Receiving + Transfer In − Transfer Out − Waste − Sold</div><div class="muted mt-2">Variance = Physical Count − Expected Closing. Positive variance means excess stock; negative variance means shortage.</div></div>
+<div class="panel mb-3"><div class="section-head"><h2 class="mb-0">Attention Required (Largest Variances)</h2><button class="btn-soft" onclick="showPage('records')">View all →</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Code</th><th>Item Name</th><th>Closing</th><th>Physical</th><th>Variance</th></tr></thead><tbody id="dashboardRows"></tbody></table></div></div>
+<div class="panel"><h2>Inventory formula</h2><div class="muted">Expected closing = Opening + Receiving + Transfer In − Transfer Out − Waste − Sold</div><div class="muted mt-2">Variance = Physical Count − Expected Closing. Positive variance means excess stock (yellow); negative variance means shortage (red); zero/tally is green.</div></div>
 </section>
 
 <section id="page-analysis" class="page">
@@ -247,7 +269,7 @@ body[dir="rtl"] .quick,body[dir="rtl"] .toolbar-actions{direction:rtl}
       <div class="col-12 col-md-3">
         <label class="form-label" for="analysisMode">Analysis period</label>
         <select class="form-select" id="analysisMode">
-          <option value="mtd">Month to date (current month)</option>
+          <option value="mtd">Month to date (1st → today)</option>
           <option value="month">Full selected month</option>
           <option value="single">Single date</option>
           <option value="range" selected>Date to date range</option>
@@ -273,13 +295,19 @@ body[dir="rtl"] .quick,body[dir="rtl"] .toolbar-actions{direction:rtl}
         <button class="btn-green w-100" type="button" onclick="runItemAnalysis()">Run Analysis</button>
       </div>
     </div>
+    <div class="row g-2 mb-3">
+      <div class="col-12 col-md-6">
+        <label class="form-label" for="analysisSearch">Search code or item name</label>
+        <input class="form-control" id="analysisSearch" placeholder="Filter analysis rows…" autocomplete="off" oninput="filterAnalysisRows()">
+      </div>
+    </div>
     <div id="analysisSummary" class="small-help mb-3" aria-live="polite">Choose a period and run analysis.</div>
     <div class="table-wrap" style="max-height:65vh">
       <table class="table">
         <thead><tr>
-          <th>Code</th><th>Item Name</th><th>Opening</th><th>Received</th><th>Transfer In</th><th>Transfer Out</th><th>Waste</th><th>Sold</th><th>Expected Closing</th><th>Actual Count</th><th>Variance</th><th>View</th>
+          <th>Code</th><th>Item Name</th><th>Opening</th><th>Received</th><th>Transfer In</th><th>Transfer Out</th><th>Waste</th><th>Sold</th><th>Expected Closing</th><th>Actual Count</th><th>Variance</th><th>Result</th><th>View</th>
         </tr></thead>
-        <tbody id="analysisRows"><tr><td colspan="12" class="empty">Select a period and run analysis.</td></tr></tbody>
+        <tbody id="analysisRows"><tr><td colspan="13" class="empty">Select a period and run analysis.</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -303,13 +331,15 @@ body[dir="rtl"] .quick,body[dir="rtl"] .toolbar-actions{direction:rtl}
       <div class="col-12 col-md-5 d-flex align-items-end gap-2 flex-wrap">
         <button class="btn-soft" type="button" onclick="gridLoad()">↻ Load grid</button>
         <button class="btn-green" type="button" id="gridSaveBtn" onclick="gridSaveChanged()">Save changed rows</button>
+        <button class="btn-soft" type="button" id="gridResaveBtn" onclick="gridMarkAllDirty()" title="Mark every row as changed so it will be sent again on the next save">↺ Re-save all rows</button>
         <button class="btn-soft" type="button" onclick="gridClearChanges()">Clear changes</button>
         <span class="small-help align-self-center" id="gridStatus">Pick a date and click Load grid.</span>
       </div>
     </div>
     <div class="small-help mb-2">
-      Opening is editable only on <b>2026-10-01</b>. Closing and Variance are preview only and are <b>never posted</b> (sheet formulas stay intact).
-      All changed rows are saved in a single batch.
+      Opening is editable only on <b>2026-10-01</b>. Closing and Variance are preview only (sheet formulas stay intact).
+      Rows whose computed closing would be <b>negative are skipped automatically</b> — the rest of the batch still saves.
+      Skipped rows stay highlighted in the grid so you can fix their numbers and retry.
     </div>
     <div class="table-wrap" style="max-height:70vh">
       <table class="table" id="gridTable">
@@ -350,13 +380,105 @@ body[dir="rtl"] .quick,body[dir="rtl"] .toolbar-actions{direction:rtl}
   </div>
 </section>
 
-<section id="page-records" class="page"><div class="panel"><div class="section-head"><h2 class="mb-0">Inventory records</h2><button class="btn-soft" onclick="exportCSV()">Export CSV</button></div><div class="row g-2 mb-3"><div class="col-12 col-md-3"><label class="form-label">Month / sheet</label><select class="form-select" id="recordMonth"><option value="">All loaded sheets</option></select></div><div class="col-12 col-md-5"><label class="form-label">Search</label><input class="form-control" id="recordSearch" placeholder="Search code or item name"></div><div class="col-12 col-md-4 d-flex align-items-end"><button class="btn-soft" onclick="renderRecords()">Apply filters</button></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Code</th><th>Item name</th><th>Opening</th><th>Received</th><th>Transfer in</th><th>Transfer out</th><th>Waste</th><th>Sold</th><th>Closing</th><th>Physical</th><th>Variance</th><th>Action</th></tr></thead><tbody id="recordsRows"></tbody></table></div><div id="recordsSummary" class="small-help mt-3"></div></div></section>
+<!-- ============ RECORDS ============ -->
+<section id="page-records" class="page">
+  <div class="panel">
+    <div class="section-head">
+      <h2 class="mb-0">Inventory records</h2>
+      <button class="btn-soft" onclick="exportCSV()">Export CSV</button>
+    </div>
+    <div class="row g-2 mb-3">
+      <div class="col-12 col-md-3">
+        <label class="form-label">Month / sheet</label>
+        <select class="form-select" id="recordMonth"><option value="">All loaded sheets</option></select>
+      </div>
+      <div class="col-12 col-md-5">
+        <label class="form-label">Search</label>
+        <input class="form-control" id="recordSearch" placeholder="Search code or item name">
+      </div>
+      <div class="col-12 col-md-4 d-flex align-items-end gap-2 flex-wrap">
+        <button class="btn-soft" onclick="renderRecords()">Apply filters</button>
+        <button class="btn-soft" onclick="loadSelectedRecordMonth()" id="recordLoadBtn">Load selected month</button>
+      </div>
+    </div>
+    <div class="month-status" id="recordMonthStatus"></div>
+    <div id="recordLoadBar" class="report-meter hide">
+      <div class="fill" id="recordLoadFill"></div>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>Date</th><th>Code</th><th>Item name</th><th>Opening</th><th>Received</th><th>Transfer in</th><th>Transfer out</th><th>Waste</th><th>Sold</th><th>Closing</th><th>Physical</th><th>Variance</th><th>Action</th></tr></thead>
+        <tbody id="recordsRows"></tbody>
+      </table>
+    </div>
+    <div id="recordsSummary" class="small-help mt-3"></div>
+  </div>
+</section>
 
-<section id="page-reports" class="page"><div class="panel mb-3"><h2>Inventory variance report</h2><div class="row g-2 mb-3"><div class="col-12 col-md-4"><label class="form-label">Sheet</label><select class="form-select" id="reportMonth"><option value="">All loaded sheets</option></select></div><div class="col-12 col-md-4"><label class="form-label">Variance filter</label><select class="form-select" id="varianceFilter"><option value="all">All records</option><option value="variance">Only non-zero variance</option><option value="shortage">Shortages only</option><option value="excess">Excess only</option></select></div><div class="col-12 col-md-4 d-flex align-items-end"><button class="btn-soft" onclick="renderReports()">Generate report</button></div></div><div class="row g-3 mb-3"><div class="col-6 col-lg-3"><div class="stat"><div class="stat-label">COUNTED RECORDS</div><div class="stat-value" id="reportCount">0</div></div></div><div class="col-6 col-lg-3"><div class="stat"><div class="stat-label">SHORTAGES</div><div class="stat-value" id="reportShortages">0</div></div></div><div class="col-6 col-lg-3"><div class="stat"><div class="stat-label">EXCESS</div><div class="stat-value" id="reportExcess">0</div></div></div><div class="col-6 col-lg-3"><div class="stat"><div class="stat-label">NET VARIANCE</div><div class="stat-value" id="reportNet">0</div></div></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Code</th><th>Item</th><th>Expected closing</th><th>Physical</th><th>Variance</th><th>Result</th></tr></thead><tbody id="reportRows"></tbody></table></div></div></section>
+<!-- ============ REPORTS ============ -->
+<section id="page-reports" class="page">
+  <div class="panel mb-3">
+    <div class="section-head">
+      <h2 class="mb-0">Inventory variance report</h2>
+      <span class="badge badge-good" id="reportPeriodBadge">—</span>
+    </div>
+    <div class="row g-2 mb-3">
+      <div class="col-12 col-md-4">
+        <label class="form-label">Sheet</label>
+        <select class="form-select" id="reportMonth"><option value="">All loaded sheets</option></select>
+      </div>
+      <div class="col-12 col-md-4">
+        <label class="form-label">Variance filter</label>
+        <select class="form-select" id="varianceFilter">
+          <option value="all">All records</option>
+          <option value="variance">Only non-zero variance</option>
+          <option value="shortage">Shortages only</option>
+          <option value="excess">Excess only</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-4 d-flex align-items-end gap-2 report-actions">
+        <button class="btn-green" onclick="generateCurrentMonthReport()" id="reportGenerateBtn">▶ Generate current-month report</button>
+        <button class="btn-soft" onclick="renderReports()" id="reportRefreshBtn">↻ Apply filters</button>
+      </div>
+    </div>
+
+    <div class="report-status" id="reportStatus" aria-live="polite">
+      <b>Ready.</b> Click <b>Generate current-month report</b> to load the current month and build the report. Once finished you can export to PDF or Excel.
+    </div>
+    <div class="report-meter hide" id="reportMeter">
+      <div class="fill" id="reportMeterFill"></div>
+    </div>
+    <div class="report-meter-text hide" id="reportMeterText">
+      <span id="reportMeterLabel">Preparing…</span>
+      <b id="reportMeterPct">0%</b>
+    </div>
+
+    <div class="export-btns mt-3 mb-3" id="reportExportBar">
+      <button class="btn-soft" onclick="exportReportPDF()" id="reportPdfBtn" disabled>⬇ Download PDF</button>
+      <button class="btn-soft" onclick="exportReportExcel()" id="reportExcelBtn" disabled>⬇ Download Excel (CSV)</button>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-6 col-lg-3"><div class="stat"><div class="stat-label">COUNTED RECORDS</div><div class="stat-value" id="reportCount">0</div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat"><div class="stat-label">SHORTAGES</div><div class="stat-value" id="reportShortages">0</div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat"><div class="stat-label">EXCESS</div><div class="stat-value" id="reportExcess">0</div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat"><div class="stat-label">NET VARIANCE</div><div class="stat-value" id="reportNet">0</div></div></div>
+  </div>
+
+  <div class="panel">
+    <div class="table-wrap" style="max-height:70vh">
+      <table class="table">
+        <thead><tr><th>Date</th><th>Code</th><th>Item</th><th>Expected closing</th><th>Physical</th><th>Variance</th><th>Result</th></tr></thead>
+        <tbody id="reportRows"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
 
 <section id="page-items" class="page"><div class="panel"><div class="section-head"><h2 class="mb-0">Item master</h2><button class="btn-soft" onclick="loadItemMaster()">↻ Reload items</button></div><p class="small-help">Items are loaded from your Google Sheet. To avoid accidental mismatches, add or edit official item codes in the Item Master sheet itself.</p><div class="row g-2 mb-3"><div class="col-12 col-md-6"><input class="form-control" id="itemSearch" placeholder="Search item code or name" oninput="renderItems()"></div><div class="col-12 col-md-6 text-md-end align-self-center"><span id="itemCount" class="small-help"></span></div></div><div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Item code</th><th>Item name</th></tr></thead><tbody id="itemsRows"></tbody></table></div></div></section>
 
-<section id="page-setup" class="page"><div class="panel mb-3"><h2>Google Apps Script connection</h2><p class="small-help">Paste your deployed Apps Script web app URL. The deployment must be accessible to the intended users and support the items, months, records and POST save actions.</p><label class="form-label" for="scriptUrl">Apps Script web app URL</label><input class="form-control" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec"><div class="quick mt-3"><button class="btn-green" onclick="saveScriptUrl()">Save URL</button><button class="btn-soft" onclick="testConnection()">Test connection</button><button class="btn-soft" onclick="refreshAll(true)">Load Sheets data</button></div><div id="setupStatus" class="small-help mt-3">Connection not tested.</div></div><div class="panel"><h2>Important notes</h2><ul class="muted mb-0"><li>Google Sheets is the shared source of truth; browser local storage is used only to remember this URL and temporary interface preferences.</li><li>Saving updates a matching date and item code row. If your backend only updates existing rows, the date/item row must already exist in the target tab.</li><li>Opening stock may be protected by sheet formulas. This page does not change sheet formulas or create missing rows.</li><li>Notes are kept in this browser only; the current Apps Script save endpoint does not store them.</li><li>Do not use this app for live stock until a test entry has been checked in the sheet.</li></ul></div></section>
+<section id="page-setup" class="page"><div class="panel mb-3"><h2>Google Apps Script connection</h2><p class="small-help">Paste your deployed Apps Script web app URL. The deployment must be accessible to the intended users and support the items, months, records and POST save actions.</p><label class="form-label" for="scriptUrl">Apps Script web app URL</label><input class="form-control" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec"><div class="quick mt-3"><button class="btn-green" onclick="saveScriptUrl()">Save URL</button><button class="btn-soft" onclick="testConnection()">Test connection</button><button class="btn-soft" onclick="refreshAll(true)">Load Sheets data</button></div><div id="setupStatus" class="small-help mt-3">Connection not tested.</div></div><div class="panel"><h2>Important notes</h2><ul class="muted mb-0"><li>Google Sheets is the shared source of truth; browser local storage is used only to remember this URL and temporary interface preferences.</li><li>Saving updates a matching date and item code row. The Apps Script backend must support creating missing rows via saveInventoryBatchForApp.</li><li>Opening stock may be protected by sheet formulas. This page does not change sheet formulas or create missing rows directly.</li><li>Do not use this app for live stock until a test entry has been checked in the sheet.</li></ul></div></section>
 <footer>StockWise · Restaurant Inventory Manager · Google Sheets backend</footer></div></main></div></div>
 
 <!-- MODAL FOR ITEM DETAILS -->
@@ -379,7 +501,7 @@ body[dir="rtl"] .quick,body[dir="rtl"] .toolbar-actions{direction:rtl}
       </div>
 
       <div class="panel mb-3" style="background:var(--bg); text-align:center;">
-        <div class="stat-label mb-2">PERIOD VARIANCE (Latest Actual - Expected Closing)</div>
+        <div class="stat-label mb-2">PERIOD VARIANCE (Latest Actual − Expected Closing)</div>
         <div class="stat-value" id="modVariance" style="font-size:36px;">0</div>
       </div>
 
@@ -413,9 +535,6 @@ body[dir="rtl"] .quick,body[dir="rtl"] .toolbar-actions{direction:rtl}
 "use strict";
 const $ = id => document.getElementById(id);
 
-/**
- * STORE MULTI-URL MAPPING
- */
 const STORE_URLS = {
   "west walk": "https://script.google.com/macros/s/AKfycbztbc2rtuc-xp7zQSDyeDpcMOeOFxmhdadm3seMB46LQOrNqAAKU1EZb5j3JLuR5GVA3A/exec",
   "iconic": "https://script.google.com/macros/s/AKfycbxOPBHJlmk_LeDVLv-OzaEU9_DK1V0Xyv9ru069ZFtqET_Qvr0o9-co4nzSBpFlEmt9Hg/exec",
@@ -429,8 +548,8 @@ let authToken="", authRole="", authStore="", stores=[], selectedStore="";
 const defaultItems=[{code:"W-0369",name:"Greek Yoghurt Dodoni",unit:"Kg"},{code:"W-0187",name:"Baladna Mozzarella",unit:"Kg"},{code:"W-0204",name:"Acqua Panna",unit:"pcs"},{code:"W-0218",name:"San Pellegrino",unit:"pcs"},{code:"W-0603",name:"Wrap & Co Swedish Bread",unit:"pcs"}];
 let items=[...defaultItems],records=[],months=[],failedRecordSheets=[],connected=false,lastRefresh=null,toastTimer;
 let currentAnalysisDetails = [];
+let currentAnalysisList = [];
 
-/* cache + background load state */
 const sheetCache = {};
 const sheetInflight = {};
 let bgLoadState = { total:0, done:0, failed:0, running:false, current:"", history:[] };
@@ -439,9 +558,13 @@ const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMon
 const n=v=>{if(v===null||v===undefined||v==="")return null;const x=Number(v);return Number.isFinite(x)?x:null};
 const fmt=v=>v===null||v===undefined||v===""?"—":Number(v).toLocaleString(undefined,{maximumFractionDigits:3});
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function toast(message){const el=$("toast");el.textContent=message;el.style.display="block";clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display="none",4200)}
+function toast(message){const el=$("toast");el.textContent=message;el.style.display="block";clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display="none",4600)}
 
-/* non-blocking background status */
+function currentMonthSheetName(){
+  const d = new Date();
+  return sheetNameForDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-01`);
+}
+
 function setBgStatus(state, extra){
   const el = $("bgLoadStatus");
   if(!el) return;
@@ -471,7 +594,6 @@ function setBgStatus(state, extra){
   }
 }
 
-// LOADING ANIMATION LOGIC
 function showLoading(show, storeName = "") {
   if(show) {
     $("loadingOverlay").style.display = "flex";
@@ -494,9 +616,6 @@ function showLoading(show, storeName = "") {
   }
 }
 
-/* ============================================================
-   CONNECTION GATE — blocks entry until every store passes
-   ============================================================ */
 async function testStoreConnection(store, rowEl, statusEl){
   try{
     const url = STORE_URLS[store.toLowerCase()];
@@ -561,7 +680,7 @@ async function testConnections(){
   evaluateGateState(results);
 }
 
-function evaluateGateState(results){
+function evaluateGateState(){
   const statuses = Array.from(document.querySelectorAll("#gateStores .gate-status"));
   const allOk = statuses.length > 0 && statuses.every(s=>s.classList.contains("success"));
   $("gateProceedBtn").disabled = !allOk;
@@ -573,7 +692,6 @@ function evaluateGateState(results){
 function showWelcomePopup() {
   const title = $("welcomePopupTitle");
   const subtitle = $("welcomePopupSubtitle");
-
   if (authRole === "area") {
     title.textContent = "Welcome, Anthony Sigfried Gatuz";
     subtitle.textContent = "Brand Manager";
@@ -583,13 +701,10 @@ function showWelcomePopup() {
     subtitle.textContent = "";
     $("welcomeMessage").textContent = authStore.toUpperCase();
   }
-
   $("welcomePopup").classList.add("active");
 }
 
-function closeWelcomePopup() {
-  $("welcomePopup").classList.remove("active");
-}
+function closeWelcomePopup() { $("welcomePopup").classList.remove("active"); }
 
 function proceedToApp(){
   const statuses = Array.from(document.querySelectorAll("#gateStores .gate-status"));
@@ -601,24 +716,15 @@ function proceedToApp(){
   window.setTimeout(showWelcomePopup, 250);
 }
 
-// LOGIN LOGIC
 async function loginStockWise(loginCode){
   const code = String(loginCode || "").trim().toLowerCase();
-
-  if (code === "000000") {
-    authRole = "area";
-    authStore = "";
-    stores = ["west walk", "iconic", "gate mall", "bani hajir", "al mashaf"];
-    selectedStore = stores[0];
-  }
+  if (code === "000000") { authRole = "area"; authStore = ""; stores = ["west walk", "iconic", "gate mall", "bani hajir", "al mashaf"]; selectedStore = stores[0]; }
   else if (code === "00west walk") { authRole = "store"; authStore = "west walk"; stores = ["west walk"]; selectedStore = "west walk"; }
   else if (code === "00iconic") { authRole = "store"; authStore = "iconic"; stores = ["iconic"]; selectedStore = "iconic"; }
   else if (code === "00gate mall") { authRole = "store"; authStore = "gate mall"; stores = ["gate mall"]; selectedStore = "gate mall"; }
   else if (code === "00bani hajir") { authRole = "store"; authStore = "bani hajir"; stores = ["bani hajir"]; selectedStore = "bani hajir"; }
   else if (code === "00al mashaf") { authRole = "store"; authStore = "al mashaf"; stores = ["al mashaf"]; selectedStore = "al mashaf"; }
-  else {
-    throw new Error("Invalid access code.");
-  }
+  else throw new Error("Invalid access code.");
 
   authToken = "session_" + Date.now();
   const select = $("storeSelect");
@@ -626,13 +732,9 @@ async function loginStockWise(loginCode){
   select.value = selectedStore;
 
   if (authRole !== "area") {
-    select.disabled = true;
-    select.style.pointerEvents = "none";
-    select.style.opacity = "0.7";
+    select.disabled = true; select.style.pointerEvents = "none"; select.style.opacity = "0.7";
   } else {
-    select.disabled = false;
-    select.style.pointerEvents = "auto";
-    select.style.opacity = "1";
+    select.disabled = false; select.style.pointerEvents = "auto"; select.style.opacity = "1";
   }
 
   testConnections();
@@ -657,10 +759,7 @@ $("loginForm").addEventListener("submit",async function(event){
 });
 
 $("storeSelect").addEventListener("change",async function(){
- if(authRole!=="area") {
-   this.value = authStore;
-   return;
- }
+ if(authRole!=="area") { this.value = authStore; return; }
  if(!stores.includes(this.value)) { this.value=selectedStore; return; }
  selectedStore=this.value;
  records=[];items=[...defaultItems];months=[];
@@ -672,22 +771,17 @@ $("storeSelect").addEventListener("change",async function(){
  await refreshAll(true);
 });
 
-
-// UTILS & API
-const i18n={
- en:{subtitle:"RESTAURANT INVENTORY",navDashboard:"▦  Dashboard",navRecords:"▤  Records",navReports:"▥  Reports",navItems:"☷  Item Master",navSetup:"⚙  Setup",dataSource:"Data source: Google Sheets",menuToggle:"☰ Menu",themeDark:"☀ Light mode",themeLight:"☾ Dark mode",eyebrow:"Operations control",pageSub:"Daily stock control · actual vs theoretical · variance monitoring",refresh:"↻ Refresh data",newEntry:"＋ New entry",itemsMaster:"ACTIVE ITEMS",stockRecords:"STOCK RECORDS",varianceItems:"VARIANCE ITEMS",lastRefresh:"LAST REFRESH",loadedItemMaster:"Loaded master",acrossTabs:"Across loaded inventory tabs",physicalDiffers:"Count ≠ Closing",browserSession:"Session",recentRecords:"Attention Required (Largest Variances)",viewAll:"View all →",inventoryFormula:"Inventory formula",varianceOverview:"Variance Overview",varianceOverviewNote:"Matched, shortage and excess records",topVariance:"Largest variance items",topVarianceNote:"Top items by absolute variance",varianceTrend:"Variance Trend",varianceTrendNote:"Daily net variance for the loaded records",titleDashboard:"Dashboard",titleEntry:"Stock Grid",titleRecords:"Inventory Records",titleReports:"Reports",titleItems:"Item Master",titleSetup:"Setup",titleAnalysis:"Item Analysis"},
- ar:{subtitle:"مخزون المطعم",navDashboard:"▦  لوحة المعلومات",navRecords:"▤  السجلات",navReports:"▥  التقارير",navItems:"☷  دليل الأصناف",navSetup:"⚙  الإعدادات",dataSource:"مصدر البيانات: جداول Google",menuToggle:"☰ القائمة",themeDark:"☀ الوضع الفاتح",themeLight:"☾ الوضع الداكن",eyebrow:"مراقبة العمليات",pageSub:"مراقبة المخزون اليومي · الفعلي مقابل النظري · متابعة الفروقات",refresh:"↻ تحديث البيانات",newEntry:"＋ إدخال جديد",itemsMaster:"الأصناف النشطة",stockRecords:"سجلات المخزون",varianceItems:"أصناف بها فروقات",lastRefresh:"آخر تحديث",loadedItemMaster:"تم التحميل من دليل الأصناف",acrossTabs:"في جميع أوراق المخزون المحمّلة",physicalDiffers:"العد الفعلي يختلف عن الرصيد المتوقع",browserSession:"جلسة المتصفح الحالية",recentRecords:"يتطلب الانتباه (أكبر الفروقات)",viewAll:"عرض الكل ←",inventoryFormula:"معادلة المخزون",varianceOverview:"ملخص الفروقات",varianceOverviewNote:"مطابق، عجز، وزيادة في المخزون",topVariance:"أكبر فروقات الأصناف",topVarianceNote:"أعلى الأصناف حسب قيمة الفرق المطلقة",varianceTrend:"اتجاه الفروقات",varianceTrendNote:"صافي الفروقات اليومية للسجلات المحمّلة",titleDashboard:"لوحة المعلومات",titleEntry:"شبكة المخزون",titleRecords:"سجلات المخزون",titleReports:"التقارير",titleItems:"دليل الأصناف",titleSetup:"الإعدادات",titleAnalysis:"تحليل الأصناف"}
-};
-let currentLanguage=localStorage.getItem("stockwise_language")||"en";
 let chartInstances={};
-function applyLanguage(){const dict=i18n[currentLanguage]||i18n.en;document.documentElement.lang=currentLanguage;document.body.dir=currentLanguage==="ar"?"rtl":"ltr";document.querySelectorAll("[data-i18n]").forEach(el=>{const key=el.dataset.i18n;if(dict[key])el.textContent=dict[key]});const titles={dashboard:dict.titleDashboard,entry:dict.titleEntry,analysis:dict.titleAnalysis,records:dict.titleRecords,reports:dict.titleReports,items:dict.titleItems,setup:dict.titleSetup};const active=document.querySelector(".navbtn.active")?.dataset.page||"dashboard";$("pageTitle").textContent=titles[active]||dict.titleDashboard;$("languageBtn").textContent=currentLanguage==="ar"?"English":"العربية";$("themeBtn").textContent=document.body.classList.contains("light-mode")?dict.themeLight:dict.themeDark;}
-function toggleLanguage(){currentLanguage=currentLanguage==="en"?"ar":"en";localStorage.setItem("stockwise_language",currentLanguage);applyLanguage();scheduleCharts()}
 function toggleTheme(){document.body.classList.toggle("light-mode");localStorage.setItem("stockwise_theme",document.body.classList.contains("light-mode")?"light":"dark");applyLanguage();scheduleCharts()}
 function toggleSidebar(){document.querySelector(".app").classList.toggle("sidebar-collapsed");localStorage.setItem("stockwise_sidebar_collapsed",document.querySelector(".app").classList.contains("sidebar-collapsed")?"1":"0");setTimeout(()=>Object.values(chartInstances).forEach(c=>c.resize()),220)}
 
-/* ============================================================
-   CHARTS — corporate style, animation:false for speed
-   ============================================================ */
+function applyLanguage(){
+  const titles = { dashboard:"Dashboard", entry:"Stock Grid", analysis:"Item Analysis", records:"Inventory Records", reports:"Reports", items:"Item Master", setup:"Setup" };
+  const active = document.querySelector(".navbtn.active")?.dataset.page || "dashboard";
+  $("pageTitle").textContent = titles[active] || "StockWise";
+  $("themeBtn").textContent = document.body.classList.contains("light-mode") ? "☾ Dark mode" : "☀ Light mode";
+}
+
 let _renderChartsTimer = null;
 function scheduleCharts(){
   clearTimeout(_renderChartsTimer);
@@ -702,9 +796,7 @@ function renderCharts(){
   const gridColor = light ? "#dce6df" : "#2b3b32";
 
   const base = {
-    responsive:true,
-    maintainAspectRatio:false,
-    animation:false,
+    responsive:true, maintainAspectRatio:false, animation:false,
     plugins:{
       legend:{ labels:{ color:textColor, boxWidth:12, usePointStyle:true, font:{size:11} } },
       tooltip:{ intersect:false, mode:"index" }
@@ -716,41 +808,33 @@ function renderCharts(){
     chartInstances[id] = new Chart(canvas, config);
   };
 
-  /* 1. Variance overview — donut */
   const shortages = valid.filter(r=>r.variance < -0.0001).length;
   const excess    = valid.filter(r=>r.variance >  0.0001).length;
   const matched   = valid.length - shortages - excess;
   upsert("varianceDonut", {
     type:"doughnut",
-    data:{ labels:["Shortage","Excess","Matched"],
+    data:{ labels:["Shortage (red)","Excess (yellow)","Tally (green)"],
            datasets:[{ data:[shortages,excess,matched],
-             backgroundColor:["#ff7777","#53df91","#78958a"],
-             borderWidth:0, hoverOffset:6 }] },
+             backgroundColor:["#ff7777","#f5c96a","#53df91"], borderWidth:0, hoverOffset:6 }] },
     options:{ ...base, cutout:"66%",
-      plugins:{ ...base.plugins,
-        legend:{ position:"bottom",
-          labels:{ color:textColor, boxWidth:10, usePointStyle:true, padding:12, font:{size:11} } } } }
+      plugins:{ ...base.plugins, legend:{ position:"bottom", labels:{ color:textColor, boxWidth:10, usePointStyle:true, padding:12, font:{size:11} } } } }
   });
 
-  /* 2. Variance trend — line */
   const byDate = {};
   valid.forEach(r=>{ const d = r.date || "Unknown"; byDate[d] = (byDate[d]||0) + r.variance; });
   const trend = Object.entries(byDate).sort((a,b)=>a[0].localeCompare(b[0])).slice(-14);
   upsert("varianceTrendChart", {
     type:"line",
     data:{ labels: trend.map(x=>x[0]),
-      datasets:[{ label:"Net variance",
-        data: trend.map(x=>x[1]),
+      datasets:[{ label:"Net variance", data: trend.map(x=>x[1]),
         borderColor:"#53df91", backgroundColor:"#53df9122",
         fill:true, tension:.3, pointRadius:2.5, pointHoverRadius:5, borderWidth:2 }] },
     options:{ ...base,
-      scales:{
-        x:{ grid:{color:gridColor}, ticks:{ color:textColor, maxRotation:45, minRotation:0, font:{size:10} } },
-        y:{ grid:{color:gridColor}, ticks:{ color:textColor, font:{size:10} } } },
+      scales:{ x:{ grid:{color:gridColor}, ticks:{ color:textColor, maxRotation:45, minRotation:0, font:{size:10} } },
+               y:{ grid:{color:gridColor}, ticks:{ color:textColor, font:{size:10} } } },
       plugins:{ ...base.plugins, legend:{ display:false } } }
   });
 
-  /* 3. Waste Top 5 — bar */
   const wasteTop = valid.filter(r=>r.waste>0).sort((a,b)=>b.waste-a.waste).slice(0,5);
   upsert("wasteChart", {
     type:"bar",
@@ -758,13 +842,11 @@ function renderCharts(){
       datasets:[{ label:"Waste qty", data: wasteTop.map(r=>r.waste),
         backgroundColor:"#f5c96a", borderRadius:6, maxBarThickness:34 }] },
     options:{ ...base,
-      scales:{
-        x:{ grid:{display:false}, ticks:{ color:textColor, font:{size:10} } },
-        y:{ grid:{color:gridColor}, ticks:{ color:textColor, font:{size:10} } } },
+      scales:{ x:{ grid:{display:false}, ticks:{ color:textColor, font:{size:10} } },
+               y:{ grid:{color:gridColor}, ticks:{ color:textColor, font:{size:10} } } },
       plugins:{ ...base.plugins, legend:{ display:false } } }
   });
 
-  /* 4. Movement classes — horizontal bar (fast / moderate / slow) */
   const byItem = {};
   valid.forEach(r=>{
     const k = r.code; if(!k) return;
@@ -781,17 +863,15 @@ function renderCharts(){
   upsert("movementChart", {
     type:"bar",
     data:{ labels: rows.map(r=>r.code),
-      datasets:[{ label:"Sold",
-        data: rows.map(r=>r.sold),
+      datasets:[{ label:"Sold", data: rows.map(r=>r.sold),
         backgroundColor: rows.map((r)=>{
           const idx = sorted.findIndex(x=>x.code===r.code);
           return colors[classOf(idx)];
         }),
         borderRadius:5, maxBarThickness:22 }] },
     options:{ ...base, indexAxis:"y",
-      scales:{
-        x:{ grid:{color:gridColor}, ticks:{ color:textColor, font:{size:10} } },
-        y:{ grid:{display:false},       ticks:{ color:textColor, font:{size:10} } } },
+      scales:{ x:{ grid:{color:gridColor}, ticks:{ color:textColor, font:{size:10} } },
+               y:{ grid:{display:false},       ticks:{ color:textColor, font:{size:10} } } },
       plugins:{ ...base.plugins, legend:{ display:false } } }
   });
 }
@@ -800,12 +880,11 @@ function showPage(page){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   $("page-"+page).classList.add("active");
   document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
-  const titles={dashboard:"Dashboard",entry:"Stock Grid",analysis:"Item Analysis",records:"Inventory Records",reports:"Reports",items:"Item Master",setup:"Setup"};
-  $("pageTitle").textContent=titles[page]||"StockWise";applyLanguage();
+  applyLanguage();
   if(page==="dashboard"){ renderDashboard(); scheduleCharts(); }
-  if(page==="records")renderRecords();
-  if(page==="reports")renderReports();
-  if(page==="items")renderItems();
+  if(page==="records"){ ensureCurrentMonthForRecords(); renderRecords(); }
+  if(page==="reports"){ updateReportsStatus(); renderReports(); }
+  if(page==="items")    renderItems();
   if(page==="entry" && window.gridOnShow)window.gridOnShow();
   window.scrollTo({top:0,behavior:"smooth"})
 }
@@ -820,9 +899,7 @@ function getAppsScriptUrl(){
 function saveScriptUrl(){
   const url=$("scriptUrl").value.trim();
   if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url))return toast("Enter a valid Apps Script URL ending in /exec.");
-  if(selectedStore){
-    STORE_URLS[selectedStore.toLowerCase()] = url;
-  }
+  if(selectedStore){ STORE_URLS[selectedStore.toLowerCase()] = url; }
   localStorage.setItem("stockwise_script_url_"+selectedStore.toLowerCase(),url);
   toast("Apps Script URL saved for "+selectedStore+".");
   testConnection()
@@ -847,15 +924,89 @@ function apiGet(params,timeoutMs=15000){
 function unwrapArray(data,keys){if(Array.isArray(data))return data;for(const k of keys){if(Array.isArray(data?.[k]))return data[k]}return []}
 function getField(o,...keys){for(const k of keys){if(o&&o[k]!==undefined&&o[k]!==null)return o[k]}return null}
 function normalizeItem(x){return{code:String(getField(x,"code","itemCode","itemcode","item_code")??"").trim(),name:String(getField(x,"name","itemName","itemname","item_name")??"").trim(),unit:String(getField(x,"unit","uom","Unit")??"")}}
-function normalizeRecord(x,sheetName){const dateRaw=getField(x,"date","Date","inventoryDate");let date="";if(dateRaw instanceof Date)date=dateRaw.toISOString().slice(0,10);else if(typeof dateRaw==="string"){const m=dateRaw.match(/^(\d{4}-\d{2}-\d{2})/);if(m)date=m[1];else{const d=new Date(dateRaw);if(!isNaN(d))date=d.toISOString().slice(0,10)}}else if(typeof dateRaw==="number"){const d=new Date(dateRaw);if(!isNaN(d))date=d.toISOString().slice(0,10)}const code=String(getField(x,"itemCode","itemcode","code","Item Code")??"").trim();const name=String(getField(x,"itemName","itemname","name","Item Name")??"").trim();const opening=n(getField(x,"opening","openingStock","opening_stock"))??0;const receiving=n(getField(x,"receiving","received","receivingStock"))??0;const transferIn=n(getField(x,"transferIn","transfer_in","transferin"))??0;const transferOut=n(getField(x,"transferOut","transfer_out","transferout"))??0;const waste=n(getField(x,"waste"))??0;const sold=n(getField(x,"sold","consumption"))??0;const closing=n(getField(x,"closing","closingStock","closing_stock"));const physical=n(getField(x,"physicalCount","physical","actual","physical_count"));const variance=n(getField(x,"variance"));const row=getField(x,"row","rowNumber");return{id:String(sheetName)+":"+String(row??date+":"+code),sheetName,date,code,name,opening,receiving,transferIn,transferOut,waste,sold,closing:closing??(opening+receiving+transferIn-transferOut-waste-sold),physical,variance:variance??(physical===null?null:physical-(closing??(opening+receiving+transferIn-transferOut-waste-sold))),row}}
+function normalizeRecord(x,sheetName){
+  const dateRaw=getField(x,"date","Date","inventoryDate");
+  let date="";
+  if(dateRaw instanceof Date) date=dateRaw.toISOString().slice(0,10);
+  else if(typeof dateRaw==="string"){const m=dateRaw.match(/^(\d{4}-\d{2}-\d{2})/);if(m)date=m[1];else{const d=new Date(dateRaw);if(!isNaN(d))date=d.toISOString().slice(0,10)}}
+  else if(typeof dateRaw==="number"){const d=new Date(dateRaw);if(!isNaN(d))date=d.toISOString().slice(0,10)}
+  const code=String(getField(x,"itemCode","itemcode","code","Item Code")??"").trim();
+  const name=String(getField(x,"itemName","itemname","name","Item Name")??"").trim();
+  const opening=n(getField(x,"opening","openingStock","opening_stock"))??0;
+  const receiving=n(getField(x,"receiving","received","receivingStock"))??0;
+  const transferIn=n(getField(x,"transferIn","transfer_in","transferin"))??0;
+  const transferOut=n(getField(x,"transferOut","transfer_out","transferout"))??0;
+  const waste=n(getField(x,"waste"))??0;
+  const sold=n(getField(x,"sold","consumption"))??0;
+  const closing=n(getField(x,"closing","closingStock","closing_stock"));
+  const physical=n(getField(x,"physicalCount","physical","actual","physical_count"));
+  const variance=n(getField(x,"variance"));
+  const row=getField(x,"row","rowNumber");
+  return {
+    id:String(sheetName)+":"+String(row??date+":"+code),
+    sheetName,date,code,name,opening,receiving,transferIn,transferOut,waste,sold,
+    closing:closing??(opening+receiving+transferIn-transferOut-waste-sold),
+    physical,
+    variance:variance??(physical===null?null:physical-(closing??(opening+receiving+transferIn-transferOut-waste-sold))),
+    row
+  };
+}
 function sheetNameForDate(date){const [y,m]=date.split("-").map(Number);if(y===2026&&m===10)return"Daily Inventory";return new Date(y,m-1,1).toLocaleString("en-US",{month:"long",year:"numeric"})}
 
-async function loadItemMaster(){if(!authToken||!selectedStore)throw new Error("Please log in and select a store first.");try{const data=await apiGet({action:"items"});if(data?.success===false)throw new Error(data.error||data.message||"Items endpoint returned an error.");const arr=unwrapArray(data,["items","data","result","records"]);if(!arr.length)throw new Error("Item endpoint returned no item list. Check the Apps Script response format.");items=arr.map(normalizeItem).filter(x=>x.code||x.name);renderItems();populateItemDatalist();$("statItems").textContent=items.length;return true}catch(e){console.error(e);toast("Could not load items: "+e.message);return false}}
-async function loadMonths(){if(!authToken||!selectedStore)throw new Error("Please log in and select a store first.");try{const data=await apiGet({action:"months"});if(data?.success===false)throw new Error(data.error||data.message||"Months endpoint returned an error.");let arr=unwrapArray(data,["months","sheets","data","result"]);if(!arr.length&&Array.isArray(data?.data?.months))arr=data.data.months;months=arr.map(x=>typeof x==="string"?x:String(getField(x,"name","sheetName","sheet","title")??"")).filter(Boolean);if(!months.length)months=["Daily Inventory","November 2026","December 2026","January 2027","February 2027","March 2027","April 2027","May 2027","June 2027","July 2027"];populateMonthSelects();return true}catch(e){console.warn(e);months=["Daily Inventory","November 2026","December 2026","January 2027","February 2027","March 2027","April 2027","May 2027","June 2027","July 2027"];populateMonthSelects();return false}}
-function populateMonthSelects(){["recordMonth","reportMonth"].forEach(id=>{const sel=$(id),old=sel.value;sel.innerHTML='<option value="">All loaded sheets</option>'+months.map(m=>{let tag="";if(failedRecordSheets.indexOf(m)!==-1)tag=" (failed)";else if(!sheetCache[m])tag=" (not loaded yet)";return `<option value="${esc(m)}">${esc(m)}${tag}</option>`}).join("");if(months.includes(old))sel.value=old})}
-async function loadRecordsForSheet(sheet){if(!authToken||!selectedStore)throw new Error("Please log in and select a store first.");const data=await apiGet({action:"records",sheetName:sheet});if(data?.success===false)throw new Error(data.error||data.message||"Records endpoint returned an error for "+sheet);const arr=unwrapArray(data,["records","data","result","items"]);return arr.map(x=>normalizeRecord(x,sheet)).filter(r=>r.date||r.code||r.name)}
+async function loadItemMaster(){
+  if(!authToken||!selectedStore)throw new Error("Please log in and select a store first.");
+  try{
+    const data=await apiGet({action:"items"});
+    if(data?.success===false)throw new Error(data.error||data.message||"Items endpoint returned an error.");
+    const arr=unwrapArray(data,["items","data","result","records"]);
+    if(!arr.length)throw new Error("Item endpoint returned no item list. Check the Apps Script response format.");
+    items=arr.map(normalizeItem).filter(x=>x.code||x.name);
+    renderItems();
+    populateItemDatalist();
+    $("statItems").textContent=items.length;
+    if(window.gridOnItemsLoaded) window.gridOnItemsLoaded();
+    return true
+  }catch(e){console.error(e);toast("Could not load items: "+e.message);return false}
+}
+async function loadMonths(){
+  if(!authToken||!selectedStore)throw new Error("Please log in and select a store first.");
+  try{
+    const data=await apiGet({action:"months"});
+    if(data?.success===false)throw new Error(data.error||data.message||"Months endpoint returned an error.");
+    let arr=unwrapArray(data,["months","sheets","data","result"]);
+    if(!arr.length&&Array.isArray(data?.data?.months))arr=data.data.months;
+    months=arr.map(x=>typeof x==="string"?x:String(getField(x,"name","sheetName","sheet","title")??"")).filter(Boolean);
+    if(!months.length)months=["Daily Inventory","November 2026","December 2026","January 2027","February 2027","March 2027","April 2027","May 2027","June 2027","July 2027"];
+    populateMonthSelects();return true
+  }catch(e){
+    console.warn(e);
+    months=["Daily Inventory","November 2026","December 2026","January 2027","February 2027","March 2027","April 2027","May 2027","June 2027","July 2027"];
+    populateMonthSelects();
+    return false
+  }
+}
+function populateMonthSelects(){
+  ["recordMonth","reportMonth"].forEach(id=>{
+    const sel=$(id); if(!sel) return;
+    const old=sel.value;
+    sel.innerHTML='<option value="">All loaded sheets</option>'+months.map(m=>{
+      let tag="";
+      if(failedRecordSheets.indexOf(m)!==-1)tag=" (failed)";
+      else if(!sheetCache[m])tag=" (not loaded yet)";
+      return `<option value="${esc(m)}">${esc(m)}${tag}</option>`
+    }).join("");
+    if(months.includes(old))sel.value=old;
+  });
+  renderRecordMonthStatus();
+}
+async function loadRecordsForSheet(sheet){
+  if(!authToken||!selectedStore)throw new Error("Please log in and select a store first.");
+  const data=await apiGet({action:"records",sheetName:sheet});
+  if(data?.success===false)throw new Error(data.error||data.message||"Records endpoint returned an error for "+sheet);
+  const arr=unwrapArray(data,["records","data","result","items"]);
+  return arr.map(x=>normalizeRecord(x,sheet)).filter(r=>r.date||r.code||r.name)
+}
 
-/* Serialize all record fetches: one at a time, small gap, with retry. */
 let _fetchQueue = Promise.resolve();
 function _sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
@@ -880,6 +1031,25 @@ function fetchSheet(sheet, attempt){
   _fetchQueue = p.catch(() => {});
   sheetInflight[sheet] = p;
   return p;
+}
+
+function rebuildRecords(){
+  const merged = [];
+  months.forEach(sn => { if(sheetCache[sn]) merged.push(...sheetCache[sn]); });
+  records = merged;
+}
+
+async function ensureSheetLoaded(sheet, opts){
+  if(!sheet || sheet === "") return;
+  if(sheetCache[sheet]) return;
+  if(opts && opts.showToast) toast("Loading " + sheet + "…");
+  try{
+    await fetchSheet(sheet);
+    rebuildRecords();
+    renderAll();
+  } catch(e){
+    toast("Could not load " + sheet + ": " + e.message);
+  }
 }
 
 async function ensureSheetsLoadedForRange(start, end, opts){
@@ -910,33 +1080,70 @@ async function ensureSheetsLoadedForRange(start, end, opts){
       bgLoadState.current = "";
     }
   }
-  const merged = [];
-  months.forEach(sn => { if(sheetCache[sn]) merged.push(...sheetCache[sn]); });
-  records = merged;
+  rebuildRecords();
   renderAll();
   if(failedNames.length){
     toast("Some months could not be loaded after retries: " + failedNames.join(", "));
   }
 }
 
-async function ensureSheetLoaded(sheet, opts){
-  if(!sheet || sheet === "") return;
-  if(sheetCache[sheet]) return;
-  if(opts && opts.showToast) toast("Loading " + sheet + "…");
-  try{
-    await fetchSheet(sheet);
-    const merged = [];
-    months.forEach(sn => { if(sheetCache[sn]) merged.push(...sheetCache[sn]); });
-    records = merged;
-    renderAll();
-  } catch(e){
-    toast("Could not load " + sheet + ": " + e.message);
+let _recordsBootstrapStarted = false;
+async function ensureCurrentMonthForRecords(){
+  if(!authToken || !selectedStore) return;
+  if(!months.length){ await loadMonths(); }
+
+  const prioritySheet = currentMonthSheetName();
+
+  if(!sheetCache[prioritySheet]){
+    renderRecordMonthStatus(prioritySheet, "loading");
+    for(let attempt = 1; attempt <= 3; attempt++){
+      try{
+        await fetchSheet(prioritySheet);
+        renderRecordMonthStatus();
+        break;
+      }catch(e){
+        if(attempt === 3){
+          renderRecordMonthStatus(prioritySheet, "failed");
+          console.warn("Current month load failed:", e);
+        } else {
+          await _sleep(700 * attempt);
+        }
+      }
+    }
+    rebuildRecords();
+    renderRecords();
+    populateMonthSelects();
   }
+
+  if(_recordsBootstrapStarted) return;
+  _recordsBootstrapStarted = true;
+
+  const rest = months.filter(m => m !== prioritySheet && !sheetCache[m] && !sheetInflight[m]);
+  if(!rest.length) return;
+
+  (async () => {
+    for(const sheet of rest){
+      try{
+        renderRecordMonthStatus(sheet, "loading");
+        await fetchSheet(sheet);
+        renderRecordMonthStatus();
+      }catch(e){
+        renderRecordMonthStatus(sheet, "failed");
+        console.warn("Background month failed:", sheet, e);
+      }
+      rebuildRecords();
+      const active = document.querySelector(".page.active")?.id;
+      if(active === "page-records") renderRecords();
+      populateMonthSelects();
+    }
+    const active = document.querySelector(".page.active")?.id.replace("page-","");
+    if(active === "records") renderRecords();
+    if(active === "dashboard"){ renderDashboard(); scheduleCharts(); }
+    if(active === "reports"){ updateReportsStatus(); renderReports(); }
+  })();
 }
 
 async function loadAllRecords(){
-  /* Progressive loading. Current month is BLOCKING and MUST succeed;
-     the rest load in the background, serialized, with retries. */
   failedRecordSheets = [];
   const unique = [...new Set(months)];
   if(!unique.length){ records = []; return; }
@@ -950,7 +1157,6 @@ async function loadAllRecords(){
   bgLoadState = { total: ordered.length, done: 0, failed: 0, running: true, current: "", history: [] };
   setBgStatus("loading");
 
-  // 1. Priority month: blocking, retried up to 5 times.
   let priorityList;
   let lastPriorityErr;
   for(let attempt = 1; attempt <= 5; attempt++){
@@ -970,17 +1176,13 @@ async function loadAllRecords(){
   }
   if(lastPriorityErr){
     if(failedRecordSheets.indexOf(prioritySheet) === -1) failedRecordSheets.push(prioritySheet);
-    bgLoadState.running = false;
     setBgStatus("error", "Current month (" + prioritySheet + ") failed to load: " + lastPriorityErr.message);
-    throw new Error("Current month could not be loaded: " + prioritySheet + " — " + lastPriorityErr.message);
   }
-  const mergedAfterPriority = [];
-  months.forEach(sn => { if(sheetCache[sn]) mergedAfterPriority.push(...sheetCache[sn]); });
-  records = mergedAfterPriority;
+
+  rebuildRecords();
   renderAll();
   setBgStatus("loading");
 
-  // 2. Remaining months, one at a time via the shared queue.
   (async () => {
     for(const sheet of rest){
       try {
@@ -993,14 +1195,17 @@ async function loadAllRecords(){
         bgLoadState.failed++;
         bgLoadState.current = "";
       }
-      const merged = [];
-      months.forEach(sn => { if(sheetCache[sn]) merged.push(...sheetCache[sn]); });
-      records = merged;
+      rebuildRecords();
       renderAll();
       setBgStatus("loading");
     }
     bgLoadState.running = false;
-    setBgStatus("done", failedRecordSheets.join(", "));
+    setBgStatus(failedRecordSheets.length ? "error" : "done", failedRecordSheets.join(", "));
+
+    const active = document.querySelector(".page.active")?.id.replace("page-", "");
+    if (active === "records")  renderRecords();
+    if (active === "reports")  { updateReportsStatus(); renderReports(); }
+    if (active === "dashboard"){ renderDashboard(); scheduleCharts(); }
   })();
 }
 
@@ -1036,6 +1241,7 @@ async function refreshAll(showMessage=false){
     Object.keys(sheetCache).forEach(k=>delete sheetCache[k]);
     Object.keys(sheetInflight).forEach(k=>delete sheetInflight[k]);
     bgLoadState = { total:0, done:0, failed:0, running:false, current:"", history:[] };
+    _recordsBootstrapStarted = false;
     setBgStatus("loading");
 
     const itemOK=await loadItemMaster();
@@ -1061,35 +1267,40 @@ $("itemCode").addEventListener("input",()=>{const item=itemByCode($("itemCode").
 $("itemName").addEventListener("input",()=>{const item=items.find(i=>i.name.toLowerCase()===$("itemName").value.trim().toLowerCase());if(item)$("itemCode").value=item.code});
 document.querySelectorAll(".qty,#physical").forEach(el=>el.addEventListener("input",updatePreview));$("date").addEventListener("change",updatePreview);
 function num(id){return n($(id).value)}
-function updatePreview(){const keys=["opening","receiving","transferIn","transferOut","waste","sold"];const v={};keys.forEach(k=>v[k]=num(k)??0);const close=v.opening+v.receiving+v.transferIn-v.transferOut-v.waste-v.sold;$("previewClosing").textContent=fmt(close);const p=num("physical");$("previewVariance").textContent=p===null?"—":fmt(p-close);$("previewVariance").style.color=p===null?"var(--text)":p-close<0?"var(--red)":"var(--green)"}
+function updatePreview(){const keys=["opening","receiving","transferIn","transferOut","waste","sold"];const v={};keys.forEach(k=>v[k]=num(k)??0);const close=v.opening+v.receiving+v.transferIn-v.transferOut-v.waste-v.sold;$("previewClosing").textContent=fmt(close);const p=num("physical");$("previewVariance").textContent=p===null?"—":fmt(p-close);$("previewVariance").style.color=p===null?"var(--text)":p-close<0?"var(--red)":p-close>0?"var(--amber)":"var(--green)"}
 function resetForm(){ $("inventoryForm").reset();$("editId").value="";$("date").value=today();["opening","receiving","transferIn","transferOut","waste","sold"].forEach(k=>$(k).value="0");$("saveBtn").textContent="Save row";$("formStatus").textContent="";updatePreview() }
 async function saveToSheet(payload){const url=getAppsScriptUrl();const response=await fetch(url,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});return response}
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-async function saveAndVerify(payload, sheetName) {
-  try { await Promise.race([ saveToSheet(payload), sleep(8000).then(()=>{throw new Error("POST response was slow")}) ]); }
-  catch (err) { console.warn("POST unavailable/slow; checking sheet.", err); }
-  const started = Date.now(); let lastError = "";
-  while (Date.now() - started < 45000) {
-    try {
-      delete sheetCache[sheetName];
-      const latest = await loadRecordsForSheet(sheetName);
-      sheetCache[sheetName] = latest;
-      const match = latest.find(r => r.date === payload.date && r.code.toLowerCase() === payload.itemCode.toLowerCase());
-      if (match) {
-        const fields = ["receiving", "transferIn", "transferOut", "waste", "sold"];
-        const mismatch = fields.some(key => Math.abs((match[key] ?? 0) - (payload[key] ?? 0)) > 0.0001);
-        const physicalMismatch = payload.physicalCount !== null && (match.physical === null || Math.abs(match.physical - payload.physicalCount) > 0.0001);
-        const isOctoberFirst = sheetName === "Daily Inventory" && payload.date === "2026-10-01";
-        const openingMismatch = isOctoberFirst && Math.abs((match.opening ?? 0) - (payload.opening ?? 0)) > 0.0001;
-        if (!mismatch && !physicalMismatch && !openingMismatch) return match;
-        lastError = "Row present but values not yet matching.";
-      } else lastError = "Waiting for matching date/item row.";
-    } catch (err) { lastError = err.message || "Could not read saved row."; }
-    await sleep(2000);
-  }
-  throw new Error("Save not verified after 45s. " + (lastError || "Check the sheet."));
-}
-$("inventoryForm").addEventListener("submit",async event=>{event.preventDefault();const date=$("date").value,code=$("itemCode").value.trim(),name=$("itemName").value.trim();if(!date||!code||!name)return toast("Complete date, code and name.");const keys=["opening","receiving","transferIn","transferOut","waste","sold"],values={};for(const key of keys){values[key]=num(key)??0;if(!Number.isFinite(values[key])||values[key]<0)return toast("Enter valid non-negative quantities.")}const physical=num("physical");if(physical!==null&&(!Number.isFinite(physical)||physical<0))return toast("Physical must be ≥ 0.");const closing=values.opening+values.receiving+values.transferIn-values.transferOut-values.waste-values.sold;if(closing<0)return toast("Closing cannot be negative.");const sheetName=sheetNameForDate(date);if(months.length&&!months.includes(sheetName))return toast(`No sheet tab for ${date}: expected "${sheetName}".`);if(!itemByCode(code))return toast("Item not in Item Master.");const payload={token:authToken,storeName:selectedStore,sheetName,date,itemCode:code,opening:values.opening,receiving:values.receiving,transferIn:values.transferIn,transferOut:values.transferOut,waste:values.waste,sold:values.sold,physicalCount:physical};const btn=$("saveBtn");btn.disabled=true;btn.textContent="Saving…";$("formStatus").textContent=`Sending to ${sheetName}…`;try{const match=await saveAndVerify(payload,sheetName);records=records.filter(r=>!(r.date===date&&r.code.toLowerCase()===code.toLowerCase()&&r.sheetName===sheetName));records.push(match);renderAll();toast("Saved and verified.");resetForm()}catch(e){$("formStatus").textContent=e.message;toast("Save not verified: "+e.message)}finally{btn.disabled=false;btn.textContent="Save row"}});
+
+$("inventoryForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  const date=$("date").value,code=$("itemCode").value.trim(),name=$("itemName").value.trim();
+  if(!date||!code||!name)return toast("Complete date, code and name.");
+  const keys=["opening","receiving","transferIn","transferOut","waste","sold"],values={};
+  for(const key of keys){values[key]=num(key)??0;if(!Number.isFinite(values[key])||values[key]<0)return toast("Enter valid non-negative quantities.")}
+  const physical=num("physical");
+  if(physical!==null&&(!Number.isFinite(physical)||physical<0))return toast("Physical must be ≥ 0.");
+  /* Negative closing is rejected at the row level — informational message only. */
+  const closingVal = values.opening+values.receiving+values.transferIn-values.transferOut-values.waste-values.sold;
+  if(closingVal < -0.0001) return toast("Closing would be negative — fix inputs before saving this row.");
+  const sheetName=sheetNameForDate(date);
+  if(months.length&&!months.includes(sheetName))return toast(`No sheet tab for ${date}: expected "${sheetName}".`);
+  if(!itemByCode(code))return toast("Item not in Item Master.");
+  const payload={token:authToken,storeName:selectedStore,sheetName,date,itemCode:code,opening:values.opening,receiving:values.receiving,transferIn:values.transferIn,transferOut:values.transferOut,waste:values.waste,sold:values.sold,physicalCount:physical};
+  const btn=$("saveBtn");btn.disabled=true;btn.textContent="Saving…";$("formStatus").textContent=`Sending to ${sheetName}…`;
+  try{
+    try { await Promise.race([ saveToSheet(payload), sleep(8000).then(()=>{throw new Error("POST timed out")}) ]); }
+    catch(err){ console.warn("POST slow/err; will verify from sheet",err); }
+    delete sheetCache[sheetName];
+    const latest = await loadRecordsForSheet(sheetName);
+    sheetCache[sheetName]=latest;
+    const match = latest.find(r=>r.date===date && r.code.toLowerCase()===code.toLowerCase());
+    if(!match) throw new Error("Row was not found after save. Check the sheet.");
+    rebuildRecords();
+    toast("Saved and verified.");resetForm();
+  }catch(e){$("formStatus").textContent=e.message;toast("Save not verified: "+e.message)}
+  finally{btn.disabled=false;btn.textContent="Save row"}
+});
 
 function renderAll(){
   let varItems=0, totVar=0, totWaste=0, missing=0;
@@ -1117,7 +1328,20 @@ function renderAll(){
   if(window.gridOnDataChanged)window.gridOnDataChanged();
 }
 
-function varianceHTML(v){if(v===null||v===undefined)return"—";const cls=v<-.0001?"variance-neg":v>.0001?"variance-pos":"muted";return `<span class="${cls}">${v>0?"+":""}${esc(fmt(v))}</span>`}
+function varianceHTML(v){
+  if(v===null||v===undefined) return "—";
+  let cls;
+  if(v < -0.0001)     cls = "variance-neg";
+  else if(v > 0.0001) cls = "variance-pos";
+  else                cls = "variance-zero";
+  return `<span class="${cls}">${v>0?"+":""}${esc(fmt(v))}</span>`;
+}
+function varianceBadgeHTML(v){
+  if(v===null||v===undefined) return '<span class="badge">No count</span>';
+  if(v < -0.0001) return '<span class="badge badge-bad">Shortage</span>';
+  if(v >  0.0001) return '<span class="badge badge-warn">Excess</span>';
+  return '<span class="badge badge-good">Matched</span>';
+}
 
 function renderInsights(){
   const el = $("aiInsights"); if(!el) return;
@@ -1141,176 +1365,357 @@ function renderDashboard(){
   $("dashboardRows").innerHTML=sorted.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td></tr>`).join("")||'<tr><td colspan="6" class="empty">No variances found for '+selectedStore+'.</td></tr>';
   renderInsights();
 }
-function filteredRecords(){const sheet=$("recordMonth").value,search=($("recordSearch").value||"").trim().toLowerCase();return records.filter(r=>(!sheet||r.sheetName===sheet)&&(!search||r.code.toLowerCase().includes(search)||r.name.toLowerCase().includes(search))).sort((a,b)=>(b.date||"").localeCompare(a.date||""))}
+
+function renderRecordMonthStatus(sheetName,state){
+  const el = $("recordMonthStatus");
+  if(!el) return;
+  const cur = currentMonthSheetName();
+  const list = months.length ? months : [];
+  if(!list.length){ el.innerHTML = ""; return; }
+  el.innerHTML = list.map(m=>{
+    let cls = "";
+    let label = "";
+    if(sheetCache[m]){ cls = "loaded"; label = "loaded"; }
+    else if(failedRecordSheets.indexOf(m) !== -1){ cls = "failed"; label = "failed"; }
+    else if(sheetInflight[m]){ cls = "loading"; label = "loading…"; }
+    else { cls = ""; label = "not loaded"; }
+    if(m === sheetName){
+      if(state === "loading"){ cls = "loading"; label = "loading…"; }
+      if(state === "failed"){ cls = "failed"; label = "failed"; }
+      if(state === "loaded"){ cls = "loaded"; label = "loaded"; }
+    }
+    const isCur = (m === cur) ? " · current" : "";
+    return `<span class="month-chip ${cls}" title="${esc(m)}"><span class="dot"></span>${esc(m)}${isCur} · ${label}</span>`;
+  }).join("");
+}
+
+async function loadSelectedRecordMonth(){
+  const sheet = $("recordMonth").value;
+  if(!sheet){ toast("Select a specific month to load."); return; }
+  if(sheetCache[sheet]){ toast(`${sheet} is already loaded.`); return; }
+  const btn = $("recordLoadBtn");
+  const bar = $("recordLoadBar");
+  const fill = $("recordLoadFill");
+  if(btn){ btn.disabled = true; btn.textContent = "Loading…"; }
+  if(bar){ bar.classList.remove("hide"); fill.style.width = "35%"; }
+  renderRecordMonthStatus(sheet, "loading");
+  try{
+    await fetchSheet(sheet);
+    renderRecordMonthStatus(sheet, "loaded");
+    rebuildRecords();
+    renderRecords();
+    populateMonthSelects();
+    if(fill) fill.style.width = "100%";
+    toast(`${sheet} loaded.`);
+  }catch(e){
+    renderRecordMonthStatus(sheet, "failed");
+    toast(`Failed to load ${sheet}: ${e.message}`);
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = "Load selected month"; }
+    setTimeout(()=>{ if(bar) bar.classList.add("hide"); if(fill) fill.style.width="0"; }, 500);
+  }
+}
+
+function filteredRecords(){
+  const sheet=$("recordMonth").value,search=($("recordSearch").value||"").trim().toLowerCase();
+  return records.filter(r=>(!sheet||r.sheetName===sheet)&&(!search||r.code.toLowerCase().includes(search)||r.name.toLowerCase().includes(search)))
+    .sort((a,b)=>(b.date||"").localeCompare(a.date||""))
+}
 
 function renderRecords(){
   const sheet = $("recordMonth").value;
+  renderRecordMonthStatus();
+
   if(sheet && !sheetCache[sheet]){
-    $("recordsRows").innerHTML = `<tr><td colspan="13" class="empty">Loading ${esc(sheet)}…</td></tr>`;
-    $("recordsSummary").textContent = `Fetching ${sheet} from Google Sheets…`;
-    ensureSheetLoaded(sheet, {showToast:false});
+    $("recordsRows").innerHTML = `<tr><td colspan="13" class="empty">"${esc(sheet)}" is not loaded yet — click <b>Load selected month</b> above to fetch it.</td></tr>`;
+    $("recordsSummary").textContent = `${sheet} not loaded. Current-month data is already available if you choose "All loaded sheets".`;
     return;
   }
   const list=filteredRecords();
   $("recordsRows").innerHTML=list.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.opening))}</td><td>${esc(fmt(r.receiving))}</td><td>${esc(fmt(r.transferIn))}</td><td>${esc(fmt(r.transferOut))}</td><td>${esc(fmt(r.waste))}</td><td>${esc(fmt(r.sold))}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td><td><button class="btn-soft" onclick="editRecord('${esc(r.id)}')">Edit</button></td></tr>`).join("")||'<tr><td colspan="13" class="empty">No matching records for '+selectedStore+'.</td></tr>';
-  $("recordsSummary").textContent=`Showing ${list.length} record(s).`
+  $("recordsSummary").textContent=`Showing ${list.length} record(s)${sheet ? " from " + sheet : " from loaded sheets"}.`
 }
 function editRecord(id){const r=records.find(x=>x.id===id);if(!r)return toast("Record not found.");$("date").value=r.date;$("itemCode").value=r.code;$("itemName").value=r.name;["opening","receiving","transferIn","transferOut","waste","sold"].forEach(k=>$(k).value=r[k]??0);$("physical").value=r.physical??"";$("editId").value=r.id;$("formStatus").textContent=`Editing row in ${r.sheetName}.`;showPage("entry");document.getElementById("singleFormWrap").classList.remove("hide");toast("Loaded into single-item form (below the grid).")}
 
+function renderItems(){
+  const search=($("itemSearch")?.value||"").trim().toLowerCase();
+  const list=items.filter(i=>!search||i.code.toLowerCase().includes(search)||i.name.toLowerCase().includes(search));
+  if($("itemsRows"))$("itemsRows").innerHTML=list.map((i,index)=>`<tr><td>${index+1}</td><td>${esc(i.code)}</td><td>${esc(i.name)}</td></tr>`).join("")||'<tr><td colspan="3" class="empty">No items.</td></tr>';
+  if($("itemCount"))$("itemCount").textContent=`${list.length} item(s)`
+}
+function exportCSV(){
+  const list=filteredRecords();
+  const headers=["sheetName","date","code","name","opening","receiving","transferIn","transferOut","waste","sold","closing","physical","variance"];
+  const cell=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+  const csv=[headers.join(","),...list.map(r=>headers.map(k=>cell(r[k])).join(","))].join("\r\n");
+  const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="stockwise-"+selectedStore+"-inventory.csv";
+  a.click();
+  URL.revokeObjectURL(a.href)
+}
+$("recordSearch").addEventListener("input",renderRecords);
+$("recordMonth").addEventListener("change",()=>{ renderRecords(); const v=$("recordMonth").value; if(v && !sheetCache[v]) { $("recordsSummary").textContent = `${v} not loaded yet — click "Load selected month".`; } });
+$("reportMonth").addEventListener("change",renderReports);
+$("varianceFilter").addEventListener("change",renderReports);
+
+let reportState = { running:false, ready:false, list:[], periodLabel:"", generatedAt:null };
+
+function updateReportsStatus(extra){
+  const el = $("reportStatus");
+  if(!el) return;
+  if(reportState.running){
+    el.className = "report-status running";
+    el.innerHTML = `<b>Generating…</b> ${esc(extra||"")}`;
+    return;
+  }
+  if(reportState.ready){
+    const t = reportState.generatedAt ? reportState.generatedAt.toLocaleString() : "";
+    el.className = "report-status done";
+    el.innerHTML = `<b>Report ready.</b> ${reportState.list.length} row(s) · ${esc(reportState.periodLabel)} · generated ${esc(t)}. Use PDF or Excel buttons below.`;
+    return;
+  }
+  el.className = "report-status";
+  el.innerHTML = `<b>Ready.</b> Click <b>Generate current-month report</b> to load the current month and build the report. Once finished you can export to PDF or Excel.`;
+}
+
+function setReportMeter(pct, label){
+  const meter = $("reportMeter");
+  const fill  = $("reportMeterFill");
+  const txt   = $("reportMeterText");
+  const lbl   = $("reportMeterLabel");
+  const pctEl = $("reportMeterPct");
+  if(!meter) return;
+  if(pct === null){
+    meter.classList.add("hide");
+    if(txt) txt.classList.add("hide");
+    return;
+  }
+  meter.classList.remove("hide");
+  if(txt) txt.classList.remove("hide");
+  if(fill) fill.style.width = Math.max(0, Math.min(100, pct)) + "%";
+  if(lbl) lbl.textContent = label || "";
+  if(pctEl) pctEl.textContent = Math.round(pct) + "%";
+}
+
+function enableReportExport(enabled){
+  const pdf = $("reportPdfBtn");
+  const xls = $("reportExcelBtn");
+  if(pdf) pdf.disabled = !enabled;
+  if(xls) xls.disabled = !enabled;
+}
+
+function filterReportRecords(){
+  const sheet = $("reportMonth").value;
+  const filter = $("varianceFilter").value;
+  let list = records.filter(r => !sheet || r.sheetName === sheet).filter(r => r.variance !== null);
+  if(filter === "variance") list = list.filter(r => Math.abs(r.variance) > 0.0001);
+  if(filter === "shortage") list = list.filter(r => r.variance < -0.0001);
+  if(filter === "excess")   list = list.filter(r => r.variance >  0.0001);
+  return list.sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+}
+
 function renderReports(){
-  const sheet=$("reportMonth").value;
+  const sheet = $("reportMonth").value;
   if(sheet && !sheetCache[sheet]){
-    $("reportRows").innerHTML = `<tr><td colspan="7" class="empty">Loading ${esc(sheet)}…</td></tr>`;
-    ensureSheetLoaded(sheet, {showToast:false});
+    $("reportRows").innerHTML = `<tr><td colspan="7" class="empty">"${esc(sheet)}" is not loaded yet. Click <b>Generate current-month report</b> or load it from the Records tab.</td></tr>`;
+    $("reportCount").textContent = 0;
+    $("reportShortages").textContent = 0;
+    $("reportExcess").textContent = 0;
+    $("reportNet").textContent = 0;
     return;
   }
-  const filter=$("varianceFilter").value;
-  let list=records.filter(r=>!sheet||r.sheetName===sheet).filter(r=>r.variance!==null);
-  if(filter==="variance")list=list.filter(r=>Math.abs(r.variance)>.0001);
-  if(filter==="shortage")list=list.filter(r=>r.variance<-.0001);
-  if(filter==="excess")list=list.filter(r=>r.variance>.0001);
-  $("reportCount").textContent=list.length;$("reportShortages").textContent=list.filter(r=>r.variance<-.0001).length;$("reportExcess").textContent=list.filter(r=>r.variance>.0001).length;$("reportNet").textContent=fmt(list.reduce((s,r)=>s+(r.variance||0),0));
-  $("reportRows").innerHTML=list.sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td><td>${r.variance<-.0001?'<span class="badge badge-bad">Shortage</span>':r.variance>.0001?'<span class="badge badge-good">Excess</span>':'<span class="badge">Matched</span>'}</td></tr>`).join("")||'<tr><td colspan="7" class="empty">No records for this filter in '+selectedStore+'.</td></tr>'
-}
-function renderItems(){const search=($("itemSearch")?.value||"").trim().toLowerCase();const list=items.filter(i=>!search||i.code.toLowerCase().includes(search)||i.name.toLowerCase().includes(search));if($("itemsRows"))$("itemsRows").innerHTML=list.map((i,index)=>`<tr><td>${index+1}</td><td>${esc(i.code)}</td><td>${esc(i.name)}</td></tr>`).join("")||'<tr><td colspan="3" class="empty">No items.</td></tr>';if($("itemCount"))$("itemCount").textContent=`${list.length} item(s)`}
-function exportCSV(){const list=filteredRecords();const headers=["sheetName","date","code","name","opening","receiving","transferIn","transferOut","waste","sold","closing","physical","variance"];const cell=v=>'"'+String(v??"").replace(/"/g,'""')+'"';const csv=[headers.join(","),...list.map(r=>headers.map(k=>cell(r[k])).join(","))].join("\r\n");const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="stockwise-"+selectedStore+"-inventory.csv";a.click();URL.revokeObjectURL(a.href)}
-$("recordSearch").addEventListener("input",renderRecords);$("recordMonth").addEventListener("change",renderRecords);$("reportMonth").addEventListener("change",renderReports);$("varianceFilter").addEventListener("change",renderReports);
-
-function getAnalysisPeriod(){
-  const mode=$("analysisMode").value;
-  const now=new Date();
-  const isoDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-  if(mode==="mtd"){
-    const start=isoDate(new Date(now.getFullYear(),now.getMonth(),1));
-    return {start,end:today(),label:`Month to date · ${start} to ${today()}`};
+  const list = filterReportRecords();
+  $("reportCount").textContent=list.length;
+  $("reportShortages").textContent=list.filter(r=>r.variance<-.0001).length;
+  $("reportExcess").textContent=list.filter(r=>r.variance>.0001).length;
+  $("reportNet").textContent=fmt(list.reduce((s,r)=>s+(r.variance||0),0));
+  $("reportRows").innerHTML=list.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td><td>${varianceHTML(r.variance)}</td><td>${varianceBadgeHTML(r.variance)}</td></tr>`).join("")||'<tr><td colspan="7" class="empty">No records for this filter in '+esc(selectedStore)+'.</td></tr>';
+  if(!reportState.running){
+    reportState.list = list;
+    reportState.periodLabel = list.length ? (sheet || "All loaded sheets") : "";
+    reportState.ready = list.length > 0;
+    $("reportPeriodBadge").textContent = reportState.periodLabel || "—";
+    enableReportExport(reportState.ready);
+    updateReportsStatus();
   }
-  if(mode==="month"){
-    const value=$("analysisMonth").value;
-    if(!value) throw new Error("Choose a month.");
-    const [y,m]=value.split("-").map(Number);
-    return {start:`${value}-01`,end:isoDate(new Date(y,m,0)),label:`Full month · ${value}`};
-  }
-  if(mode==="single"){
-    const date=$("analysisDate").value;
-    if(!date) throw new Error("Choose a date.");
-    return {start:date,end:date,label:`Single date · ${date}`};
-  }
-  const start=$("analysisStart").value,end=$("analysisEnd").value;
-  if(!start||!end) throw new Error("Choose both From and To dates.");
-  if(start>end) throw new Error("From date cannot be after To date.");
-  return {start,end,label:`Date range · ${start} to ${end}`};
-}
-function updateAnalysisControls(){
-  const mode=$("analysisMode").value;
-  $("analysisMonthWrap").classList.toggle("hide",mode!=="month");
-  $("analysisDateWrap").classList.toggle("hide",mode!=="single");
-  $("analysisStartWrap").classList.toggle("hide",mode!=="range");
-  $("analysisEndWrap").classList.toggle("hide",mode!=="range");
-}
-function calcRowVariance(r){
-  if(r.physical===null||r.physical===undefined) return null;
-  const expected=(r.opening||0)+(r.receiving||0)+(r.transferIn||0)-(r.transferOut||0)-(r.waste||0)-(r.sold||0);
-  return r.physical-expected;
 }
 
-async function runItemAnalysis(){
-  let period;
-  try{period=getAnalysisPeriod()}catch(e){return toast(e.message)}
-  await ensureSheetsLoadedForRange(period.start, period.end, {showToast:true});
+async function generateCurrentMonthReport(){
+  if(!authToken || !selectedStore) return toast("Please log in first.");
+  if(reportState.running) return toast("Report is already generating.");
 
-  if(failedRecordSheets.length){
-    const retry = confirm("Some month sheets failed to load (" +
-      failedRecordSheets.join(", ") + ").\n\nRetry now?\n\n" +
-      "Cancel = run analysis with partial data.");
-    if(retry){
-      failedRecordSheets = [];
-      await ensureSheetsLoadedForRange(period.start, period.end, {showToast:false});
+  const btn = $("reportGenerateBtn");
+  reportState.running = true;
+  reportState.ready = false;
+  enableReportExport(false);
+  if(btn){ btn.disabled = true; btn.textContent = "Generating…"; }
+  updateReportsStatus("Loading current month from Google Sheets…");
+  setReportMeter(5, "Preparing request…");
+
+  const prioritySheet = currentMonthSheetName();
+  if(!months.length){ await loadMonths(); }
+
+  if($("reportMonth")) $("reportMonth").value = prioritySheet;
+
+  try{
+    setReportMeter(20, `Fetching ${prioritySheet}…`);
+    updateReportsStatus(`Fetching ${prioritySheet}…`);
+    if(!sheetCache[prioritySheet]){
+      await fetchSheet(prioritySheet);
     }
-  }
+    rebuildRecords();
+    setReportMeter(60, "Aggregating variance rows…");
 
-  const filtered=records.filter(r=>r.date&&r.date>=period.start&&r.date<=period.end)
-    .sort((a,b)=>(a.date||"").localeCompare(b.date||"")||a.code.localeCompare(b.code));
-  $("analysisStoreName").textContent=(selectedStore||"No store selected").toUpperCase();
-  $("analysisPeriodBadge").textContent=period.label;
-  if(!filtered.length){
-    currentAnalysisDetails=[];
-    $("analysisRows").innerHTML=`<tr><td colspan="12" class="empty">No records found for ${esc(selectedStore)} between ${esc(period.start)} and ${esc(period.end)}. Confirm that the selected store's month tabs contain these dates, then refresh data.</td></tr>`;
-    $("analysisSummary").textContent=`0 records loaded for ${period.label}.`;
-    return;
-  }
-  const aggregated={};
-  filtered.forEach(r=>{
-    if(!r.code)return;
-    const key=r.code.toLowerCase();
-    if(!aggregated[key]) aggregated[key]={code:r.code,name:r.name,opening:r.opening||0,receiving:0,transferIn:0,transferOut:0,waste:0,sold:0,actualCount:null,actualDate:"",expectedOnHand:0,variance:null,days:0,records:[]};
-    const a=aggregated[key];
-    if(a.days===0)a.opening=r.opening||0;
-    a.receiving+=r.receiving||0;a.transferIn+=r.transferIn||0;a.transferOut+=r.transferOut||0;
-    a.waste+=r.waste||0;a.sold+=r.sold||0;a.days++;a.records.push(r);
-    if(r.physical!==null&&r.physical!==undefined&&(!a.actualDate||r.date>=a.actualDate)){
-      a.actualCount=r.physical;a.actualDate=r.date;
+    populateMonthSelects();
+    if($("reportMonth").value !== prioritySheet) $("reportMonth").value = prioritySheet;
+
+    await _sleep(120);
+    setReportMeter(80, "Rendering…");
+
+    const list = filterReportRecords();
+    reportState.list = list;
+    reportState.periodLabel = prioritySheet;
+    reportState.generatedAt = new Date();
+    reportState.ready = list.length > 0;
+
+    $("reportPeriodBadge").textContent = reportState.periodLabel;
+    renderReports();
+
+    setReportMeter(100, "Done");
+    setTimeout(()=>setReportMeter(null), 900);
+
+    if(reportState.ready){
+      updateReportsStatus();
+      enableReportExport(true);
+      toast(`Report ready · ${list.length} row(s) from ${prioritySheet}`);
+    }else{
+      updateReportsStatus("No counted records in the current month yet.");
+      enableReportExport(false);
+      toast("No records to report for " + prioritySheet);
     }
-  });
-  Object.values(aggregated).forEach(a=>{
-    a.expectedOnHand=a.opening+a.receiving+a.transferIn-a.transferOut-a.waste-a.sold;
-    a.variance=a.actualCount===null?null:a.actualCount-a.expectedOnHand;
-  });
-  const list=Object.values(aggregated).sort((a,b)=>a.code.localeCompare(b.code));
-  currentAnalysisDetails=filtered;
-  $("analysisRows").innerHTML=list.map(item=>`
-    <tr><td>${esc(item.code)}</td><td>${esc(item.name)}</td>
-    <td>${esc(fmt(item.opening))}</td><td>${esc(fmt(item.receiving))}</td>
-    <td>${esc(fmt(item.transferIn))}</td><td>${esc(fmt(item.transferOut))}</td>
-    <td>${esc(fmt(item.waste))}</td><td>${esc(fmt(item.sold))}</td>
-    <td>${esc(fmt(item.expectedOnHand))}</td><td>${item.actualCount!==null?esc(fmt(item.actualCount)):"—"}${item.actualDate?`<div class="small-help">${esc(item.actualDate)}</div>`:""}</td>
-    <td>${varianceHTML(item.variance)}</td>
-    <td><button class="btn-green" style="padding:5px 9px;font-size:12px" onclick="openItemModal('${esc(item.code)}')">View</button></td></tr>`).join("");
+  }catch(e){
+    console.warn("Report generation failed:", e);
+    reportState.ready = false;
+    reportState.list = [];
+    enableReportExport(false);
+    updateReportsStatus("Failed: " + (e.message || e));
+    setReportMeter(null);
+    toast("Report failed: " + (e.message || e));
+  }finally{
+    reportState.running = false;
+    if(btn){ btn.disabled = false; btn.textContent = "▶ Generate current-month report"; }
+  }
+}
 
-  const sheetSet = new Set(filtered.map(r=>r.sheetName));
-  const accurateMsg = `✓ Analysis accurate · ${list.length} item(s) · ${filtered.length} daily record(s) · ${sheetSet.size} sheet(s) · ${period.label}`;
-  toast(accurateMsg);
-  $("analysisSummary").textContent = accurateMsg + ` · ${selectedStore.toUpperCase()}. Positive variance = excess; negative = shortage.` +
-    (failedRecordSheets.length ? ` ⚠ Some sheets could not be loaded (${failedRecordSheets.join(", ")}); refresh or retry via Setup.` : "");
+function _downloadBlob(filename, blob){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
 }
-function openItemModal(code){
-  const details=currentAnalysisDetails.filter(r=>r.code.toLowerCase()===code.toLowerCase())
-    .sort((a,b)=>(a.date||"").localeCompare(b.date||""));
-  if(!details.length)return toast("No detail rows found for this item in the selected period.");
-  const first=details[0],totals={opening:first.opening||0,receiving:0,transferIn:0,transferOut:0,waste:0,sold:0};
-  let latestActual=null,latestActualDate="";
-  details.forEach(r=>{
-    totals.receiving+=r.receiving||0;totals.transferIn+=r.transferIn||0;totals.transferOut+=r.transferOut||0;
-    totals.waste+=r.waste||0;totals.sold+=r.sold||0;
-    if(r.physical!==null&&r.physical!==undefined&&(!latestActualDate||r.date>=latestActualDate)){latestActual=r.physical;latestActualDate=r.date}
-  });
-  const expected=totals.opening+totals.receiving+totals.transferIn-totals.transferOut-totals.waste-totals.sold;
-  const variance=latestActual===null?null:latestActual-expected;
-  $("modalTitle").textContent=`${first.name||"Item"} (${code}) · ${selectedStore.toUpperCase()}`;
-  $("modTotalOpening").textContent=fmt(totals.opening);$("modTotalReceiving").textContent=fmt(totals.receiving);
-  $("modTotalTransferIn").textContent=fmt(totals.transferIn);$("modTotalTransferOut").textContent=fmt(totals.transferOut);
-  $("modTotalWaste").textContent=fmt(totals.waste);$("modTotalSold").textContent=fmt(totals.sold);
-  $("modExpectedOnHand").textContent=fmt(expected);
-  $("modActualCount").textContent=latestActual===null?"—":`${fmt(latestActual)}${latestActualDate?` · ${latestActualDate}`:""}`;
-  $("modVariance").innerHTML=variance===null?"—":`${varianceHTML(variance)}<div class="small-help">${variance>0?"Excess stock":variance<0?"Shortage":"Matched"}</div>`;
-  $("modalDetailRows").innerHTML=details.map(r=>`<tr>
-    <td>${esc(r.date)}</td><td>${esc(fmt(r.opening))}</td><td>${esc(fmt(r.receiving))}</td>
-    <td>${esc(fmt(r.transferIn))}</td><td>${esc(fmt(r.transferOut))}</td><td>${esc(fmt(r.waste))}</td>
-    <td>${esc(fmt(r.sold))}</td><td>${esc(fmt(r.closing))}</td><td>${r.physical!==null?esc(fmt(r.physical)):"—"}</td>
-    <td>${varianceHTML(calcRowVariance(r))}</td></tr>`).join("");
-  $("itemModal").classList.add("active");
+function _reportTitle(){ return `StockWise Inventory Variance Report · ${selectedStore.toUpperCase()} · ${reportState.periodLabel}`; }
+function _reportRowsForExport(){
+  return reportState.list.map(r=>({
+    date: r.date, code: r.code, name: r.name,
+    closing: r.closing, physical: r.physical,
+    variance: r.variance,
+    result: r.variance < -0.0001 ? "Shortage" : r.variance > 0.0001 ? "Excess" : "Matched"
+  }));
 }
-$("analysisMode").addEventListener("change",updateAnalysisControls);
-$("analysisMonth").addEventListener("change",()=>{if($("analysisMode").value==="month")runItemAnalysis()});
-$("analysisDate").addEventListener("change",()=>{if($("analysisMode").value==="single")runItemAnalysis()});
-$("analysisStart").addEventListener("change",()=>{if($("analysisMode").value==="range"&&$("analysisEnd").value)runItemAnalysis()});
-$("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="range"&&$("analysisStart").value)runItemAnalysis()});
+function exportReportExcel(){
+  if(!reportState.ready || !reportState.list.length) return toast("Generate the report first.");
+  const headers = ["Date","Code","Item","Expected Closing","Physical","Variance","Result"];
+  const rows = _reportRowsForExport();
+  const cell = v => '"' + String(v ?? "").replace(/"/g,'""') + '"';
+  const csv = [
+    cell(_reportTitle()),
+    cell("Generated: " + (reportState.generatedAt ? reportState.generatedAt.toLocaleString() : "")),
+    "",
+    headers.map(cell).join(","),
+    ...rows.map(r=>headers.map(h=>{
+      const key = h === "Expected Closing" ? "closing"
+                : h === "Physical" ? "physical"
+                : h === "Variance" ? "variance"
+                : h === "Result" ? "result"
+                : h.toLowerCase();
+      return cell(r[key] ?? "");
+    }).join(","))
+  ].join("\r\n");
+  const blob = new Blob(["\ufeff"+csv], {type:"text/csv;charset=utf-8;"});
+  const stamp = (reportState.generatedAt || new Date()).toISOString().slice(0,10);
+  _downloadBlob(`stockwise-report-${selectedStore}-${stamp}.csv`, blob);
+  toast("Excel (CSV) exported.");
+}
+
+function exportReportPDF(){
+  if(!reportState.ready || !reportState.list.length) return toast("Generate the report first.");
+  const rows = _reportRowsForExport();
+  const shortages = rows.filter(r => r.variance < -0.0001).length;
+  const excess    = rows.filter(r => r.variance >  0.0001).length;
+  const net       = rows.reduce((s,r)=>s+(Number(r.variance)||0),0);
+
+  const html = `
+  <!doctype html><html><head><meta charset="utf-8">
+  <title>${esc(_reportTitle())}</title>
+  <style>
+    body{font:12px/1.45 Arial,Helvetica,sans-serif;color:#111;padding:18px}
+    h1{font-size:18px;margin:0 0 4px}
+    .meta{color:#555;font-size:11px;margin-bottom:12px}
+    .kpis{display:flex;gap:14px;margin:10px 0 14px;flex-wrap:wrap}
+    .kpi{border:1px solid #ddd;border-radius:6px;padding:8px 12px;min-width:110px}
+    .kpi b{display:block;font-size:16px;margin-top:2px}
+    table{border-collapse:collapse;width:100%;font-size:11px}
+    th,td{border:1px solid #ddd;padding:5px 6px;text-align:left}
+    th{background:#f3f6f4}
+    .red{color:#c62828;font-weight:700}
+    .yellow{color:#a07800;font-weight:700}
+    .green{color:#1b7a44;font-weight:700}
+    @page{size:A4;margin:12mm}
+  </style></head><body>
+    <h1>${esc(_reportTitle())}</h1>
+    <div class="meta">Generated ${esc((reportState.generatedAt||new Date()).toLocaleString())} · Store ${esc(selectedStore.toUpperCase())}</div>
+    <div class="kpis">
+      <div class="kpi">Counted records<b>${rows.length}</b></div>
+      <div class="kpi">Shortages<b>${shortages}</b></div>
+      <div class="kpi">Excess<b>${excess}</b></div>
+      <div class="kpi">Net variance<b>${esc(fmt(net))}</b></div>
+    </div>
+    <table>
+      <thead><tr><th>Date</th><th>Code</th><th>Item</th><th>Expected Closing</th><th>Physical</th><th>Variance</th><th>Result</th></tr></thead>
+      <tbody>
+        ${rows.map(r=>{
+          const cls = r.variance < -0.0001 ? "red" : r.variance > 0.0001 ? "yellow" : "green";
+          return `<tr>
+            <td>${esc(r.date)}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td>
+            <td>${esc(fmt(r.closing))}</td><td>${esc(fmt(r.physical))}</td>
+            <td class="${cls}">${r.variance>0?"+":""}${esc(fmt(r.variance))}</td>
+            <td>${esc(r.result)}</td>
+          </tr>`;
+        }).join("")}
+      </tbody>
+    </table>
+    <p style="margin-top:14px;color:#555;font-size:10px">Variance colours: red = shortage, yellow = excess, green = matched.</p>
+    <script>window.onload=function(){setTimeout(function(){window.print()},250)}<\/script>
+  </body></html>`;
+  const w = window.open("", "_blank");
+  if(!w) return toast("Pop-up blocked. Allow pop-ups to save as PDF.");
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  toast("PDF print dialog opened — choose 'Save as PDF'.");
+}
 
 /* ============================================================
-   STOCK GRID module
+   STOCK GRID module — negative-closing rows are skipped
    ============================================================ */
 (function () {
   "use strict";
-  const G = { date:"", sheet:"", rows:[], saving:false };
+  const G = { date:"", sheet:"", rows:[], saving:false, lastSavedAt:null };
 
   function computeRow(r){
     r.closing = (Number(r.opening)||0)+(Number(r.receiving)||0)+(Number(r.transferIn)||0)
@@ -1339,12 +1744,20 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
       return computeRow(r);
     });
   }
-  function varCls(v){ if(v===null) return "muted"; if(v<-0.0001) return "variance-neg"; if(v>0.0001) return "variance-pos"; return "muted"; }
+  function varCls(v){
+    if(v===null) return "muted";
+    if(v<-0.0001) return "variance-neg";
+    if(v>0.0001)  return "variance-pos";
+    return "variance-zero";
+  }
 
   function render(){
     const q = ($("gridSearch")?.value||"").trim().toLowerCase();
     const tb = $("gridRows"); if(!tb) return;
-    if(!G.rows.length){ tb.innerHTML='<tr><td colspan="12" class="empty">No rows. Open Setup → Load Sheets data, then click Load grid.</td></tr>'; return; }
+    if(!G.rows.length){
+      tb.innerHTML='<tr><td colspan="12" class="empty">No rows yet. Wait for Item Master to load, or click Load grid.</td></tr>';
+      return;
+    }
     const visible = G.rows.filter(r=>!q || r.code.toLowerCase().includes(q) || (r.name||"").toLowerCase().includes(q));
     const openingRo = G.date !== "2026-10-01";
     const inp = (f,r,ro)=>{
@@ -1353,11 +1766,13 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
       return `<input class="form-control qty" type="number" min="0" step="0.001" data-code="${esc(r.code)}" data-field="${f}" value="${esc(val)}" ${ro?"readonly":""} style="min-width:80px${bc}">`;
     };
     tb.innerHTML = visible.map(r=>{
-      const badge = r.status==="saved"?'<span class="badge badge-good">Saved ✓</span>':
-                    r.status==="error"?'<span class="badge badge-bad">Error</span>':
-                    r.status==="saving"?'<span class="badge badge-warn">Saving…</span>':
-                    r.dirty?'<span class="badge badge-warn">Changed</span>':
-                    r.existing?'<span class="badge">Loaded</span>':'<span class="badge">New</span>';
+      let badge;
+      if(r.status==="saved") badge='<span class="badge badge-good">Saved ✓</span>';
+      else if(r.status==="error") badge='<span class="badge badge-bad">Skipped (negative closing)</span>';
+      else if(r.status==="saving") badge='<span class="badge badge-warn">Saving…</span>';
+      else if(r.dirty) badge='<span class="badge badge-warn">Changed</span>';
+      else if(r.existing) badge='<span class="badge">Loaded</span>';
+      else badge='<span class="badge">New</span>';
       return `<tr data-code="${esc(r.code)}" class="${r.dirty?'row-dirty':''}">
         <td>${esc(r.code)}</td><td>${esc(r.name)}</td>
         <td>${inp("opening",r,openingRo)}</td>
@@ -1399,8 +1814,8 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
   window.gridLoad = function(){
     const d = $("gridDate").value;
     if(!d) return toast("Pick a date first.");
-    if(!items||!items.length) return toast("Item Master empty — Setup → Load Sheets data.");
-    G.date = d; G.sheet = sheetNameForDate(d);
+    if(!items||!items.length) return toast("Item Master is empty — wait for it to load, or use Setup → Load Sheets data.");
+    G.date = d; G.sheet = sheetNameForDate(d); G.lastSavedAt = null;
     $("gridSheetBadge").textContent = G.sheet;
     G.rows = buildRows(d);
     render();
@@ -1413,25 +1828,65 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
     render(); $("gridStatus").textContent="Changes cleared.";
   };
 
+  window.gridMarkAllDirty = function(){
+    if(G.saving) return toast("Save in progress.");
+    if(!G.rows.length) return toast("Load the grid first.");
+    G.rows.forEach(r=>{ r.dirty = true; r.status = "changed"; });
+    render();
+    $("gridStatus").textContent = "All rows marked as changed. Click \"Save changed rows\" to re-send everything.";
+    toast("All rows marked for re-save.");
+  };
+
   window.gridSaveChanged = async function(){
     if(G.saving) return toast("Save already running.");
     if(!G.date) return toast("Load the grid first.");
     const dirty = G.rows.filter(r=>r.dirty);
-    if(!dirty.length) return toast("No changed rows.");
+    if(!dirty.length) return toast("No changed rows. Use \"Re-save all rows\" to re-send everything.");
 
     const openingEditable = G.date === "2026-10-01";
 
+    /* Split dirty rows: toSend (closing >= 0) vs toSkip (closing < 0).
+       Only structural input errors reject the entire save; negative closing
+       rejects just that row so the rest of the batch still saves. */
+    const toSend = [];
+    const toSkip = [];
+
     for(const r of dirty){
       for(const f of ["receiving","transferIn","transferOut","waste","sold"]){
-        const v = Number(r[f]??0); if(!Number.isFinite(v)||v<0) return toast(`Row ${r.code}: ${f} invalid.`);
+        const v = Number(r[f]??0);
+        if(!Number.isFinite(v)||v<0) return toast(`Row ${r.code}: ${f} invalid.`);
       }
       if(openingEditable){ const v=Number(r.opening??0); if(!Number.isFinite(v)||v<0) return toast(`Row ${r.code}: opening invalid.`); }
       if(r.physical!==""&&r.physical!=null){ const v=Number(r.physical); if(!Number.isFinite(v)||v<0) return toast(`Row ${r.code}: physical invalid.`); }
-      if(Number(r.closing)<0) return toast(`Row ${r.code}: closing negative.`);
       if(!itemByCode(r.code)) return toast(`Row ${r.code} not in Item Master.`);
+
+      /* Authoritative closing computation from the entered values */
+      const closingVal =
+        (Number(r.opening)||0) +
+        (Number(r.receiving)||0) +
+        (Number(r.transferIn)||0) -
+        (Number(r.transferOut)||0) -
+        (Number(r.waste)||0) -
+        (Number(r.sold)||0);
+
+      if(closingVal < -0.0001){
+        toSkip.push(r.code);
+        r.status = "error";
+        r.dirty  = true;
+        continue;
+      }
+      toSend.push(r);
     }
 
-    const itemsPayload = dirty.map(r=>{
+    if(!toSend.length){
+      render();
+      const preview = toSkip.slice(0,5).join(", ") + (toSkip.length>5 ? ` +${toSkip.length-5} more` : "");
+      $("gridStatus").textContent = `Nothing saved — ${toSkip.length} row(s) would close negative: ${preview}. Fix their values and retry.`;
+      toast("All changed rows skipped (negative closing).");
+      return;
+    }
+
+    const itemsPayload = toSend.map(r=>{
       const entry = { itemCode: r.code };
       if(openingEditable) entry.opening = Number(r.opening??0);
       entry.receiving    = (r.receiving===""||r.receiving==null) ? "" : Number(r.receiving);
@@ -1453,37 +1908,126 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
 
     G.saving = true;
     $("gridSaveBtn").disabled = true;
-    dirty.forEach(r=>{ r.status="saving"; });
+    if($("gridResaveBtn")) $("gridResaveBtn").disabled = true;
+    toSend.forEach(r=>{ r.status="saving"; });
     render();
-    $("gridStatus").textContent = `Sending ${dirty.length} row(s) to Google Sheet...`;
+    $("gridStatus").textContent = `Sending ${toSend.length} row(s) to Google Sheet${toSkip.length ? " (skipping " + toSkip.length + " negative-closing row(s))" : ""}...`;
 
     try {
       await Promise.race([
         saveToSheet(payload),
-        sleep(5000).then(()=>{ throw new Error("Request timed out"); })
+        sleep(12000).then(()=>{ throw new Error("POST timed out"); })
       ]);
     } catch (err) {
-      console.warn("Bulk POST slow; assuming success as configured.", err);
+      console.warn("Bulk POST slow/err; verifying from sheet.", err);
     }
 
-    delete sheetCache[G.sheet];
+    let latestByCode = {};
+    let verifyError = "";
+    try {
+      delete sheetCache[G.sheet];
+      const latest = await loadRecordsForSheet(G.sheet);
+      sheetCache[G.sheet] = latest;
+      latest.forEach(rec=>{
+        if(rec.date === G.date) latestByCode[String(rec.code).toLowerCase()] = rec;
+      });
+    } catch (err) {
+      verifyError = err.message || String(err);
+      console.warn("Post-save verification read failed:", err);
+    }
 
-    dirty.forEach(r=>{
-      r.existing = true;
-      r.dirty = false;
-      r.status = "saved";
+    let okCount = 0;
+    const failedCodes = toSkip.slice();   /* start with client-side skips */
+
+    toSend.forEach(r=>{
+      const got = latestByCode[r.code.toLowerCase()];
+      const fields = ["receiving","transferIn","transferOut","waste","sold"];
+      let match = !!got;
+      if(match){
+        fields.forEach(k=>{
+          const a = Number(r[k]||0);
+          const b = Number(got[k]||0);
+          if(Math.abs(a-b) > 0.0001) match = false;
+        });
+        if(match){
+          const rp = (r.physical===""||r.physical==null) ? null : Number(r.physical);
+          const gp = (got.physical===null||got.physical===undefined) ? null : Number(got.physical);
+          if(rp === null){ if(gp !== null) match = false; }
+          else { if(gp === null || Math.abs(rp - gp) > 0.0001) match = false; }
+        }
+        if(match && G.date === "2026-10-01"){
+          const ro = Number(r.opening||0);
+          const go = Number(got.opening||0);
+          if(Math.abs(ro - go) > 0.0001) match = false;
+        }
+      }
+
+      if(match){
+        r.existing = true;
+        r.dirty = false;
+        r.status = "saved";
+        okCount++;
+      } else {
+        r.dirty = true;
+        r.status = "error";
+        failedCodes.push(r.code);
+      }
     });
 
+    G.lastSavedAt = new Date();
     G.saving = false;
     $("gridSaveBtn").disabled = false;
-    renderAll();
+    if($("gridResaveBtn")) $("gridResaveBtn").disabled = false;
+    render();
 
-    const msg = `Saved in Google Sheet`;
-    $("gridStatus").textContent = msg;
-    toast(msg);
+    if(failedCodes.length === 0 && !verifyError){
+      $("gridStatus").textContent = `All ${okCount} row(s) saved and verified in "${G.sheet}".`;
+      toast(`All ${okCount} row(s) saved ✓`);
+    } else if(failedCodes.length === 0 && verifyError){
+      $("gridStatus").textContent = `${okCount} row(s) POSTed but verification read failed (${verifyError}). Check the sheet manually.`;
+      toast("Saved but could not verify. Check the sheet.");
+    } else {
+      const preview = failedCodes.slice(0,5).join(", ") + (failedCodes.length>5 ? ` +${failedCodes.length-5} more` : "");
+      $("gridStatus").textContent =
+        `Saved ${okCount}/${toSend.length} sent row(s). ` +
+        `Skipped ${failedCodes.length} (negative closing or rejected by sheet): ${preview}. ` +
+        `Skipped rows stay in the grid marked "Skipped" — fix their numbers and click Save changed rows again to retry them.`;
+      toast(`${okCount} saved · ${failedCodes.length} skipped`);
+    }
+
+    window.setTimeout(async () => {
+      try {
+        rebuildRecords();
+
+        const prevByCode = {};
+        G.rows.forEach(r => { prevByCode[r.code] = r; });
+        const fresh = buildRows(G.date);
+        G.rows = fresh.map(fr => {
+          const old = prevByCode[fr.code];
+          if(!old) return fr;
+          const keep = old.status === "saved" ||
+                       old.status === "error" ||
+                       old.status === "saving" ||
+                       old.dirty;
+          if(keep){
+            ["opening","receiving","transferIn","transferOut","waste","sold","physical"]
+              .forEach(k => fr[k] = old[k]);
+            fr.dirty  = old.dirty;
+            fr.status = old.status;
+            computeRow(fr);
+          }
+          return fr;
+        });
+        render();
+        renderAll();
+      } catch(e){
+        console.warn("Post-save refresh failed:", e);
+      }
+    }, 800);
   };
 
-  window.gridResetState = function(){ G.date="";G.sheet="";G.rows=[];G.saving=false;
+  window.gridResetState = function(){
+    G.date="";G.sheet="";G.rows=[];G.saving=false;G.lastSavedAt=null;
     if($("gridRows"))$("gridRows").innerHTML="";
     if($("gridSheetBadge"))$("gridSheetBadge").textContent="—";
     if($("gridStatus"))$("gridStatus").textContent="Pick a date and click Load grid.";
@@ -1493,17 +2037,45 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
     if(!$("gridDate")) return;
     if(!$("gridDate").value) $("gridDate").value = today();
     $("gridSheetBadge").textContent = sheetNameForDate($("gridDate").value);
-    if(!G.rows.length && items && items.length) window.gridLoad();
+    if(!G.rows.length){
+      if(items && items.length){
+        window.gridLoad();
+      } else {
+        $("gridRows").innerHTML = '<tr><td colspan="12" class="empty">Waiting for Item Master to load… Click "Load grid" once it is ready.</td></tr>';
+        $("gridStatus").textContent = "Item Master not loaded yet. Wait a moment, then click Load grid.";
+      }
+    }
+  };
+
+  window.gridOnItemsLoaded = function(){
+    if(!$("gridDate")) return;
+    if(!$("gridDate").value) $("gridDate").value = today();
+    $("gridSheetBadge").textContent = sheetNameForDate($("gridDate").value);
+    if(items && items.length){
+      G.date = $("gridDate").value;
+      G.sheet = sheetNameForDate(G.date);
+      G.rows = buildRows(G.date);
+      render();
+      $("gridStatus").textContent = `${G.rows.length} rows loaded from Item Master.`;
+    }
   };
 
   window.gridOnDataChanged = function(){
     if(!G.rows.length) return;
-    const dirty = {}; G.rows.forEach(r=>{ if(r.dirty) dirty[r.code]=r; });
+    const prevByCode = {};
+    G.rows.forEach(r => { prevByCode[r.code] = r; });
     const fresh = buildRows(G.date);
-    G.rows = fresh.map(r=>{
-      const d = dirty[r.code];
-      if(d){ ["opening","receiving","transferIn","transferOut","waste","sold","physical"].forEach(k=>r[k]=d[k]); r.dirty=true; r.status=d.status==="saved"?"saved":"changed"; computeRow(r); }
-      return r;
+    G.rows = fresh.map(fr => {
+      const old = prevByCode[fr.code];
+      if(!old) return fr;
+      const keep = old.dirty || old.status === "saved" || old.status === "error" || old.status === "saving";
+      if(keep){
+        ["opening","receiving","transferIn","transferOut","waste","sold","physical"].forEach(k=>fr[k]=old[k]);
+        fr.dirty = old.dirty;
+        fr.status = old.status;
+        computeRow(fr);
+      }
+      return fr;
     });
     render();
   };
@@ -1517,6 +2089,191 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
   }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", bind); else bind();
 })();
+
+function getAnalysisPeriod(){
+  const mode=$("analysisMode").value;
+  const now=new Date();
+  const isoDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  if(mode==="mtd"){
+    const start=isoDate(new Date(now.getFullYear(),now.getMonth(),1));
+    const end=today();
+    return {start,end,label:`Month to date · ${start} → ${end}`};
+  }
+  if(mode==="month"){
+    const value=$("analysisMonth").value;
+    if(!value) throw new Error("Choose a month.");
+    const [y,m]=value.split("-").map(Number);
+    return {start:`${value}-01`,end:isoDate(new Date(y,m,0)),label:`Full month · ${value}`};
+  }
+  if(mode==="single"){
+    const date=$("analysisDate").value;
+    if(!date) throw new Error("Choose a date.");
+    return {start:date,end:date,label:`Single date · ${date}`};
+  }
+  const start=$("analysisStart").value,end=$("analysisEnd").value;
+  if(!start||!end) throw new Error("Choose both From and To dates.");
+  if(start>end) throw new Error("From date cannot be after To date.");
+  return {start,end,label:`Date range · ${start} → ${end}`};
+}
+function updateAnalysisControls(){
+  const mode=$("analysisMode").value;
+  $("analysisMonthWrap").classList.toggle("hide",mode!=="month");
+  $("analysisDateWrap").classList.toggle("hide",mode!=="single");
+  $("analysisStartWrap").classList.toggle("hide",mode!=="range");
+  $("analysisEndWrap").classList.toggle("hide",mode!=="range");
+}
+function calcRowVariance(r){
+  if(r.physical===null||r.physical===undefined) return null;
+  const expected=(r.opening||0)+(r.receiving||0)+(r.transferIn||0)-(r.transferOut||0)-(r.waste||0)-(r.sold||0);
+  return r.physical-expected;
+}
+
+function filterAnalysisRows(){
+  const q = ($("analysisSearch")?.value || "").trim().toLowerCase();
+  const tb = $("analysisRows");
+  if(!tb) return;
+  if(!currentAnalysisList.length) return;
+  const list = currentAnalysisList.filter(item =>
+    !q || item.code.toLowerCase().includes(q) || (item.name||"").toLowerCase().includes(q)
+  );
+  tb.innerHTML = list.map(item=>`
+    <tr>
+      <td>${esc(item.code)}</td><td>${esc(item.name)}</td>
+      <td>${esc(fmt(item.opening))}</td><td>${esc(fmt(item.receiving))}</td>
+      <td>${esc(fmt(item.transferIn))}</td><td>${esc(fmt(item.transferOut))}</td>
+      <td>${esc(fmt(item.waste))}</td><td>${esc(fmt(item.sold))}</td>
+      <td>${esc(fmt(item.expectedOnHand))}</td>
+      <td>${item.actualCount!==null?esc(fmt(item.actualCount)):"—"}${item.actualDate?`<div class="small-help">${esc(item.actualDate)}</div>`:""}</td>
+      <td>${varianceHTML(item.variance)}</td>
+      <td>${varianceBadgeHTML(item.variance)}</td>
+      <td><button class="btn-green" style="padding:5px 9px;font-size:12px" onclick="openItemModal('${esc(item.code)}')">View</button></td>
+    </tr>`).join("")
+    || `<tr><td colspan="13" class="empty">No items match "${esc(q)}".</td></tr>`;
+}
+
+async function runItemAnalysis(){
+  let period;
+  try{period=getAnalysisPeriod()}catch(e){return toast(e.message)}
+  await ensureSheetsLoadedForRange(period.start, period.end, {showToast:true});
+
+  if(failedRecordSheets.length){
+    const retry = confirm("Some month sheets failed to load (" +
+      failedRecordSheets.join(", ") + ").\n\nRetry now?\n\n" +
+      "Cancel = run analysis with partial data.");
+    if(retry){
+      failedRecordSheets = [];
+      await ensureSheetsLoadedForRange(period.start, period.end, {showToast:false});
+    }
+  }
+
+  const filtered=records.filter(r=>r.date&&r.date>=period.start&&r.date<=period.end)
+    .sort((a,b)=>(a.date||"").localeCompare(b.date||"")||a.code.localeCompare(b.code));
+
+  $("analysisStoreName").textContent=(selectedStore||"No store selected").toUpperCase();
+  $("analysisPeriodBadge").textContent=period.label;
+
+  if(!filtered.length){
+    currentAnalysisDetails=[];
+    currentAnalysisList=[];
+    $("analysisRows").innerHTML=`<tr><td colspan="13" class="empty">No records found for ${esc(selectedStore)} between ${esc(period.start)} and ${esc(period.end)}. Confirm that the selected store's month tabs contain these dates, then refresh data.</td></tr>`;
+    $("analysisSummary").textContent=`0 records loaded for ${period.label}.`;
+    return;
+  }
+
+  const aggregated={};
+  filtered.forEach(r=>{
+    if(!r.code) return;
+    const key=r.code.toLowerCase();
+    if(!aggregated[key]) aggregated[key]={
+      code:r.code, name:r.name,
+      opening:null,
+      receiving:0, transferIn:0, transferOut:0, waste:0, sold:0,
+      actualCount:null, actualDate:"",
+      expectedOnHand:0, variance:null,
+      days:0, firstDate:"", lastDate:"",
+      records:[]
+    };
+    const a=aggregated[key];
+    if(a.days===0){
+      a.opening = (r.opening ?? 0);
+      a.firstDate = r.date;
+    }
+    a.lastDate = r.date;
+    a.receiving   += r.receiving   || 0;
+    a.transferIn  += r.transferIn  || 0;
+    a.transferOut += r.transferOut || 0;
+    a.waste       += r.waste       || 0;
+    a.sold        += r.sold        || 0;
+    a.days++;
+    a.records.push(r);
+    if(r.physical!==null && r.physical!==undefined &&
+       (!a.actualDate || r.date>=a.actualDate)){
+      a.actualCount = r.physical;
+      a.actualDate  = r.date;
+    }
+  });
+  Object.values(aggregated).forEach(a=>{
+    a.expectedOnHand = a.opening + a.receiving + a.transferIn
+                     - a.transferOut - a.waste - a.sold;
+    a.variance = a.actualCount === null ? null : a.actualCount - a.expectedOnHand;
+  });
+
+  const list=Object.values(aggregated).sort((a,b)=>a.code.localeCompare(b.code));
+  currentAnalysisDetails=filtered;
+  currentAnalysisList=list;
+
+  filterAnalysisRows();
+
+  const sheetSet = new Set(filtered.map(r=>r.sheetName));
+  const accurateMsg = `✓ ${list.length} item(s) · ${filtered.length} daily record(s) · ${sheetSet.size} sheet(s) · ${period.label}`;
+  toast(accurateMsg);
+  $("analysisSummary").textContent = accurateMsg +
+    ` · ${selectedStore.toUpperCase()}. Positive variance = excess (yellow), negative = shortage (red), matched = green.` +
+    (failedRecordSheets.length ? ` ⚠ Some sheets could not be loaded (${failedRecordSheets.join(", ")}); refresh or retry via Setup.` : "");
+}
+
+function openItemModal(code){
+  const details=currentAnalysisDetails.filter(r=>r.code.toLowerCase()===code.toLowerCase())
+    .sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  if(!details.length)return toast("No detail rows found for this item in the selected period.");
+  const first=details[0];
+  const totals={opening:first.opening||0,receiving:0,transferIn:0,transferOut:0,waste:0,sold:0};
+  let latestActual=null,latestActualDate="";
+  details.forEach(r=>{
+    totals.receiving+=r.receiving||0;
+    totals.transferIn+=r.transferIn||0;
+    totals.transferOut+=r.transferOut||0;
+    totals.waste+=r.waste||0;
+    totals.sold+=r.sold||0;
+    if(r.physical!==null&&r.physical!==undefined&&(!latestActualDate||r.date>=latestActualDate)){
+      latestActual=r.physical;latestActualDate=r.date;
+    }
+  });
+  const expected=totals.opening+totals.receiving+totals.transferIn-totals.transferOut-totals.waste-totals.sold;
+  const variance=latestActual===null?null:latestActual-expected;
+
+  $("modalTitle").textContent=`${first.name||"Item"} (${code}) · ${selectedStore.toUpperCase()}`;
+  $("modTotalOpening").textContent=fmt(totals.opening);
+  $("modTotalReceiving").textContent=fmt(totals.receiving);
+  $("modTotalTransferIn").textContent=fmt(totals.transferIn);
+  $("modTotalTransferOut").textContent=fmt(totals.transferOut);
+  $("modTotalWaste").textContent=fmt(totals.waste);
+  $("modTotalSold").textContent=fmt(totals.sold);
+  $("modExpectedOnHand").textContent=fmt(expected);
+  $("modActualCount").textContent=latestActual===null?"—":`${fmt(latestActual)}${latestActualDate?` · ${latestActualDate}`:""}`;
+  $("modVariance").innerHTML=variance===null?"—":`${varianceHTML(variance)}<div class="small-help">${variance>0?"Excess stock (yellow)":variance<0?"Shortage (red)":"Matched (green)"}</div>`;
+  $("modalDetailRows").innerHTML=details.map(r=>`<tr>
+    <td>${esc(r.date)}</td><td>${esc(fmt(r.opening))}</td><td>${esc(fmt(r.receiving))}</td>
+    <td>${esc(fmt(r.transferIn))}</td><td>${esc(fmt(r.transferOut))}</td><td>${esc(fmt(r.waste))}</td>
+    <td>${esc(fmt(r.sold))}</td><td>${esc(fmt(r.closing))}</td><td>${r.physical!==null?esc(fmt(r.physical)):"—"}</td>
+    <td>${varianceHTML(calcRowVariance(r))}</td></tr>`).join("");
+  $("itemModal").classList.add("active");
+}
+$("analysisMode").addEventListener("change",updateAnalysisControls);
+$("analysisMonth").addEventListener("change",()=>{if($("analysisMode").value==="month")runItemAnalysis()});
+$("analysisDate").addEventListener("change",()=>{if($("analysisMode").value==="single")runItemAnalysis()});
+$("analysisStart").addEventListener("change",()=>{if($("analysisMode").value==="range"&&$("analysisEnd").value)runItemAnalysis()});
+$("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="range"&&$("analysisStart").value)runItemAnalysis()});
 
 (function init(){
   $("date").value=today();
@@ -1538,6 +2295,7 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
   applyLanguage();
   populateItemDatalist();
   renderAll();
+  updateReportsStatus();
   setConnection(false,"Please log in to load store data.");
 })();
 </script></div></body></html>
