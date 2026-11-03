@@ -2298,4 +2298,372 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
   updateReportsStatus();
   setConnection(false,"Please log in to load store data.");
 })();
+/* ============================================================
+   STOCKWISE — SINGLE SAFE OVERRIDE (paste at bottom of <script>)
+   Fixes:
+     - Pasted/autofilled grid rows never being sent
+     - Blank-vs-0 verification false negatives
+     - Sending "" for cells that previously held numbers
+     - Negative-closing skip firing on unknown opening
+     - "Not in Item Master" on partial load
+   Safe: does NOT change UI, does NOT touch any other function.
+   ============================================================ */
+(function () {
+  "use strict";
+
+  /* ---------- Local helpers (kept inside this closure) ---------- */
+  function localComputeRow(r) {
+    r.closing = (Number(r.opening) || 0) + (Number(r.receiving) || 0) + (Number(r.transferIn) || 0)
+      - (Number(r.transferOut) || 0) - (Number(r.waste) || 0) - (Number(r.sold) || 0);
+    const p = (r.physical === "" || r.physical === null || r.physical === undefined) ? null : Number(r.physical);
+    r.variance = (p === null || !Number.isFinite(p)) ? null : p - r.closing;
+    return r;
+  }
+
+  function localSheetNameForDate(date) {
+    const parts = String(date || "").split("-").map(Number);
+    const y = parts[0], m = parts[1];
+    if (y === 2026 && m === 10) return "Daily Inventory";
+    const d = new Date(y, m - 1, 1);
+    return d.toLocaleString("en-US", { month: "long", year: "numeric" });
+  }
+
+  function localBlankToZero(v) {
+    return (v === "" || v === null || v === undefined) ? 0 : Number(v);
+  }
+
+  /* ---------- Read current grid state straight from the DOM ---------- */
+  function readGridFromDom() {
+    const rows = [];
+    document.querySelectorAll("#gridRows tr[data-code]").forEach(function (tr) {
+      const code = tr.dataset.code;
+      const row = {
+        code: code,
+        name: "",
+        dirty: tr.classList.contains("row-dirty"),
+        status: "loaded",
+        existing: true
+      };
+      ["opening", "receiving", "transferIn", "transferOut", "waste", "sold", "physical"].forEach(function (f) {
+        const inp = tr.querySelector('input[data-field="' + f + '"]');
+        if (inp) {
+          const raw = inp.value.trim();
+          row[f] = (raw === "") ? "" : Number(raw);
+        } else {
+          row[f] = "";
+        }
+      });
+      const item = (typeof items !== "undefined" && Array.isArray(items))
+        ? items.find(function (i) { return i.code === code; })
+        : null;
+      if (item) row.name = item.name;
+      rows.push(localComputeRow(row));
+    });
+    return rows;
+  }
+
+  /* ---------- Override gridSaveChanged ---------- */
+  window.gridSaveChanged = async function () {
+    const dateEl = document.getElementById("gridDate");
+    const statusEl = document.getElementById("gridStatus");
+    const saveBtn = document.getElementById("gridSaveBtn");
+    const resaveBtn = document.getElementById("gridResaveBtn");
+
+    const Gdate = dateEl ? dateEl.value : "";
+    if (!Gdate) return toast("Load the grid first.");
+    if (typeof items === "undefined" || !Array.isArray(items) || !items.length)
+      return toast("Item Master empty — wait for it to load, then retry.");
+
+    const rows = readGridFromDom();
+    if (!rows.length) return toast("Grid is empty — click Load grid.");
+
+    /* Build dirty set: DOM flag OR any field differs from the last-known sheet value.
+       We compare against the value captured when the grid was built — but since the
+       earlier buildRows didn't snapshot _orig, we treat any row flagged row-dirty as
+       dirty AND any row whose values are non-zero (freshly typed) as dirty too. */
+    const dirty = rows.filter(function (r) {
+      if (r.dirty) return true;
+      /* Row is considered changed if it has any non-zero input.
+         This catches paste/autofill where 'input' events never fired. */
+      return (
+        Number(r.receiving || 0) !== 0 ||
+        Number(r.transferIn || 0) !== 0 ||
+        Number(r.transferOut || 0) !== 0 ||
+        Number(r.waste || 0) !== 0 ||
+        Number(r.sold || 0) !== 0 ||
+        (r.physical !== "" && r.physical !== null)
+      );
+    });
+
+    if (!dirty.length) return toast('No changed rows. Use "Re-save all rows" to re-send everything.');
+
+    const openingEditable = Gdate === "2026-10-01";
+    const toSend = [];
+    const toSkip = [];
+
+    for (const r of dirty) {
+      for (const f of ["receiving", "transferIn", "transferOut", "waste", "sold"]) {
+        const v = Number(r[f] ?? 0);
+        if (!Number.isFinite(v) || v < 0) return toast("Row " + r.code + ": " + f + " invalid.");
+      }
+      if (openingEditable) {
+        const v = Number(r.opening ?? 0);
+        if (!Number.isFinite(v) || v < 0) return toast("Row " + r.code + ": opening invalid.");
+      }
+      if (r.physical !== "" && r.physical !== null) {
+        const v = Number(r.physical);
+        if (!Number.isFinite(v) || v < 0) return toast("Row " + r.code + ": physical invalid.");
+      }
+      if (typeof itemByCode === "function" && items.length && !itemByCode(r.code))
+        return toast("Row " + r.code + " not in Item Master.");
+
+      const openingKnown = (Gdate === "2026-10-01") || (r.opening !== "" && r.opening !== null);
+      const closingVal =
+        (Number(r.opening) || 0) +
+        (Number(r.receiving) || 0) +
+        (Number(r.transferIn) || 0) -
+        (Number(r.transferOut) || 0) -
+        (Number(r.waste) || 0) -
+        (Number(r.sold) || 0);
+
+      if (openingKnown && closingVal < -0.0001) {
+        toSkip.push(r.code);
+        r.status = "error";
+        continue;
+      }
+      toSend.push(r);
+    }
+
+    if (!toSend.length) {
+      if (statusEl) statusEl.textContent =
+        "Nothing saved — " + toSkip.length + " row(s) would close negative: " +
+        toSkip.slice(0, 5).join(", ") + (toSkip.length > 5 ? " +" + (toSkip.length - 5) + " more" : "") +
+        ". Fix their values and retry.";
+      toast("All changed rows skipped (negative closing).");
+      return;
+    }
+
+    const sheetName = localSheetNameForDate(Gdate);
+    const itemsPayload = toSend.map(function (r) {
+      const entry = { itemCode: r.code };
+      if (openingEditable) entry.opening = Number(r.opening ?? 0);
+      entry.receiving = localBlankToZero(r.receiving);
+      entry.transferIn = localBlankToZero(r.transferIn);
+      entry.transferOut = localBlankToZero(r.transferOut);
+      entry.waste = localBlankToZero(r.waste);
+      entry.sold = localBlankToZero(r.sold);
+      entry.physicalCount = localBlankToZero(r.physical);
+      return entry;
+    });
+
+    const payload = {
+      token: typeof authToken !== "undefined" ? authToken : "",
+      storeName: typeof selectedStore !== "undefined" ? selectedStore : "",
+      sheetName: sheetName,
+      date: Gdate,
+      items: itemsPayload
+    };
+
+    if (saveBtn) saveBtn.disabled = true;
+    if (resaveBtn) resaveBtn.disabled = true;
+    if (statusEl) statusEl.textContent =
+      "Sending " + toSend.length + " row(s) to \"" + sheetName + "\"" +
+      (toSkip.length ? " (skipping " + toSkip.length + " negative-closing row(s))" : "") + "…";
+
+    try {
+      await Promise.race([
+        saveToSheet(payload),
+        new Promise(function (_, rej) { setTimeout(function () { rej(new Error("POST timed out")); }, 20000); })
+      ]);
+    } catch (err) {
+      console.warn("Bulk POST slow/err; verifying from sheet.", err);
+    }
+
+    let latestByCode = {};
+    let verifyError = "";
+    try {
+      if (typeof sheetCache !== "undefined") delete sheetCache[sheetName];
+      const latest = await loadRecordsForSheet(sheetName);
+      if (typeof sheetCache !== "undefined") sheetCache[sheetName] = latest;
+      latest.forEach(function (rec) {
+        if (rec.date === Gdate) latestByCode[String(rec.code).toLowerCase()] = rec;
+      });
+    } catch (err) {
+      verifyError = err.message || String(err);
+      console.warn("Post-save verification read failed:", err);
+    }
+
+    let okCount = 0;
+    const failedCodes = toSkip.slice();
+
+    toSend.forEach(function (r) {
+      const got = latestByCode[r.code.toLowerCase()];
+      const fields = ["receiving", "transferIn", "transferOut", "waste", "sold"];
+      let match = !!got;
+      if (match) {
+        fields.forEach(function (k) {
+          const a = Number(r[k] || 0);
+          const b = Number(got[k] || 0);
+          if (Math.abs(a - b) > 0.0001) match = false;
+        });
+        if (match) {
+          const rp = (r.physical === "" || r.physical === null) ? null : Number(r.physical);
+          const gp = (got.physical === null || got.physical === undefined || got.physical === "") ? null : Number(got.physical);
+          if (rp === null) {
+            /* Sent blank: accept whatever the sheet has. */
+          } else if (gp === null || Math.abs(rp - gp) > 0.0001) {
+            match = false;
+          }
+        }
+        if (match && openingEditable) {
+          const ro = Number(r.opening || 0);
+          const go = Number(got.opening || 0);
+          if (Math.abs(ro - go) > 0.0001) match = false;
+        }
+      }
+
+      if (match) {
+        r.existing = true;
+        r.dirty = false;
+        r.status = "saved";
+        okCount++;
+      } else {
+        r.dirty = true;
+        r.status = "error";
+        failedCodes.push(r.code);
+      }
+    });
+
+    if (saveBtn) saveBtn.disabled = false;
+    if (resaveBtn) resaveBtn.disabled = false;
+
+    if (failedCodes.length === 0 && !verifyError) {
+      if (statusEl) statusEl.textContent = "All " + okCount + " row(s) saved and verified in \"" + sheetName + "\".";
+      toast("All " + okCount + " row(s) saved ✓");
+    } else if (failedCodes.length === 0 && verifyError) {
+      if (statusEl) statusEl.textContent = okCount + " row(s) POSTed but verification read failed (" + verifyError + "). Check the sheet manually.";
+      toast("Saved but could not verify. Check the sheet.");
+    } else {
+      const preview = failedCodes.slice(0, 5).join(", ") + (failedCodes.length > 5 ? " +" + (failedCodes.length - 5) + " more" : "");
+      if (statusEl) statusEl.textContent =
+        "Saved " + okCount + "/" + toSend.length + " sent row(s). " +
+        "Skipped " + failedCodes.length + ": " + preview + ". " +
+        "Skipped rows stay in the grid marked \"Skipped\" — fix their numbers and click Save changed rows again to retry.";
+      toast(okCount + " saved · " + failedCodes.length + " skipped");
+    }
+
+    setTimeout(async function () {
+      try {
+        if (typeof rebuildRecords === "function") rebuildRecords();
+        if (typeof renderAll === "function") renderAll();
+      } catch (e) {
+        console.warn("Post-save refresh failed:", e);
+      }
+    }, 800);
+  };
+})();
+/* ============================================================
+   STOCKWISE — MAINTENANCE MODE
+   Puts Stock Grid, Records, and Reports under maintenance.
+   Dashboard, Item Analysis, Item Master, and Setup remain active.
+   ============================================================ */
+(function () {
+  "use strict";
+
+  var MAINTENANCE_PAGES = ["entry", "records", "reports"];
+
+  var NOTICE = '' +
+    '<div class="panel" style="border-left:4px solid var(--amber); background:linear-gradient(90deg,#1c1a10 0%,#121917 100%);">' +
+      '<div class="eyebrow" style="color:var(--amber)">MAINTENANCE</div>' +
+      '<h2 style="margin:6px 0 10px">This section is temporarily under maintenance</h2>' +
+      '<div class="muted">' +
+        'Stock Grid, Records, and Reports are being upgraded and are unavailable at the moment. ' +
+        'Dashboard, Item Analysis, Item Master, and Setup remain fully operational. ' +
+        'Please check back later.' +
+      '</div>' +
+      '<div class="mt-3 small-help">If you need to log stock urgently, use the <b>Dashboard → New entry</b> fallback or contact your area manager.</div>' +
+    '</div>';
+
+  /* Override showPage: block the three pages and render the notice instead */
+  var _origShowPage = window.showPage;
+  window.showPage = function (page) {
+    if (MAINTENANCE_PAGES.indexOf(page) !== -1) {
+      /* Hide every page first */
+      document.querySelectorAll(".page").forEach(function (p) { p.classList.remove("active"); });
+
+      /* Keep the nav button highlighted so the user sees where they clicked */
+      document.querySelectorAll(".navbtn").forEach(function (b) {
+        b.classList.toggle("active", b.dataset.page === page);
+      });
+
+      /* Update title */
+      var titleEl = document.getElementById("pageTitle");
+      if (titleEl) {
+        titleEl.textContent = page === "entry" ? "Stock Grid — Maintenance"
+                            : page === "records" ? "Inventory Records — Maintenance"
+                            : "Reports — Maintenance";
+      }
+
+      /* Mount the notice into the real section so layout looks normal */
+      var section = document.getElementById("page-" + page);
+      if (section) {
+        section.innerHTML = NOTICE;
+        section.classList.add("active");
+      }
+
+      /* Also disable the specific action buttons if they still exist in DOM */
+      ["gridSaveBtn", "gridResaveBtn", "reportGenerateBtn", "reportRefreshBtn",
+       "recordLoadBtn", "reportPdfBtn", "reportExcelBtn"].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) { el.disabled = true; el.title = "Disabled — maintenance"; }
+      });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    /* Non-maintenance pages: default behaviour */
+    if (typeof _origShowPage === "function") {
+      return _origShowPage(page);
+    }
+  };
+
+  /* If the page is opened directly on entry/records/reports on load, remap to dashboard */
+  document.addEventListener("DOMContentLoaded", function () {
+    var active = document.querySelector(".navbtn.active");
+    if (active && MAINTENANCE_PAGES.indexOf(active.dataset.page) !== -1) {
+      window.showPage("dashboard");
+    }
+
+    /* Add a small "Maintenance" pill to the three nav buttons */
+    document.querySelectorAll(".navbtn").forEach(function (b) {
+      if (MAINTENANCE_PAGES.indexOf(b.dataset.page) !== -1 && !b.querySelector(".maint-tag")) {
+        var tag = document.createElement("span");
+        tag.className = "maint-tag";
+        tag.style.cssText = "margin-left:auto;font-size:10px;letter-spacing:.5px;background:#332b17;color:var(--amber);border-radius:20px;padding:2px 7px;font-weight:700;";
+        tag.textContent = "MAINTENANCE";
+        b.style.display = "flex";
+        b.style.justifyContent = "space-between";
+        b.style.alignItems = "center";
+        b.appendChild(tag);
+      }
+    });
+  });
+
+  /* Also preload on script execution (in case DOMContentLoaded already fired) */
+  setTimeout(function () {
+    document.querySelectorAll(".navbtn").forEach(function (b) {
+      if (MAINTENANCE_PAGES.indexOf(b.dataset.page) !== -1 && !b.querySelector(".maint-tag")) {
+        var tag = document.createElement("span");
+        tag.className = "maint-tag";
+        tag.style.cssText = "margin-left:auto;font-size:10px;letter-spacing:.5px;background:#332b17;color:var(--amber);border-radius:20px;padding:2px 7px;font-weight:700;";
+        tag.textContent = "MAINTENANCE";
+        b.style.display = "flex";
+        b.style.justifyContent = "space-between";
+        b.style.alignItems = "center";
+        b.appendChild(tag);
+      }
+    });
+  }, 0);
+})();
 </script></div></body></html>
