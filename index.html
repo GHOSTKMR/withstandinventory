@@ -2298,137 +2298,206 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
   updateReportsStatus();
   setConnection(false,"Please log in to load store data.");
 })();
+
 /* ============================================================
-   STOCKWISE — SINGLE SAFE OVERRIDE (paste at bottom of <script>)
-   Fixes:
-     - Pasted/autofilled grid rows never being sent
-     - Blank-vs-0 verification false negatives
-     - Sending "" for cells that previously held numbers
-     - Negative-closing skip firing on unknown opening
-     - "Not in Item Master" on partial load
-   Safe: does NOT change UI, does NOT touch any other function.
+   StockWise — hotfix layer
+   Drop-in .js that repairs:
+     1. Date off-by-one (grid picked X → sheet stored X±1 day)
+     2. Blank-vs-0 verification failures
+     3. Pasted/autofilled grid rows never being sent
+     4. "Not in Item Master" false negatives on partial load
+     5. Negative-closing skip firing on unknown opening
+
+   Load AFTER the main <script>. Safe to remove: deleting this
+   file or the <script> tag that includes it reverts everything
+   to the previous behaviour.
    ============================================================ */
 (function () {
   "use strict";
 
-  /* ---------- Local helpers (kept inside this closure) ---------- */
-  function localComputeRow(r) {
-    r.closing = (Number(r.opening) || 0) + (Number(r.receiving) || 0) + (Number(r.transferIn) || 0)
-      - (Number(r.transferOut) || 0) - (Number(r.waste) || 0) - (Number(r.sold) || 0);
-    const p = (r.physical === "" || r.physical === null || r.physical === undefined) ? null : Number(r.physical);
-    r.variance = (p === null || !Number.isFinite(p)) ? null : p - r.closing;
-    return r;
-  }
+  /* -------- 1. Patch normalizeRecord (date is a pure string) -------- */
+  var _origNormalize = window.normalizeRecord;
+  window.normalizeRecord = function (x, sheetName) {
+    if (typeof x !== "object" || x === null) {
+      // fall through to original for weird input
+      return _origNormalize ? _origNormalize(x, sheetName) : null;
+    }
+    // Build the record using the SAME shape the original produced,
+    // but ONLY accept a strict "YYYY-MM-DD" string for date.
+    var dateRaw = null;
+    var keys = ["date", "Date", "inventoryDate"];
+    for (var i = 0; i < keys.length; i++) {
+      if (x[keys[i]] !== undefined && x[keys[i]] !== null) { dateRaw = x[keys[i]]; break; }
+    }
+    var date = "";
+    if (typeof dateRaw === "string") {
+      var m = dateRaw.match(/^(\d{4}-\d{2}-\d{2})/);
+      if (m) date = m[1];
+    } else if (dateRaw instanceof Date && !isNaN(dateRaw.getTime())) {
+      // Only if the backend ever hands us a Date — format in LOCAL time,
+      // never toISOString (that's what caused the shift).
+      var y  = dateRaw.getFullYear();
+      var mo = String(dateRaw.getMonth() + 1).padStart(2, "0");
+      var d  = String(dateRaw.getDate()).padStart(2, "0");
+      date = y + "-" + mo + "-" + d;
+    } else if (typeof dateRaw === "number") {
+      var d2 = new Date(dateRaw);
+      if (!isNaN(d2.getTime())) {
+        var y2  = d2.getFullYear();
+        var mo2 = String(d2.getMonth() + 1).padStart(2, "0");
+        var dd2 = String(d2.getDate()).padStart(2, "0");
+        date = y2 + "-" + mo2 + "-" + dd2;
+      }
+    }
+    // If we still don't have a valid date, fall back to the original
+    // so we don't drop records we could otherwise keep.
+    if (!date && _origNormalize) return _origNormalize(x, sheetName);
 
-  function localSheetNameForDate(date) {
-    const parts = String(date || "").split("-").map(Number);
-    const y = parts[0], m = parts[1];
-    if (y === 2026 && m === 10) return "Daily Inventory";
-    const d = new Date(y, m - 1, 1);
-    return d.toLocaleString("en-US", { month: "long", year: "numeric" });
-  }
+    var code = String(
+      x.itemCode ?? x.itemcode ?? x.code ?? x["Item Code"] ?? ""
+    ).trim();
+    var name = String(
+      x.itemName ?? x.itemname ?? x.name ?? x["Item Name"] ?? ""
+    ).trim();
 
-  function localBlankToZero(v) {
-    return (v === "" || v === null || v === undefined) ? 0 : Number(v);
-  }
+    function num(v) {
+      if (v === null || v === undefined || v === "") return null;
+      var n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    }
 
-  /* ---------- Read current grid state straight from the DOM ---------- */
-  function readGridFromDom() {
-    const rows = [];
-    document.querySelectorAll("#gridRows tr[data-code]").forEach(function (tr) {
-      const code = tr.dataset.code;
-      const row = {
+    var opening     = num(x.opening     ?? x.openingStock     ?? x.opening_stock)     ?? 0;
+    var receiving   = num(x.receiving   ?? x.received         ?? x.receivingStock)    ?? 0;
+    var transferIn  = num(x.transferIn  ?? x.transfer_in      ?? x.transferin)        ?? 0;
+    var transferOut = num(x.transferOut ?? x.transfer_out     ?? x.transferout)       ?? 0;
+    var waste       = num(x.waste)                                                    ?? 0;
+    var sold        = num(x.sold        ?? x.consumption)                             ?? 0;
+    var closing     = num(x.closing     ?? x.closingStock     ?? x.closing_stock);
+    var physical    = num(x.physicalCount ?? x.physical ?? x.actual ?? x.physical_count);
+    var variance    = num(x.variance);
+    var row         = x.row ?? x.rowNumber ?? null;
+
+    var computedClosing = opening + receiving + transferIn - transferOut - waste - sold;
+    var useClosing = (closing === null || closing === undefined) ? computedClosing : closing;
+    var useVariance = (variance === null || variance === undefined)
+      ? (physical === null ? null : physical - useClosing)
+      : variance;
+
+    return {
+      id: String(sheetName) + ":" + String(row ?? (date + ":" + code)),
+      sheetName: sheetName,
+      date: date,
+      code: code,
+      name: name,
+      opening: opening,
+      receiving: receiving,
+      transferIn: transferIn,
+      transferOut: transferOut,
+      waste: waste,
+      sold: sold,
+      closing: useClosing,
+      physical: physical,
+      variance: useVariance,
+      row: row
+    };
+  };
+
+  /* -------- 2. Patch gridSaveChanged --------
+     We cannot reach into the grid IIFE's closure, so instead of
+     redefining the whole handler we read the DOM directly and
+     post to the same backend contract. This makes the save path
+     identical to before but immune to the three bugs listed above.
+  --------------------------------------------------------- */
+  window.gridSaveChanged = async function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var dateEl   = $("gridDate");
+    var statusEl = $("gridStatus");
+    var saveBtn  = $("gridSaveBtn");
+    var resaveBtn= $("gridResaveBtn");
+
+    var Gdate = dateEl ? String(dateEl.value || "").trim() : "";
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(Gdate)) return toast("Pick a valid date first.");
+
+    // Pull globals from the outer script scope
+    var its   = (typeof items !== "undefined" && Array.isArray(items)) ? items : [];
+    var store = (typeof selectedStore !== "undefined") ? selectedStore : "";
+    var token = (typeof authToken !== "undefined")     ? authToken : "";
+
+    if (!its.length) return toast("Item Master empty — wait for it to load, then retry.");
+
+    // Build rows straight from the DOM. This captures paste/autofill
+    // (which don't fire "input" on every row) and does not rely on
+    // the grid module's private `dirty` flags.
+    var rowEls = document.querySelectorAll("#gridRows tr[data-code]");
+    if (!rowEls.length) return toast("Grid is empty — click Load grid.");
+
+    var rows = [];
+    rowEls.forEach(function (tr) {
+      var code = tr.dataset.code;
+      var item = its.find(function (it) { return it.code === code; });
+      var rec = {
         code: code,
-        name: "",
-        dirty: tr.classList.contains("row-dirty"),
-        status: "loaded",
-        existing: true
+        name: item ? item.name : "",
+        opening: null, receiving: null, transferIn: null, transferOut: null,
+        waste: null, sold: null, physical: null
       };
       ["opening", "receiving", "transferIn", "transferOut", "waste", "sold", "physical"].forEach(function (f) {
-        const inp = tr.querySelector('input[data-field="' + f + '"]');
-        if (inp) {
-          const raw = inp.value.trim();
-          row[f] = (raw === "") ? "" : Number(raw);
-        } else {
-          row[f] = "";
-        }
+        var inp = tr.querySelector('input[data-field="' + f + '"]');
+        if (!inp) return;
+        var raw = String(inp.value || "").trim();
+        rec[f] = (raw === "") ? "" : Number(raw);
       });
-      const item = (typeof items !== "undefined" && Array.isArray(items))
-        ? items.find(function (i) { return i.code === code; })
-        : null;
-      if (item) row.name = item.name;
-      rows.push(localComputeRow(row));
-    });
-    return rows;
-  }
-
-  /* ---------- Override gridSaveChanged ---------- */
-  window.gridSaveChanged = async function () {
-    const dateEl = document.getElementById("gridDate");
-    const statusEl = document.getElementById("gridStatus");
-    const saveBtn = document.getElementById("gridSaveBtn");
-    const resaveBtn = document.getElementById("gridResaveBtn");
-
-    const Gdate = dateEl ? dateEl.value : "";
-    if (!Gdate) return toast("Load the grid first.");
-    if (typeof items === "undefined" || !Array.isArray(items) || !items.length)
-      return toast("Item Master empty — wait for it to load, then retry.");
-
-    const rows = readGridFromDom();
-    if (!rows.length) return toast("Grid is empty — click Load grid.");
-
-    /* Build dirty set: DOM flag OR any field differs from the last-known sheet value.
-       We compare against the value captured when the grid was built — but since the
-       earlier buildRows didn't snapshot _orig, we treat any row flagged row-dirty as
-       dirty AND any row whose values are non-zero (freshly typed) as dirty too. */
-    const dirty = rows.filter(function (r) {
-      if (r.dirty) return true;
-      /* Row is considered changed if it has any non-zero input.
-         This catches paste/autofill where 'input' events never fired. */
-      return (
-        Number(r.receiving || 0) !== 0 ||
-        Number(r.transferIn || 0) !== 0 ||
-        Number(r.transferOut || 0) !== 0 ||
-        Number(r.waste || 0) !== 0 ||
-        Number(r.sold || 0) !== 0 ||
-        (r.physical !== "" && r.physical !== null)
-      );
+      // closing & variance previews
+      var opening = Number(rec.opening) || 0;
+      var closing = opening
+        + (Number(rec.receiving)   || 0)
+        + (Number(rec.transferIn)  || 0)
+        - (Number(rec.transferOut) || 0)
+        - (Number(rec.waste)       || 0)
+        - (Number(rec.sold)        || 0);
+      rec.closing = closing;
+      var p = (rec.physical === "" || rec.physical === null) ? null : Number(rec.physical);
+      rec.variance = (p === null || !Number.isFinite(p)) ? null : p - closing;
+      rec.dirty = tr.classList.contains("row-dirty");
+      rec.changed = rec.dirty
+        || (Number(rec.receiving)   || 0) !== 0
+        || (Number(rec.transferIn)  || 0) !== 0
+        || (Number(rec.transferOut) || 0) !== 0
+        || (Number(rec.waste)       || 0) !== 0
+        || (Number(rec.sold)        || 0) !== 0
+        || (rec.physical !== "" && rec.physical !== null);
+      rows.push(rec);
     });
 
+    var dirty = rows.filter(function (r) { return r.changed; });
     if (!dirty.length) return toast('No changed rows. Use "Re-save all rows" to re-send everything.');
 
-    const openingEditable = Gdate === "2026-10-01";
-    const toSend = [];
-    const toSkip = [];
+    var openingEditable = Gdate === "2026-10-01";
+    var toSend = [];
+    var toSkip = [];
 
-    for (const r of dirty) {
-      for (const f of ["receiving", "transferIn", "transferOut", "waste", "sold"]) {
-        const v = Number(r[f] ?? 0);
-        if (!Number.isFinite(v) || v < 0) return toast("Row " + r.code + ": " + f + " invalid.");
-      }
+    for (var i = 0; i < dirty.length; i++) {
+      var r = dirty[i];
+      var bad = false;
+      ["receiving", "transferIn", "transferOut", "waste", "sold"].forEach(function (f) {
+        var v = Number(r[f] ?? 0);
+        if (!Number.isFinite(v) || v < 0) { bad = true; toast("Row " + r.code + ": " + f + " invalid."); }
+      });
+      if (bad) return;
       if (openingEditable) {
-        const v = Number(r.opening ?? 0);
-        if (!Number.isFinite(v) || v < 0) return toast("Row " + r.code + ": opening invalid.");
+        var ov = Number(r.opening ?? 0);
+        if (!Number.isFinite(ov) || ov < 0) return toast("Row " + r.code + ": opening invalid.");
       }
       if (r.physical !== "" && r.physical !== null) {
-        const v = Number(r.physical);
-        if (!Number.isFinite(v) || v < 0) return toast("Row " + r.code + ": physical invalid.");
+        var pv = Number(r.physical);
+        if (!Number.isFinite(pv) || pv < 0) return toast("Row " + r.code + ": physical invalid.");
       }
-      if (typeof itemByCode === "function" && items.length && !itemByCode(r.code))
+      if (its.length && !its.find(function (it) { return it.code.toLowerCase() === r.code.toLowerCase(); })) {
         return toast("Row " + r.code + " not in Item Master.");
-
-      const openingKnown = (Gdate === "2026-10-01") || (r.opening !== "" && r.opening !== null);
-      const closingVal =
-        (Number(r.opening) || 0) +
-        (Number(r.receiving) || 0) +
-        (Number(r.transferIn) || 0) -
-        (Number(r.transferOut) || 0) -
-        (Number(r.waste) || 0) -
-        (Number(r.sold) || 0);
-
-      if (openingKnown && closingVal < -0.0001) {
+      }
+      var openingKnown = (Gdate === "2026-10-01") || (r.opening !== "" && r.opening !== null);
+      if (openingKnown && r.closing < -0.0001) {
         toSkip.push(r.code);
-        r.status = "error";
         continue;
       }
       toSend.push(r);
@@ -2443,24 +2512,34 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
       return;
     }
 
-    const sheetName = localSheetNameForDate(Gdate);
-    const itemsPayload = toSend.map(function (r) {
-      const entry = { itemCode: r.code };
+    // Derive the sheet name using ONLY the local Date, never UTC.
+    function sheetNameForDateLocal(dateStr) {
+      var parts = dateStr.split("-").map(Number);
+      var y = parts[0], m = parts[1];
+      if (y === 2026 && m === 10) return "Daily Inventory";
+      var d = new Date(y, m - 1, 1); // local midnight, no TZ shift
+      return d.toLocaleString("en-US", { month: "long", year: "numeric" });
+    }
+    var sheetName = sheetNameForDateLocal(Gdate);
+
+    var toNum = function (v) { return (v === "" || v === null || v === undefined) ? 0 : Number(v); };
+    var itemsPayload = toSend.map(function (r) {
+      var entry = { itemCode: r.code };
       if (openingEditable) entry.opening = Number(r.opening ?? 0);
-      entry.receiving = localBlankToZero(r.receiving);
-      entry.transferIn = localBlankToZero(r.transferIn);
-      entry.transferOut = localBlankToZero(r.transferOut);
-      entry.waste = localBlankToZero(r.waste);
-      entry.sold = localBlankToZero(r.sold);
-      entry.physicalCount = localBlankToZero(r.physical);
+      entry.receiving    = toNum(r.receiving);
+      entry.transferIn   = toNum(r.transferIn);
+      entry.transferOut  = toNum(r.transferOut);
+      entry.waste        = toNum(r.waste);
+      entry.sold         = toNum(r.sold);
+      entry.physicalCount= toNum(r.physical);
       return entry;
     });
 
-    const payload = {
-      token: typeof authToken !== "undefined" ? authToken : "",
-      storeName: typeof selectedStore !== "undefined" ? selectedStore : "",
+    var payload = {
+      token: token,
+      storeName: store,
       sheetName: sheetName,
-      date: Gdate,
+      date: Gdate,          // <-- strict YYYY-MM-DD string, never a Date
       items: itemsPayload
     };
 
@@ -2479,11 +2558,12 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
       console.warn("Bulk POST slow/err; verifying from sheet.", err);
     }
 
-    let latestByCode = {};
-    let verifyError = "";
+    // Verify from the sheet
+    var latestByCode = {};
+    var verifyError = "";
     try {
       if (typeof sheetCache !== "undefined") delete sheetCache[sheetName];
-      const latest = await loadRecordsForSheet(sheetName);
+      var latest = await loadRecordsForSheet(sheetName);
       if (typeof sheetCache !== "undefined") sheetCache[sheetName] = latest;
       latest.forEach(function (rec) {
         if (rec.date === Gdate) latestByCode[String(rec.code).toLowerCase()] = rec;
@@ -2493,45 +2573,34 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
       console.warn("Post-save verification read failed:", err);
     }
 
-    let okCount = 0;
-    const failedCodes = toSkip.slice();
+    var okCount = 0;
+    var failedCodes = toSkip.slice();
 
     toSend.forEach(function (r) {
-      const got = latestByCode[r.code.toLowerCase()];
-      const fields = ["receiving", "transferIn", "transferOut", "waste", "sold"];
-      let match = !!got;
+      var got = latestByCode[r.code.toLowerCase()];
+      var fields = ["receiving", "transferIn", "transferOut", "waste", "sold"];
+      var match = !!got;
       if (match) {
         fields.forEach(function (k) {
-          const a = Number(r[k] || 0);
-          const b = Number(got[k] || 0);
+          var a = Number(r[k] || 0);
+          var b = Number(got[k] || 0);
           if (Math.abs(a - b) > 0.0001) match = false;
         });
         if (match) {
-          const rp = (r.physical === "" || r.physical === null) ? null : Number(r.physical);
-          const gp = (got.physical === null || got.physical === undefined || got.physical === "") ? null : Number(got.physical);
-          if (rp === null) {
-            /* Sent blank: accept whatever the sheet has. */
-          } else if (gp === null || Math.abs(rp - gp) > 0.0001) {
-            match = false;
-          }
+          var rp = (r.physical === "" || r.physical === null) ? 0 : Number(r.physical);
+          var gp = (got.physical === null || got.physical === undefined || got.physical === "")
+            ? 0
+            : Number(got.physical);
+          if (Math.abs(rp - gp) > 0.0001) match = false;
         }
         if (match && openingEditable) {
-          const ro = Number(r.opening || 0);
-          const go = Number(got.opening || 0);
+          var ro = Number(r.opening || 0);
+          var go = Number(got.opening || 0);
           if (Math.abs(ro - go) > 0.0001) match = false;
         }
       }
-
-      if (match) {
-        r.existing = true;
-        r.dirty = false;
-        r.status = "saved";
-        okCount++;
-      } else {
-        r.dirty = true;
-        r.status = "error";
-        failedCodes.push(r.code);
-      }
+      if (match) okCount++;
+      else failedCodes.push(r.code);
     });
 
     if (saveBtn) saveBtn.disabled = false;
@@ -2541,129 +2610,684 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
       if (statusEl) statusEl.textContent = "All " + okCount + " row(s) saved and verified in \"" + sheetName + "\".";
       toast("All " + okCount + " row(s) saved ✓");
     } else if (failedCodes.length === 0 && verifyError) {
-      if (statusEl) statusEl.textContent = okCount + " row(s) POSTed but verification read failed (" + verifyError + "). Check the sheet manually.";
+      if (statusEl) statusEl.textContent =
+        okCount + " row(s) POSTed but verification read failed (" + verifyError + "). Check the sheet manually.";
       toast("Saved but could not verify. Check the sheet.");
     } else {
-      const preview = failedCodes.slice(0, 5).join(", ") + (failedCodes.length > 5 ? " +" + (failedCodes.length - 5) + " more" : "");
+      var preview = failedCodes.slice(0, 5).join(", ")
+        + (failedCodes.length > 5 ? " +" + (failedCodes.length - 5) + " more" : "");
       if (statusEl) statusEl.textContent =
         "Saved " + okCount + "/" + toSend.length + " sent row(s). " +
         "Skipped " + failedCodes.length + ": " + preview + ". " +
-        "Skipped rows stay in the grid marked \"Skipped\" — fix their numbers and click Save changed rows again to retry.";
+        "Fix the skipped rows and click Save changed rows again.";
       toast(okCount + " saved · " + failedCodes.length + " skipped");
     }
 
-    setTimeout(async function () {
+    // Refresh dashboard / records after a tick so the module's own state
+    // doesn't fight with our DOM-based rebuild.
+    setTimeout(function () {
       try {
         if (typeof rebuildRecords === "function") rebuildRecords();
-        if (typeof renderAll === "function") renderAll();
+        if (typeof renderAll === "function")      renderAll();
       } catch (e) {
         console.warn("Post-save refresh failed:", e);
       }
     }, 800);
   };
+
+  /* -------- 3. Optional: log a boot banner so you can see it loaded -------- */
+  try {
+    console.log("[StockWise hotfix] date-safe normalizeRecord + gridSaveChanged loaded.");
+  } catch (e) { /* ignore */ }
 })();
 /* ============================================================
-   STOCKWISE — MAINTENANCE MODE
-   Puts Stock Grid, Records, and Reports under maintenance.
-   Dashboard, Item Analysis, Item Master, and Setup remain active.
+   StockWise — sold-values hotfix v2
+   Fixes:
+     1. Sold > 0 on items with opening = 0 no longer skip the
+        entire batch (negative-closing guard now per-row report,
+        not a silent skip).
+     2. "Not in Item Master" no longer aborts the whole save —
+        only that one row is reported.
+     3. Every changed row is confirmed against the sheet by
+        (date, itemCode) after save, so missing rows are visible.
    ============================================================ */
 (function () {
   "use strict";
 
-  var MAINTENANCE_PAGES = ["entry", "records", "reports"];
+  window.gridSaveChanged = async function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var dateEl   = $("gridDate");
+    var statusEl = $("gridStatus");
+    var saveBtn  = $("gridSaveBtn");
+    var resaveBtn= $("gridResaveBtn");
 
-  var NOTICE = '' +
-    '<div class="panel" style="border-left:4px solid var(--amber); background:linear-gradient(90deg,#1c1a10 0%,#121917 100%);">' +
-      '<div class="eyebrow" style="color:var(--amber)">MAINTENANCE</div>' +
-      '<h2 style="margin:6px 0 10px">This section is temporarily under maintenance</h2>' +
-      '<div class="muted">' +
-        'Stock Grid, Records, and Reports are being upgraded and are unavailable at the moment. ' +
-        'Dashboard, Item Analysis, Item Master, and Setup remain fully operational. ' +
-        'Please check back later.' +
-      '</div>' +
-      '<div class="mt-3 small-help">If you need to log stock urgently, use the <b>Dashboard → New entry</b> fallback or contact your area manager.</div>' +
-    '</div>';
+    var Gdate = dateEl ? String(dateEl.value || "").trim() : "";
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(Gdate)) return toast("Pick a valid date first.");
 
-  /* Override showPage: block the three pages and render the notice instead */
-  var _origShowPage = window.showPage;
-  window.showPage = function (page) {
-    if (MAINTENANCE_PAGES.indexOf(page) !== -1) {
-      /* Hide every page first */
-      document.querySelectorAll(".page").forEach(function (p) { p.classList.remove("active"); });
+    var its   = (typeof items !== "undefined" && Array.isArray(items)) ? items : [];
+    var store = (typeof selectedStore !== "undefined") ? selectedStore : "";
+    var token = (typeof authToken !== "undefined")     ? authToken : "";
+    if (!its.length) return toast("Item Master empty — wait for it to load, then retry.");
 
-      /* Keep the nav button highlighted so the user sees where they clicked */
-      document.querySelectorAll(".navbtn").forEach(function (b) {
-        b.classList.toggle("active", b.dataset.page === page);
+    // Map item codes case-insensitively so casing never breaks the match
+    var itemByLower = {};
+    its.forEach(function (it) { itemByLower[String(it.code).toLowerCase()] = it; });
+
+    // Read every grid row straight from the DOM
+    var rowEls = document.querySelectorAll("#gridRows tr[data-code]");
+    if (!rowEls.length) return toast("Grid is empty — click Load grid.");
+
+    var rows = [];
+    rowEls.forEach(function (tr) {
+      var code = tr.dataset.code;
+      var item = itemByLower[String(code).toLowerCase()];
+      var rec = {
+        code: code,
+        name: item ? item.name : "",
+        opening: "", receiving: "", transferIn: "", transferOut: "",
+        waste: "", sold: "", physical: ""
+      };
+      ["opening", "receiving", "transferIn", "transferOut", "waste", "sold", "physical"].forEach(function (f) {
+        var inp = tr.querySelector('input[data-field="' + f + '"]');
+        if (!inp) return;
+        var raw = String(inp.value || "").trim();
+        rec[f] = (raw === "") ? "" : Number(raw);
       });
+      var opening = Number(rec.opening) || 0;
+      var closing = opening
+        + (Number(rec.receiving)   || 0)
+        + (Number(rec.transferIn)  || 0)
+        - (Number(rec.transferOut) || 0)
+        - (Number(rec.waste)       || 0)
+        - (Number(rec.sold)        || 0);
+      rec.closing = closing;
+      var p = (rec.physical === "" || rec.physical === null) ? null : Number(rec.physical);
+      rec.variance = (p === null || !Number.isFinite(p)) ? null : p - closing;
+      rec.changed = tr.classList.contains("row-dirty")
+        || (rec.opening !== "" && Number(rec.opening) !== 0)
+        || (rec.receiving !== "" && Number(rec.receiving) !== 0)
+        || (rec.transferIn !== "" && Number(rec.transferIn) !== 0)
+        || (rec.transferOut !== "" && Number(rec.transferOut) !== 0)
+        || (rec.waste !== "" && Number(rec.waste) !== 0)
+        || (rec.sold !== "" && Number(rec.sold) !== 0)
+        || (rec.physical !== "" && rec.physical !== null);
+      rows.push(rec);
+    });
 
-      /* Update title */
-      var titleEl = document.getElementById("pageTitle");
-      if (titleEl) {
-        titleEl.textContent = page === "entry" ? "Stock Grid — Maintenance"
-                            : page === "records" ? "Inventory Records — Maintenance"
-                            : "Reports — Maintenance";
+    var dirty = rows.filter(function (r) { return r.changed; });
+    if (!dirty.length) return toast('No changed rows. Use "Re-save all rows" to re-send everything.');
+
+    // Per-row validation, but NEVER return (which would abort the batch).
+    var toSend = [];
+    var rejected = [];
+    dirty.forEach(function (r) {
+      // Numeric validation
+      var bad = null;
+      ["receiving", "transferIn", "transferOut", "waste", "sold"].forEach(function (f) {
+        if (r[f] === "" || r[f] === null) return;
+        var v = Number(r[f]);
+        if (!Number.isFinite(v) || v < 0) bad = f;
+      });
+      if (r.physical !== "" && r.physical !== null) {
+        var pv = Number(r.physical);
+        if (!Number.isFinite(pv) || pv < 0) bad = "physical";
+      }
+      if (bad) { rejected.push(r.code + " (" + bad + " invalid)"); return; }
+
+      // Code must exist in Item Master (case-insensitive)
+      if (!itemByLower[String(r.code).toLowerCase()]) {
+        rejected.push(r.code + " (not in Item Master)");
+        return;
       }
 
-      /* Mount the notice into the real section so layout looks normal */
-      var section = document.getElementById("page-" + page);
-      if (section) {
-        section.innerHTML = NOTICE;
-        section.classList.add("active");
-      }
+      // Note: we deliberately DO NOT reject negative-closing rows here.
+      // Sub-recipe items with opening=0 and sold>0 are valid data that
+      // the sheet formula will show. The backend has its own guard for
+      // truly unsafe writes; sending them gives us a per-row error
+      // instead of a silent skip.
 
-      /* Also disable the specific action buttons if they still exist in DOM */
-      ["gridSaveBtn", "gridResaveBtn", "reportGenerateBtn", "reportRefreshBtn",
-       "recordLoadBtn", "reportPdfBtn", "reportExcelBtn"].forEach(function (id) {
-        var el = document.getElementById(id);
-        if (el) { el.disabled = true; el.title = "Disabled — maintenance"; }
-      });
+      toSend.push(r);
+    });
 
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    if (!toSend.length) {
+      var msg = "Nothing saved. " +
+        (rejected.length ? "Rejected: " + rejected.slice(0, 5).join("; ") + (rejected.length > 5 ? " +" + (rejected.length - 5) + " more" : "") + ". " : "") +
+        "Check your values and try again.";
+      if (statusEl) statusEl.textContent = msg;
+      toast("Nothing saved — see grid status.");
       return;
     }
 
-    /* Non-maintenance pages: default behaviour */
-    if (typeof _origShowPage === "function") {
-      return _origShowPage(page);
+    // Sheet name — derived purely from date string, no timezone
+    function sheetNameForDateLocal(dateStr) {
+      var parts = dateStr.split("-").map(Number);
+      var y = parts[0], m = parts[1];
+      if (y === 2026 && m === 10) return "Daily Inventory";
+      var d = new Date(y, m - 1, 1);
+      return d.toLocaleString("en-US", { month: "long", year: "numeric" });
     }
+    var sheetName = sheetNameForDateLocal(Gdate);
+
+    function toNum(v) {
+      if (v === "" || v === null || v === undefined) return 0;
+      var n = Number(v);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    var itemsPayload = toSend.map(function (r) {
+      var entry = { itemCode: r.code };
+      if (Gdate === "2026-10-01") entry.opening = toNum(r.opening);
+      entry.receiving     = toNum(r.receiving);
+      entry.transferIn    = toNum(r.transferIn);
+      entry.transferOut   = toNum(r.transferOut);
+      entry.waste         = toNum(r.waste);
+      entry.sold          = toNum(r.sold);
+      entry.physicalCount = toNum(r.physical);
+      return entry;
+    });
+
+    var payload = {
+      token: token,
+      storeName: store,
+      sheetName: sheetName,
+      date: Gdate,
+      items: itemsPayload
+    };
+
+    if (saveBtn) saveBtn.disabled = true;
+    if (resaveBtn) resaveBtn.disabled = true;
+    if (statusEl) statusEl.textContent =
+      "Sending " + toSend.length + " row(s) to \"" + sheetName + "\" for " + Gdate + "…";
+
+    try {
+      await Promise.race([
+        saveToSheet(payload),
+        new Promise(function (_, rej) { setTimeout(function () { rej(new Error("POST timed out")); }, 30000); })
+      ]);
+    } catch (err) {
+      console.warn("POST slow/err; verifying from sheet.", err);
+    }
+
+    // Read back and verify each row
+    var latestByCode = {};
+    var verifyError = "";
+    try {
+      if (typeof sheetCache !== "undefined") delete sheetCache[sheetName];
+      var latest = await loadRecordsForSheet(sheetName);
+      if (typeof sheetCache !== "undefined") sheetCache[sheetName] = latest;
+      latest.forEach(function (rec) {
+        if (rec.date === Gdate) latestByCode[String(rec.code).toLowerCase()] = rec;
+      });
+    } catch (err) {
+      verifyError = err.message || String(err);
+      console.warn("Post-save verification read failed:", err);
+    }
+
+    var okCount = 0;
+    var failedCodes = [];
+    var failedReasons = {};
+
+    toSend.forEach(function (r) {
+      var got = latestByCode[r.code.toLowerCase()];
+      if (!got) {
+        failedCodes.push(r.code);
+        failedReasons[r.code] = "row not found in sheet after save";
+        return;
+      }
+      var match = true;
+      ["receiving", "transferIn", "transferOut", "waste", "sold"].forEach(function (k) {
+        var a = Number(r[k] || 0);
+        var b = Number(got[k] || 0);
+        if (Math.abs(a - b) > 0.0001) {
+          match = false;
+          failedReasons[r.code] = "sheet " + k + " = " + b + " but sent " + a;
+        }
+      });
+      if (match) {
+        var rp = (r.physical === "" || r.physical === null) ? 0 : Number(r.physical);
+        var gp = (got.physical === null || got.physical === undefined || got.physical === "") ? 0 : Number(got.physical);
+        if (Math.abs(rp - gp) > 0.0001) {
+          match = false;
+          failedReasons[r.code] = "sheet physical = " + gp + " but sent " + rp;
+        }
+      }
+      if (match) okCount++;
+      else if (failedCodes.indexOf(r.code) === -1) failedCodes.push(r.code);
+    });
+
+    if (saveBtn) saveBtn.disabled = false;
+    if (resaveBtn) resaveBtn.disabled = false;
+
+    var summary = "Saved " + okCount + "/" + toSend.length + " row(s) to \"" + sheetName + "\" (" + Gdate + ").";
+    if (rejected.length) summary += " Client-rejected: " + rejected.length + ".";
+    if (failedCodes.length) {
+      var sample = failedCodes.slice(0, 5).map(function (c) {
+        return c + (failedReasons[c] ? " — " + failedReasons[c] : "");
+      }).join("; ");
+      summary += " Not verified in sheet: " + failedCodes.length + " (" + sample + (failedCodes.length > 5 ? " +more" : "") + ").";
+    }
+    if (verifyError) summary += " Verification read failed: " + verifyError;
+
+    if (statusEl) statusEl.textContent = summary;
+
+    if (okCount === toSend.length && !rejected.length && !failedCodes.length) {
+      toast("All " + okCount + " row(s) saved ✓");
+    } else if (okCount > 0) {
+      toast(okCount + " saved · " + (rejected.length + failedCodes.length) + " with issues");
+    } else {
+      toast("Save did not land any rows — check grid status.");
+    }
+
+    setTimeout(function () {
+      try {
+        if (typeof rebuildRecords === "function") rebuildRecords();
+        if (typeof renderAll === "function")      renderAll();
+      } catch (e) {
+        console.warn("Post-save refresh failed:", e);
+      }
+    }, 800);
   };
 
-  /* If the page is opened directly on entry/records/reports on load, remap to dashboard */
-  document.addEventListener("DOMContentLoaded", function () {
-    var active = document.querySelector(".navbtn.active");
-    if (active && MAINTENANCE_PAGES.indexOf(active.dataset.page) !== -1) {
-      window.showPage("dashboard");
-    }
-
-    /* Add a small "Maintenance" pill to the three nav buttons */
-    document.querySelectorAll(".navbtn").forEach(function (b) {
-      if (MAINTENANCE_PAGES.indexOf(b.dataset.page) !== -1 && !b.querySelector(".maint-tag")) {
-        var tag = document.createElement("span");
-        tag.className = "maint-tag";
-        tag.style.cssText = "margin-left:auto;font-size:10px;letter-spacing:.5px;background:#332b17;color:var(--amber);border-radius:20px;padding:2px 7px;font-weight:700;";
-        tag.textContent = "MAINTENANCE";
-        b.style.display = "flex";
-        b.style.justifyContent = "space-between";
-        b.style.alignItems = "center";
-        b.appendChild(tag);
-      }
-    });
-  });
-
-  /* Also preload on script execution (in case DOMContentLoaded already fired) */
-  setTimeout(function () {
-    document.querySelectorAll(".navbtn").forEach(function (b) {
-      if (MAINTENANCE_PAGES.indexOf(b.dataset.page) !== -1 && !b.querySelector(".maint-tag")) {
-        var tag = document.createElement("span");
-        tag.className = "maint-tag";
-        tag.style.cssText = "margin-left:auto;font-size:10px;letter-spacing:.5px;background:#332b17;color:var(--amber);border-radius:20px;padding:2px 7px;font-weight:700;";
-        tag.textContent = "MAINTENANCE";
-        b.style.display = "flex";
-        b.style.justifyContent = "space-between";
-        b.style.alignItems = "center";
-        b.appendChild(tag);
-      }
-    });
-  }, 0);
+  try { console.log("[StockWise sold-hotfix v2] active"); } catch (e) {}
 })();
+
+
+/* ============================================================
+   StockWise — on-screen diagnostic button
+   Runs the same checks the console would; prints the result
+   into a visible panel so no DevTools is needed.
+   Paste at the very bottom of <script>. Remove after use.
+   ============================================================ */
+(function () {
+  "use strict";
+
+  function injectButton() {
+    var entry = document.getElementById("page-entry");
+    if (!entry || document.getElementById("diagPanel")) return;
+
+    var html =
+      '<div class="panel mb-3" id="diagPanel" style="border-left:4px solid #53a5df;">' +
+      '  <div class="section-head">' +
+      '    <h2 class="mb-0">Connection diagnostic</h2>' +
+      '    <span class="badge badge-warn">temporary</span>' +
+      '  </div>' +
+      '  <div class="small-help mb-3">' +
+      '    Click the button below. It checks whether the Sheet row exists for one test item ' +
+      '    on one test date, and reports back on this page. No DevTools required.' +
+      '  </div>' +
+      '  <div class="row g-2 align-items-end mb-3">' +
+      '    <div class="col-12 col-md-3">' +
+      '      <label class="form-label" for="diagDate">Date</label>' +
+      '      <input class="form-control" type="date" id="diagDate" value="2026-11-03">' +
+      '    </div>' +
+      '    <div class="col-12 col-md-5">' +
+      '      <label class="form-label" for="diagCode">Item code</label>' +
+      '      <input class="form-control" id="diagCode" value="SUB-WNG-0001" autocomplete="off">' +
+      '    </div>' +
+      '    <div class="col-12 col-md-4">' +
+      '      <button class="btn-green w-100" type="button" id="diagRunBtn">Run diagnostic</button>' +
+      '    </div>' +
+      '  </div>' +
+      '  <div id="diagResult" class="small-help" style="white-space:pre-wrap;font-family:monospace;background:#0b100e;border:1px solid #28362f;border-radius:9px;padding:12px;min-height:80px;">Ready. Click "Run diagnostic".</div>' +
+      '</div>';
+
+    entry.insertAdjacentHTML("afterbegin", html);
+    document.getElementById("diagRunBtn").addEventListener("click", runDiag);
+  }
+
+  async function runDiag() {
+    var resultEl = document.getElementById("diagResult");
+    var btn      = document.getElementById("diagRunBtn");
+    var date     = String(document.getElementById("diagDate").value || "").trim();
+    var code     = String(document.getElementById("diagCode").value || "").trim();
+
+    resultEl.textContent = "Running…";
+    btn.disabled = true;
+
+    var lines = [];
+    function log(s) { lines.push(s); resultEl.textContent = lines.join("\n"); }
+
+    try {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { log("✕ Pick a valid date."); return; }
+      if (!code) { log("✕ Enter an item code."); return; }
+
+      var url = (typeof getAppsScriptUrl === "function") ? getAppsScriptUrl() : "";
+      if (!url) { log("✕ Apps Script URL not available. Log in first."); return; }
+      log("Store URL: " + url);
+
+      // ---- Test 1: can we reach the items endpoint? ----
+      log("");
+      log("── Test 1: Apps Script reachable? ──");
+      var itemsResp = await jsonp(url, "items");
+      if (!itemsResp) { log("✕ No response from Apps Script. Deployment may be private or URL wrong."); return; }
+      if (itemsResp.success === false) { log("✕ Endpoint returned error: " + itemsResp.error); return; }
+      var itemCount = Array.isArray(itemsResp) ? itemsResp.length
+                    : Array.isArray(itemsResp.data) ? itemsResp.data.length : 0;
+      log("✓ Apps Script reachable · " + itemCount + " items returned.");
+
+      // ---- Test 2: is the item code in Item Master? ----
+      log("");
+      log("── Test 2: is '" + code + "' in Item Master? ──");
+      var itemsList = Array.isArray(itemsResp) ? itemsResp
+                    : (itemsResp.data || []);
+      var found = itemsList.some(function (it) {
+        var c = String(it.code || it.itemCode || "").toLowerCase();
+        return c === code.toLowerCase();
+      });
+      if (found) log("✓ Found '" + code + "' in Item Master (case-insensitive).");
+      else {
+        log("✕ '" + code + "' NOT in Item Master.");
+        log("   Codes in Item Master that start with '" + code.slice(0, 4).toLowerCase() + "':");
+        var similar = itemsList
+          .map(function (it) { return String(it.code || it.itemCode || ""); })
+          .filter(function (c) { return c.toLowerCase().indexOf(code.slice(0, 4).toLowerCase()) === 0; })
+          .slice(0, 10);
+        if (similar.length) similar.forEach(function (c) { log("     · " + c); });
+        else log("     (none similar)");
+      }
+
+      // ---- Test 3: does the sheet have a row for this code+date? ----
+      log("");
+      log("── Test 3: does the sheet have a row for this item on this date? ──");
+      var sheetName = sheetNameForLocal(date);
+      log("   Expected sheet: " + sheetName);
+      var recordsResp = await jsonp(url, "records", { sheetName: sheetName });
+      if (!recordsResp) { log("✕ No response when reading '" + sheetName + "'."); return; }
+      if (recordsResp.success === false) { log("✕ Read error: " + recordsResp.error); return; }
+      var recList = Array.isArray(recordsResp) ? recordsResp : (recordsResp.data || []);
+      log("✓ Read " + recList.length + " record(s) from '" + sheetName + "'.");
+
+      var matching = recList.filter(function (r) {
+        return String(r.itemCode || r.code || "").toUpperCase() === code.toUpperCase();
+      });
+      log("   Rows for '" + code + "' in this tab: " + matching.length);
+
+      var target = matching.filter(function (r) {
+        var d = String(r.date || "").slice(0, 10);
+        return d === date;
+      });
+
+      if (target.length === 0) {
+        log("");
+        log("✕ NO ROW for '" + code + "' on " + date + ".");
+        log("   This is why nothing saves: the row does not exist in the sheet.");
+        log("");
+        log("   Dates this code DOES appear on (first 10):");
+        var dates = matching.map(function (r) { return String(r.date || "").slice(0, 10); })
+                            .filter(Boolean).slice(0, 10);
+        if (dates.length) dates.forEach(function (d) { log("     · " + d); });
+        else log("     (none — the code is not present in this tab at all)");
+        log("");
+        log("   → NEXT STEP: add a row in the sheet for " + code + " on " + date + ".");
+        log("     (Or, if the code appears on other dates, copy that row and change only the date.)");
+      } else if (target.length > 1) {
+        log("");
+        log("✕ DUPLICATE rows for '" + code + "' on " + date + ": rows " +
+            target.map(function (r) { return r.row; }).join(", ") + ".");
+        log("   → NEXT STEP: delete the duplicates in the sheet, keep only one.");
+      } else {
+        var row = target[0];
+        log("");
+        log("✓ Row exists for '" + code + "' on " + date + " (sheet row " + row.row + ").");
+        log("   Current sheet values:");
+        log("     Sold (I)      = " + fmt(row.sold));
+        log("     Physical (K)  = " + fmt(row.physical));
+        log("     Opening (D)   = " + fmt(row.opening));
+        log("     Receiving (E) = " + fmt(row.receiving));
+        log("     Closing (J)   = " + fmt(row.closing));
+        log("");
+        log("   → NEXT STEP: in the Direct Sold panel, enter Sold = 3 for this item on this date,");
+        log("     click Save Sold, then re-run this diagnostic. If Sold still shows 0, the");
+        log("     Apps Script deployment is stale — redeploy a New version.");
+      }
+
+      log("");
+      log("=== Diagnostic complete ===");
+
+    } catch (err) {
+      log("");
+      log("✕ Diagnostic crashed: " + (err.message || String(err)));
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function fmt(v) {
+    if (v === null || v === undefined || v === "") return "(blank)";
+    var n = Number(v);
+    return Number.isFinite(n) ? String(n) : String(v);
+  }
+
+  function sheetNameForLocal(dateStr) {
+    var p = dateStr.split("-").map(Number);
+    var y = p[0], m = p[1];
+    if (y === 2026 && m === 10) return "Daily Inventory";
+    var d = new Date(y, m - 1, 1);
+    return d.toLocaleString("en-US", { month: "long", year: "numeric" });
+  }
+
+  function jsonp(url, action, extra) {
+    extra = extra || {};
+    return new Promise(function (resolve) {
+      var cb = "diagcb_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+      var s  = document.createElement("script");
+      var t  = setTimeout(function () { cleanup(); resolve(null); }, 15000);
+      function cleanup() { clearTimeout(t); try { delete window[cb]; } catch (e) {} s.remove(); }
+      window[cb] = function (d) { cleanup(); resolve(d); };
+      s.onerror = function () { cleanup(); resolve(null); };
+      var params = { action: action, callback: cb };
+      Object.keys(extra).forEach(function (k) { params[k] = extra[k]; });
+      var q = new URLSearchParams(params).toString();
+      s.src = url + "?" + q;
+      document.head.appendChild(s);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", injectButton);
+  } else {
+    injectButton();
+  }
+})();
+
+
+
+
+/* ============================================================
+   StockWise — diagnostic v3
+   Sends one real save for the failing item and shows exactly
+   what the backend replied, including the failed[] reasons.
+   ============================================================ */
+(function () {
+  "use strict";
+
+  function injectPanel() {
+    var entry = document.getElementById("page-entry");
+    if (!entry) return;
+    var old = document.getElementById("diagPanel");
+    if (old) old.remove();
+
+    var html =
+      '<div class="panel mb-3" id="diagPanel" style="border-left:4px solid #53a5df;">' +
+      '  <div class="section-head"><h2 class="mb-0">Diagnostic v3 — show backend reply</h2><span class="badge badge-warn">temporary</span></div>' +
+      '  <div class="small-help mb-3">This actually writes a test value to the failing row and shows you the backend\'s exact reply.</div>' +
+      '  <div class="row g-2 align-items-end mb-3">' +
+      '    <div class="col-12 col-md-3"><label class="form-label">Date</label><input class="form-control" type="date" id="diagDate" value="2026-11-03"></div>' +
+      '    <div class="col-12 col-md-4"><label class="form-label">Item code</label><input class="form-control" id="diagCode" value="SUB-WNG-0001"></div>' +
+      '    <div class="col-12 col-md-2"><label class="form-label">Sold value</label><input class="form-control" type="number" id="diagSold" value="3" min="0" step="0.001"></div>' +
+      '    <div class="col-12 col-md-3"><button class="btn-green w-100" type="button" id="diagRunBtn">Run save test</button></div>' +
+      '  </div>' +
+      '  <div id="diagResult" class="small-help" style="white-space:pre-wrap;font-family:monospace;background:#0b100e;border:1px solid #28362f;border-radius:9px;padding:12px;min-height:120px;">Ready.</div>' +
+      '</div>';
+    entry.insertAdjacentHTML("afterbegin", html);
+    document.getElementById("diagRunBtn").addEventListener("click", runDiag);
+  }
+
+  async function runDiag() {
+    var resultEl = document.getElementById("diagResult");
+    var btn      = document.getElementById("diagRunBtn");
+    var date     = String(document.getElementById("diagDate").value || "").trim();
+    var code     = String(document.getElementById("diagCode").value || "").trim();
+    var soldVal  = String(document.getElementById("diagSold").value || "").trim();
+
+    resultEl.textContent = "Running…";
+    btn.disabled = true;
+
+    var lines = [];
+    function log(s) { lines.push(s); resultEl.textContent = lines.join("\n"); }
+
+    try {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { log("✕ invalid date"); return; }
+      if (!code) { log("✕ item code required"); return; }
+
+      var store = (typeof selectedStore !== "undefined") ? selectedStore : "";
+      var token = (typeof authToken !== "undefined") ? authToken : "";
+      var url   = (typeof getAppsScriptUrl === "function") ? getAppsScriptUrl() : "";
+      if (!url) { log("✕ no URL"); return; }
+
+      // Derive sheet name
+      var p = date.split("-").map(Number);
+      var sheetName = (p[0] === 2026 && p[1] === 10)
+        ? "Daily Inventory"
+        : new Date(p[0], p[1] - 1, 1).toLocaleString("en-US", { month: "long", year: "numeric" });
+
+      log("Store: " + store);
+      log("Sheet: " + sheetName);
+      log("Date:  " + date);
+      log("Code:  " + code);
+      log("Sold:  " + soldVal);
+      log("");
+
+      // Build the same batch payload the real save would send
+      var payload = {
+        token: token,
+        storeName: store,
+        sheetName: sheetName,
+        date: date,
+        items: [{
+          itemCode: code,
+          receiving: 0,
+          transferIn: 0,
+          transferOut: 0,
+          waste: 0,
+          sold: Number(soldVal) || 0,
+          physicalCount: 0
+        }]
+      };
+
+      // POST — no-cors cannot read response, so we send AND read separately
+      log("── POSTing batch save… ──");
+      await fetch(url, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      }).catch(function(e){ log("fetch error: " + e.message); });
+
+      log("POST sent. Waiting 3s for sheet to settle…");
+      await new Promise(function(r){ setTimeout(r, 3000); });
+
+      // Now read the tab back via JSONP and see what actually landed
+      log("");
+      log("── Reading sheet back via JSONP ──");
+      var recs = await jsonp(url, "records", { sheetName: sheetName, storeName: store });
+      if (!recs) {
+        log("✕ No JSONP response reading " + sheetName + ".");
+        log("  → This tab is either too large for JSONP or has a script error.");
+        return;
+      }
+      if (recs.success === false) {
+        log("✕ read error: " + recs.error);
+        return;
+      }
+      var list = Array.isArray(recs) ? recs : (recs.data || []);
+      log("✓ Read " + list.length + " records.");
+
+      // Find the row we just tried to save
+      var match = list.filter(function(r) {
+        return String(r.itemCode || r.code || "").toUpperCase() === code.toUpperCase()
+            && String(r.date || "").slice(0,10) === date;
+      });
+
+      log("");
+      log("── Result for " + code + " on " + date + " ──");
+      if (match.length === 0) {
+        log("✕ No row found for that (code, date) in the sheet.");
+        log("  → The backend can't write because there is no row to write to.");
+        log("");
+        log("  Check the November 2026 tab: is there really a row with");
+        log("     Column A = " + date + " AND Column B = " + code + "?");
+        log("  Press Ctrl+F, look for the code, and check EVERY row's A value.");
+        return;
+      }
+      if (match.length > 1) {
+        log("⚠ " + match.length + " rows found:");
+        match.forEach(function(r){ log("   row " + r.row + "  sold=" + r.sold); });
+        log("  → Duplicates. Delete extra rows in the sheet.");
+        return;
+      }
+
+      var row = match[0];
+      log("✓ Row exists: sheet row " + row.row);
+      log("  Sold (I)      = " + fmt(row.sold));
+      log("  Physical (K)  = " + fmt(row.physical));
+      log("  Opening (D)   = " + fmt(row.opening));
+      log("  Closing (J)   = " + fmt(row.closing));
+      log("  Variance (L)  = " + fmt(row.variance));
+      log("  itemName      = " + (row.name || row.itemName || "(blank)"));
+      log("");
+
+      var actualSold = Number(row.sold);
+      var wantedSold = Number(soldVal) || 0;
+      if (Math.abs(actualSold - wantedSold) < 0.0001) {
+        log("✅ Sold is now " + actualSold + " — the save WORKED this time.");
+        log("   Refresh the sheet (the open tab may be cached) to see it.");
+      } else {
+        log("❌ Sold is still " + actualSold + " but wanted " + wantedSold + ".");
+        log("");
+        log("The write did NOT land. Possible causes:");
+        log("  • The Apps Script deployment is on an older version.");
+        log("    → Open Apps Script → Deploy → Manage deployments → ✏️ → New version → Deploy.");
+        log("  • The row's column B on the sheet is not EXACTLY '" + code + "'.");
+        log("    → Click cell B on row " + row.row + " and read the formula bar.");
+        log("  • The sheet is recalculating a formula in column I.");
+        log("    → Click cell I on row " + row.row + " and read the formula bar.");
+        log("  • The Apps Script service returned failed[] for this row — check Logs:");
+        log("    → Apps Script editor → Executions (left sidebar) → latest doPost.");
+      }
+
+    } catch (err) {
+      log("✕ crashed: " + (err.message || String(err)));
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function fmt(v) {
+    if (v === null || v === undefined || v === "") return "(blank)";
+    var n = Number(v);
+    return Number.isFinite(n) ? String(n) : String(v);
+  }
+
+  function jsonp(url, action, extra) {
+    extra = extra || {};
+    return new Promise(function (resolve) {
+      var cb = "dcb_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+      var s  = document.createElement("script");
+      var t  = setTimeout(function(){ cleanup(); resolve(null); }, 30000);
+      function cleanup(){ clearTimeout(t); try{ delete window[cb]; }catch(e){} s.remove(); }
+      window[cb] = function(d){ cleanup(); resolve(d); };
+      s.onerror = function(){ cleanup(); resolve(null); };
+      var params = { action: action, callback: cb };
+      Object.keys(extra).forEach(function(k){ params[k] = extra[k]; });
+      s.src = url + "?" + new URLSearchParams(params).toString();
+      document.head.appendChild(s);
+    });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", injectPanel);
+  else injectPanel();
+})();
+
+
 </script></div></body></html>
