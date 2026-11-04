@@ -3290,4 +3290,188 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
 })();
 
 
+/* ============================================================
+   StockWise — "Under Maintenance" lock for 4 pages
+   Paste at the very bottom of <script>. Delete to revert.
+   Pages locked: analysis, records, reports, items
+   ============================================================ */
+(function () {
+  "use strict";
+
+  var LOCKED = ["analysis", "records", "reports", "items"];
+
+  // ---- 1. Inject a maintenance overlay + styles (once) ----
+  function injectMaintenanceUI() {
+    if (document.getElementById("maintenanceOverlay")) return;
+
+    var css = document.createElement("style");
+    css.textContent = `
+      .nav-maintenance{
+        font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+        color:#f5c96a;background:#332b17;border:1px solid #4a3d1d;
+        border-radius:20px;padding:2px 7px;margin-left:6px;
+        white-space:nowrap;vertical-align:middle;
+      }
+      .light-mode .nav-maintenance{
+        color:#805700;background:#fff0c5;border-color:#e6d39a;
+      }
+      #maintenanceOverlay{
+        position:fixed;inset:0;z-index:5000;display:none;
+        align-items:center;justify-content:center;padding:20px;
+        background:rgba(0,0,0,.78);backdrop-filter:blur(5px);
+      }
+      #maintenanceOverlay.active{display:flex;}
+      .maintenance-card{
+        width:100%;max-width:420px;text-align:center;
+        background:var(--panel);border:1px solid #4a3d1d;
+        border-radius:20px;padding:30px 24px;
+        box-shadow:0 24px 70px #0009;
+        animation:welcomeIn .22s ease-out;
+      }
+      .maintenance-mark{
+        width:62px;height:62px;margin:0 auto 16px;border-radius:18px;
+        display:grid;place-items:center;
+        background:#332b17;color:var(--amber);font-size:30px;
+      }
+      .maintenance-title{
+        font-size:22px;font-weight:850;line-height:1.25;
+        margin-bottom:9px;color:var(--text);
+      }
+      .maintenance-subtitle{font-size:13px;color:var(--muted);margin-bottom:22px;}
+    `;
+    document.head.appendChild(css);
+
+    var overlay = document.createElement("div");
+    overlay.id = "maintenanceOverlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.innerHTML =
+      '<div class="maintenance-card">' +
+      '  <div class="maintenance-mark" aria-hidden="true">🛠</div>' +
+      '  <div class="maintenance-title">Under Maintenance</div>' +
+      '  <div class="maintenance-subtitle" id="maintenancePageName">This section is temporarily unavailable.</div>' +
+      '  <button class="btn-green w-100" type="button" id="maintenanceCloseBtn">OK</button>' +
+      '</div>';
+    document.body.appendChild(overlay);
+
+    document.getElementById("maintenanceCloseBtn").addEventListener("click", function () {
+      overlay.classList.remove("active");
+    });
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) overlay.classList.remove("active");
+    });
+  }
+
+  function showMaintenance(pageName) {
+    injectMaintenanceUI();
+    var names = {
+      analysis: "Item Analysis",
+      records: "Records",
+      reports: "Reports",
+      items: "Item Master"
+    };
+    document.getElementById("maintenancePageName").textContent =
+      (names[pageName] || "This section") + " is under maintenance. Please check back later.";
+    document.getElementById("maintenanceOverlay").classList.add("active");
+    if (typeof toast === "function") {
+      toast("Under Maintenance — temporarily unavailable.");
+    }
+  }
+
+  // ---- 2. Guard showPage() ----
+  if (typeof window.showPage === "function" && !window.__showPageLocked) {
+    var _origShowPage = window.showPage;
+    window.showPage = function (page) {
+      if (LOCKED.indexOf(page) !== -1) {
+        showMaintenance(page);
+        return;
+      }
+      return _origShowPage.apply(this, arguments);
+    };
+    window.__showPageLocked = true;
+  }
+
+  // ---- 3. Label the buttons + intercept clicks ----
+  function lockNav() {
+    document.querySelectorAll(".navbtn").forEach(function (btn) {
+      var page = btn.getAttribute("data-page");
+      if (LOCKED.indexOf(page) === -1) return;
+
+      // Add the "Under Maintenance" chip once
+      if (!btn.querySelector(".nav-maintenance")) {
+        var chip = document.createElement("span");
+        chip.className = "nav-maintenance";
+        chip.textContent = "Under Maintenance";
+        btn.appendChild(chip);
+      }
+
+      // Visual disabled look
+      btn.style.opacity = "0.55";
+      btn.style.cursor = "not-allowed";
+      btn.title = "Under Maintenance";
+
+      // Capture-phase click so the original handler never fires
+      if (btn.dataset.maintLocked === "1") return;
+      btn.dataset.maintLocked = "1";
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        showMaintenance(page);
+      }, true);
+    });
+  }
+
+  // ---- 4. If a locked page is somehow active, bounce to dashboard ----
+  function bounceIfLocked() {
+    var active = document.querySelector(".page.active");
+    if (!active) return;
+    var id = active.id.replace("page-", "");
+    if (LOCKED.indexOf(id) === -1) return;
+
+    document.querySelectorAll(".page").forEach(function (p) {
+      p.classList.remove("active");
+    });
+    var dash = document.getElementById("page-dashboard");
+    if (dash) dash.classList.add("active");
+    document.querySelectorAll(".navbtn").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-page") === "dashboard");
+    });
+    if (typeof applyLanguage === "function") applyLanguage();
+    showMaintenance(id);
+  }
+
+  // ---- 5. Boot + observe ----
+  function run() {
+    injectMaintenanceUI();
+    lockNav();
+    bounceIfLocked();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", run);
+  } else {
+    run();
+  }
+
+  var mo = new MutationObserver(function () {
+    lockNav();
+  });
+  mo.observe(document.body, { childList: true, subtree: true });
+
+  // ---- 6. Block the data hooks so nothing loads behind the scenes ----
+  ["runItemAnalysis", "loadSelectedRecordMonth", "generateCurrentMonthReport", "loadItemMaster"].forEach(function (fn) {
+    if (typeof window[fn] === "function") {
+      window[fn] = function () {
+        showMaintenance(fn === "runItemAnalysis" ? "analysis"
+                       : fn === "loadSelectedRecordMonth" ? "records"
+                       : fn === "generateCurrentMonthReport" ? "reports"
+                       : "items");
+      };
+    }
+  });
+
+  try { console.log("[StockWise] Under-Maintenance lock active for:", LOCKED.join(", ")); } catch (e) {}
+})();
+
+
 </script></div></body></html>
