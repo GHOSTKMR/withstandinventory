@@ -180,7 +180,164 @@ footer{color:#6f8076;font-size:11px;text-align:center;padding:24px 0 8px}
   .export-btns .btn-soft{width:100%}
   #page-reports .stat-value{font-size:20px}
 }
-</style></head>
+</style>
+<style>
+/* ============================================================
+   Wrap&Go — CSS-only rebrand (v2, dominant + properly spaced)
+   ============================================================ */
+
+/* ---- Neutralize the original .brand wrapper ---- */
+.brand {
+  font-size: 0 !important;
+  line-height: 0 !important;
+  letter-spacing: 0 !important;
+  position: relative;
+  display: block;
+  /* give the wordmark its own vertical space */
+  padding: 6px 0 10px;
+  margin: 0 0 6px;
+  min-height: 48px;
+}
+.brand > * { visibility: hidden; }
+
+/* ---- The Wrap&Go wordmark ---- */
+.brand::after {
+  content: "Wrap&Go";
+  display: inline-block;
+  position: relative;
+
+  /* Big and dominant */
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+  vertical-align: middle;
+
+  /* Orange gradient text */
+  background: linear-gradient(100deg,
+      #ff8a2b 0%, #ff8a2b 40%,
+      #ffe0b8 50%,
+      #ff8a2b 60%, #ff8a2b 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* Glow */
+  text-shadow:
+    0 0 6px rgba(255,138,43,.9),
+    0 0 16px rgba(255,138,43,.65),
+    0 0 34px rgba(255,110,0,.45),
+    0 0 60px rgba(255,90,0,.28);
+
+  animation: wgSheen 5s ease-in-out infinite,
+             wgPulse 2.6s ease-in-out infinite;
+}
+
+@keyframes wgSheen {
+  0%, 55%   { background-position: 120% 0; }
+  75%, 100% { background-position: -20% 0; }
+}
+@keyframes wgPulse {
+  0%, 100% {
+    text-shadow:
+      0 0 6px rgba(255,138,43,.9),
+      0 0 16px rgba(255,138,43,.65),
+      0 0 34px rgba(255,110,0,.45),
+      0 0 60px rgba(255,90,0,.28);
+  }
+  50% {
+    text-shadow:
+      0 0 8px rgba(255,150,60,1),
+      0 0 22px rgba(255,138,43,.9),
+      0 0 48px rgba(255,110,0,.65),
+      0 0 90px rgba(255,90,0,.45);
+    filter: brightness(1.18);
+  }
+}
+
+/* ---- LOGIN SCREEN: extra big, centered, with clear spacing ---- */
+.login-card .brand {
+  text-align: center;
+  padding: 4px 0 20px;
+  margin: 0 0 18px;
+  min-height: 72px;
+  border-bottom: 1px solid var(--line);   /* separates from "WITHSTAND INVENTORY · SECURE LOGIN" */
+}
+.login-card .brand::after {
+  font-size: 46px;
+  letter-spacing: -1px;
+}
+/* Pull the sub-brand line (WITHSTAND INVENTORY...) down cleanly */
+.login-card .subbrand {
+  margin-top: 6px !important;
+  margin-bottom: 26px !important;
+  text-align: center;
+}
+
+/* ---- SIDEBAR: big enough to dominate, still fits column ---- */
+.sidebar .brand {
+  padding: 8px 0 14px;
+  margin: 0 0 12px;
+  min-height: 52px;
+  border-bottom: 1px solid var(--line);
+}
+.sidebar .brand::after {
+  font-size: 30px;
+  letter-spacing: -0.4px;
+}
+/* Push the "RESTAURANT INVENTORY" sub-brand line clear of the logo */
+.sidebar .subbrand {
+  margin-top: 4px !important;
+  margin-bottom: 6px !important;
+  line-height: 1.3;
+}
+
+/* ---- Keep the version badge from colliding with the wordmark ---- */
+.sidebar .brandline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.sidebar .brandline > .badge {
+  align-self: flex-start;
+  margin-top: 2px;
+}
+
+/* ---- Light mode ---- */
+body.light-mode .brand::after {
+  background: linear-gradient(100deg,
+      #d95f00 0%, #d95f00 40%,
+      #ffb060 50%,
+      #d95f00 60%, #d95f00 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow:
+    0 0 6px rgba(217,95,0,.5),
+    0 0 16px rgba(217,95,0,.32),
+    0 0 32px rgba(255,110,0,.18);
+}
+
+/* ---- Mobile: keep it big but not overflowing ---- */
+@media (max-width: 767px) {
+  .login-card .brand::after { font-size: 38px; }
+  .login-card .brand { min-height: 62px; padding-bottom: 16px; }
+  .sidebar .brand::after { font-size: 26px; }
+  .sidebar .brand { min-height: 44px; padding: 4px 0 10px; }
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .brand::after { animation: none !important; }
+}
+
+</style>
+
+</head>
 <body>
 
 <!-- CONNECTION GATE OVERLAY -->
@@ -3290,188 +3447,941 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
 })();
 
 
+
+
 /* ============================================================
-   StockWise — "Under Maintenance" lock for 4 pages
+   StockWise — Waste Chart Fix
    Paste at the very bottom of <script>. Delete to revert.
-   Pages locked: analysis, records, reports, items
+   ------------------------------------------------------------
+   Problem: the waste chart was built from `valid`, which is
+   pre-filtered to records that have a physical count. Rows with
+   waste but no physical count were dropped → empty chart.
+
+   Fix: aggregate total waste per item across ALL loaded records,
+   independent of variance, with numeric guards, and register a
+   Chart.js afterRender hook so it re-draws on every data refresh.
    ============================================================ */
 (function () {
   "use strict";
 
-  var LOCKED = ["analysis", "records", "reports", "items"];
+  if (typeof Chart === "undefined") {
+    console.warn("[WasteFix] Chart.js not loaded — aborting.");
+    return;
+  }
 
-  // ---- 1. Inject a maintenance overlay + styles (once) ----
-  function injectMaintenanceUI() {
-    if (document.getElementById("maintenanceOverlay")) return;
+  /* ---------- 1. Draw the waste chart ourselves ---------- */
+  function drawWasteChart() {
+    var canvas = document.getElementById("wasteChart");
+    if (!canvas) return;
 
-    var css = document.createElement("style");
-    css.textContent = `
-      .nav-maintenance{
-        font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
-        color:#f5c96a;background:#332b17;border:1px solid #4a3d1d;
-        border-radius:20px;padding:2px 7px;margin-left:6px;
-        white-space:nowrap;vertical-align:middle;
-      }
-      .light-mode .nav-maintenance{
-        color:#805700;background:#fff0c5;border-color:#e6d39a;
-      }
-      #maintenanceOverlay{
-        position:fixed;inset:0;z-index:5000;display:none;
-        align-items:center;justify-content:center;padding:20px;
-        background:rgba(0,0,0,.78);backdrop-filter:blur(5px);
-      }
-      #maintenanceOverlay.active{display:flex;}
-      .maintenance-card{
-        width:100%;max-width:420px;text-align:center;
-        background:var(--panel);border:1px solid #4a3d1d;
-        border-radius:20px;padding:30px 24px;
-        box-shadow:0 24px 70px #0009;
-        animation:welcomeIn .22s ease-out;
-      }
-      .maintenance-mark{
-        width:62px;height:62px;margin:0 auto 16px;border-radius:18px;
-        display:grid;place-items:center;
-        background:#332b17;color:var(--amber);font-size:30px;
-      }
-      .maintenance-title{
-        font-size:22px;font-weight:850;line-height:1.25;
-        margin-bottom:9px;color:var(--text);
-      }
-      .maintenance-subtitle{font-size:13px;color:var(--muted);margin-bottom:22px;}
-    `;
-    document.head.appendChild(css);
+    // Pull current records from the outer scope
+    var recs = (typeof records !== "undefined" && Array.isArray(records)) ? records : [];
 
-    var overlay = document.createElement("div");
-    overlay.id = "maintenanceOverlay";
-    overlay.setAttribute("role", "dialog");
-    overlay.setAttribute("aria-modal", "true");
-    overlay.innerHTML =
-      '<div class="maintenance-card">' +
-      '  <div class="maintenance-mark" aria-hidden="true">🛠</div>' +
-      '  <div class="maintenance-title">Under Maintenance</div>' +
-      '  <div class="maintenance-subtitle" id="maintenancePageName">This section is temporarily unavailable.</div>' +
-      '  <button class="btn-green w-100" type="button" id="maintenanceCloseBtn">OK</button>' +
-      '</div>';
-    document.body.appendChild(overlay);
-
-    document.getElementById("maintenanceCloseBtn").addEventListener("click", function () {
-      overlay.classList.remove("active");
+    // Aggregate waste per item across ALL records (no variance filter)
+    var byItem = {};
+    recs.forEach(function (r) {
+      var w = Number(r.waste);
+      if (!Number.isFinite(w) || w <= 0) return;
+      var key = r.code || r.name || "?";
+      if (!byItem[key]) {
+        byItem[key] = { code: key, name: r.name || "", waste: 0 };
+      }
+      byItem[key].waste += w;
     });
-    overlay.addEventListener("click", function (e) {
-      if (e.target === overlay) overlay.classList.remove("active");
+
+    var top = Object.keys(byItem)
+      .map(function (k) { return byItem[k]; })
+      .sort(function (a, b) { return b.waste - a.waste; })
+      .slice(0, 5);
+
+    // Theme-aware colours
+    var light = document.body.classList.contains("light-mode");
+    var textColor = light ? "#425449" : "#b7c8bd";
+    var gridColor = light ? "#dce6df" : "#2b3b32";
+
+    // Destroy any existing chart bound to this canvas
+    var existing = Chart.getChart(canvas);
+    if (existing) existing.destroy();
+
+    var labels = top.length ? top.map(function (x) { return x.code; }) : ["No waste recorded"];
+    var values = top.length ? top.map(function (x) { return x.waste; }) : [0];
+
+    new Chart(canvas, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Waste qty",
+          data: values,
+          backgroundColor: top.length ? "#f5c96a" : (light ? "#e2e8e3" : "#2b3b32"),
+          borderRadius: 6,
+          maxBarThickness: 34
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: function (items) {
+                var i = items[0].dataIndex;
+                return top[i] ? (top[i].name || top[i].code) : "No waste recorded";
+              },
+              label: function (item) {
+                return "Waste: " + item.formattedValue;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: textColor, font: { size: 10 } }
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: gridColor },
+            ticks: { color: textColor, font: { size: 10 } }
+          }
+        }
+      }
     });
   }
 
-  function showMaintenance(pageName) {
-    injectMaintenanceUI();
-    var names = {
-      analysis: "Item Analysis",
-      records: "Records",
-      reports: "Reports",
-      items: "Item Master"
+  /* ---------- 2. Re-draw after every render pipeline run ---------- */
+  // scheduleCharts() is called from renderAll(), toggleTheme(),
+  // showPage('dashboard') and page load. We wrap it so the waste
+  // chart always uses our drawing logic.
+  if (typeof window.scheduleCharts === "function" && !window.__wasteFixWrapped) {
+    var _origSchedule = window.scheduleCharts;
+    window.scheduleCharts = function () {
+      // Let the original run (donut, trend, movement)
+      try { _origSchedule.apply(this, arguments); } catch (e) { console.warn(e); }
+
+      // Then draw our own waste chart after the tick so we win
+      // the race against the original renderCharts() destroying it.
+      clearTimeout(window.__wasteFixTimer);
+      window.__wasteFixTimer = setTimeout(function () {
+        try { drawWasteChart(); } catch (e) { console.warn("[WasteFix]", e); }
+      }, 160);
     };
-    document.getElementById("maintenancePageName").textContent =
-      (names[pageName] || "This section") + " is under maintenance. Please check back later.";
-    document.getElementById("maintenanceOverlay").classList.add("active");
-    if (typeof toast === "function") {
-      toast("Under Maintenance — temporarily unavailable.");
-    }
+    window.__wasteFixWrapped = true;
   }
 
-  // ---- 2. Guard showPage() ----
-  if (typeof window.showPage === "function" && !window.__showPageLocked) {
-    var _origShowPage = window.showPage;
-    window.showPage = function (page) {
-      if (LOCKED.indexOf(page) !== -1) {
-        showMaintenance(page);
-        return;
+  /* ---------- 3. Also redraw when records get rebuilt ---------- */
+  if (typeof window.rebuildRecords === "function" && !window.__wasteFixRebuild) {
+    var _origRebuild = window.rebuildRecords;
+    window.rebuildRecords = function () {
+      var out = _origRebuild.apply(this, arguments);
+      // After merge, if dashboard is visible, redraw
+      var active = document.querySelector(".page.active");
+      if (active && active.id === "page-dashboard") {
+        clearTimeout(window.__wasteFixTimer);
+        window.__wasteFixTimer = setTimeout(function () {
+          try { drawWasteChart(); } catch (e) { console.warn("[WasteFix]", e); }
+        }, 120);
       }
-      return _origShowPage.apply(this, arguments);
+      return out;
     };
-    window.__showPageLocked = true;
+    window.__wasteFixRebuild = true;
   }
 
-  // ---- 3. Label the buttons + intercept clicks ----
-  function lockNav() {
-    document.querySelectorAll(".navbtn").forEach(function (btn) {
-      var page = btn.getAttribute("data-page");
-      if (LOCKED.indexOf(page) === -1) return;
-
-      // Add the "Under Maintenance" chip once
-      if (!btn.querySelector(".nav-maintenance")) {
-        var chip = document.createElement("span");
-        chip.className = "nav-maintenance";
-        chip.textContent = "Under Maintenance";
-        btn.appendChild(chip);
-      }
-
-      // Visual disabled look
-      btn.style.opacity = "0.55";
-      btn.style.cursor = "not-allowed";
-      btn.title = "Under Maintenance";
-
-      // Capture-phase click so the original handler never fires
-      if (btn.dataset.maintLocked === "1") return;
-      btn.dataset.maintLocked = "1";
-      btn.addEventListener("click", function (e) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        showMaintenance(page);
-      }, true);
-    });
-  }
-
-  // ---- 4. If a locked page is somehow active, bounce to dashboard ----
-  function bounceIfLocked() {
-    var active = document.querySelector(".page.active");
-    if (!active) return;
-    var id = active.id.replace("page-", "");
-    if (LOCKED.indexOf(id) === -1) return;
-
-    document.querySelectorAll(".page").forEach(function (p) {
-      p.classList.remove("active");
-    });
-    var dash = document.getElementById("page-dashboard");
-    if (dash) dash.classList.add("active");
-    document.querySelectorAll(".navbtn").forEach(function (b) {
-      b.classList.toggle("active", b.getAttribute("data-page") === "dashboard");
-    });
-    if (typeof applyLanguage === "function") applyLanguage();
-    showMaintenance(id);
-  }
-
-  // ---- 5. Boot + observe ----
-  function run() {
-    injectMaintenanceUI();
-    lockNav();
-    bounceIfLocked();
+  /* ---------- 4. First draw on boot + when dashboard opens ---------- */
+  function boot() {
+    // Chart.js needs a moment after DOM ready
+    setTimeout(function () {
+      try { drawWasteChart(); } catch (e) { console.warn("[WasteFix]", e); }
+    }, 400);
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", run);
+    document.addEventListener("DOMContentLoaded", boot);
   } else {
-    run();
+    boot();
   }
 
-  var mo = new MutationObserver(function () {
-    lockNav();
-  });
-  mo.observe(document.body, { childList: true, subtree: true });
+  // Redraw whenever the user navigates to dashboard
+  if (typeof window.showPage === "function" && !window.__wasteFixShowPage) {
+    var _origShowPage = window.showPage;
+    window.showPage = function (page) {
+      var out = _origShowPage.apply(this, arguments);
+      if (page === "dashboard") {
+        clearTimeout(window.__wasteFixTimer);
+        window.__wasteFixTimer = setTimeout(function () {
+          try { drawWasteChart(); } catch (e) { console.warn("[WasteFix]", e); }
+        }, 200);
+      }
+      return out;
+    };
+    window.__wasteFixShowPage = true;
+  }
 
-  // ---- 6. Block the data hooks so nothing loads behind the scenes ----
-  ["runItemAnalysis", "loadSelectedRecordMonth", "generateCurrentMonthReport", "loadItemMaster"].forEach(function (fn) {
-    if (typeof window[fn] === "function") {
-      window[fn] = function () {
-        showMaintenance(fn === "runItemAnalysis" ? "analysis"
-                       : fn === "loadSelectedRecordMonth" ? "records"
-                       : fn === "generateCurrentMonthReport" ? "reports"
-                       : "items");
-      };
+  console.log("[WasteFix] active — waste chart now reads from all records.");
+})();
+
+/* ============================================================
+   StockWise — Movement Classes Chart Fix
+   Paste at the very bottom of <script>. Delete to revert.
+   ------------------------------------------------------------
+   Problem: the movement chart was built from `valid`, which is
+   pre-filtered to records that have a physical count. Items with
+   sales/sold but no physical count were dropped → empty chart.
+   It also only ever showed 8 items (top 4 + next 4), so most
+   items never appeared.
+
+   Fix: aggregate total SOLD per item across ALL loaded records,
+   independent of variance, classify Fast / Moderate / Slow by
+   sales rank, and redraw on every render pipeline run.
+   ============================================================ */
+(function () {
+  "use strict";
+
+  if (typeof Chart === "undefined") {
+    console.warn("[MovementFix] Chart.js not loaded — aborting.");
+    return;
+  }
+
+  /* ---------- 1. Draw the movement chart ourselves ---------- */
+  function drawMovementChart() {
+    var canvas = document.getElementById("movementChart");
+    if (!canvas) return;
+
+    var recs = (typeof records !== "undefined" && Array.isArray(records)) ? records : [];
+
+    // Aggregate total sold per item across ALL records (no variance filter)
+    var byItem = {};
+    recs.forEach(function (r) {
+      var s = Number(r.sold);
+      if (!Number.isFinite(s) || s <= 0) return;
+      var key = r.code || r.name || "?";
+      if (!byItem[key]) {
+        byItem[key] = { code: key, name: r.name || "", sold: 0 };
+      }
+      byItem[key].sold += s;
+    });
+
+    var sorted = Object.keys(byItem)
+      .map(function (k) { return byItem[k]; })
+      .sort(function (a, b) { return b.sold - a.sold; });
+
+    var n = sorted.length;
+    var fastCut = Math.max(1, Math.ceil(n * 0.20));              // top 20% = Fast
+    var slowCut = Math.max(fastCut + 1, Math.floor(n * 0.60));   // next 40% = Moderate, rest = Slow
+
+    function classOf(i) {
+      if (i < fastCut) return "Fast";
+      if (i < slowCut) return "Moderate";
+      return "Slow";
     }
-  });
 
-  try { console.log("[StockWise] Under-Maintenance lock active for:", LOCKED.join(", ")); } catch (e) {}
+    // Show up to 10 items: top 5 fast movers + 5 fast/medium mix.
+    // Falls back to whatever exists if fewer than 10.
+    var shown = sorted.slice(0, 10);
+
+    var colors = { Fast: "#53df91", Moderate: "#53a5df", Slow: "#f5c96a" };
+
+    // Theme-aware colours
+    var light = document.body.classList.contains("light-mode");
+    var textColor = light ? "#425449" : "#b7c8bd";
+    var gridColor = light ? "#dce6df" : "#2b3b32";
+
+    var existing = Chart.getChart(canvas);
+    if (existing) existing.destroy();
+
+    var labels, values, bgColors, classLabels;
+    if (shown.length) {
+      labels = shown.map(function (x) { return x.code; });
+      values = shown.map(function (x) { return x.sold; });
+      bgColors = shown.map(function (x) {
+        return colors[classOf(sorted.indexOf(x))];
+      });
+      classLabels = shown.map(function (x) {
+        return classOf(sorted.indexOf(x));
+      });
+    } else {
+      labels = ["No sales recorded"];
+      values = [0];
+      bgColors = [light ? "#e2e8e3" : "#2b3b32"];
+      classLabels = ["—"];
+    }
+
+    new Chart(canvas, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Sold",
+          data: values,
+          backgroundColor: bgColors,
+          borderRadius: 5,
+          maxBarThickness: 22
+        }]
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: function (items) {
+                var i = items[0].dataIndex;
+                return shown[i] ? (shown[i].name || shown[i].code) : "No sales recorded";
+              },
+              label: function (item) {
+                var i = item.dataIndex;
+                var cls = classLabels[i] || "—";
+                return ["Sold: " + item.formattedValue, "Class: " + cls];
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: { color: gridColor },
+            ticks: { color: textColor, font: { size: 10 } }
+          },
+          y: {
+            grid: { display: false },
+            ticks: { color: textColor, font: { size: 10 } }
+          }
+        }
+      }
+    });
+  }
+
+  /* ---------- 2. Re-draw after every render pipeline run ---------- */
+  if (typeof window.scheduleCharts === "function" && !window.__movementFixWrapped) {
+    var _origSchedule = window.scheduleCharts;
+    window.scheduleCharts = function () {
+      try { _origSchedule.apply(this, arguments); } catch (e) { console.warn(e); }
+      clearTimeout(window.__movementFixTimer);
+      window.__movementFixTimer = setTimeout(function () {
+        try { drawMovementChart(); } catch (e) { console.warn("[MovementFix]", e); }
+      }, 170);
+    };
+    window.__movementFixWrapped = true;
+  }
+
+  /* ---------- 3. Redraw when records get rebuilt ---------- */
+  if (typeof window.rebuildRecords === "function" && !window.__movementFixRebuild) {
+    var _origRebuild = window.rebuildRecords;
+    window.rebuildRecords = function () {
+      var out = _origRebuild.apply(this, arguments);
+      var active = document.querySelector(".page.active");
+      if (active && active.id === "page-dashboard") {
+        clearTimeout(window.__movementFixTimer);
+        window.__movementFixTimer = setTimeout(function () {
+          try { drawMovementChart(); } catch (e) { console.warn("[MovementFix]", e); }
+        }, 130);
+      }
+      return out;
+    };
+    window.__movementFixRebuild = true;
+  }
+
+  /* ---------- 4. First draw on boot + when dashboard opens ---------- */
+  function boot() {
+    setTimeout(function () {
+      try { drawMovementChart(); } catch (e) { console.warn("[MovementFix]", e); }
+    }, 420);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+
+  if (typeof window.showPage === "function" && !window.__movementFixShowPage) {
+    var _origShowPage = window.showPage;
+    window.showPage = function (page) {
+      var out = _origShowPage.apply(this, arguments);
+      if (page === "dashboard") {
+        clearTimeout(window.__movementFixTimer);
+        window.__movementFixTimer = setTimeout(function () {
+          try { drawMovementChart(); } catch (e) { console.warn("[MovementFix]", e); }
+        }, 210);
+      }
+      return out;
+    };
+    window.__movementFixShowPage = true;
+  }
+
+  console.log("[MovementFix] active — movement chart reads from all records.");
 })();
 
 
-</script></div></body></html>
+
+
+</script>
+
+
+/* ============================================================
+   StockWise — Item Analysis · consolidated replacement
+   Paste at the very bottom of <script>. Overrides:
+     - runItemAnalysis
+     - filterAnalysisRows
+     - openItemModal
+   Same logic, same math, same UI, same colours as the original.
+   Adds: month-preload guard, in-flight wait, hard failure
+   reporting, empty-state handling, and safe re-entrancy.
+   Remove this block to revert to the previous behaviour.
+   ============================================================ */
+(function () {
+  "use strict";
+
+  /* ---------- shared helpers (mirror the originals) ---------- */
+  const $ = (id) => document.getElementById(id);
+  const n = (v) => {
+    if (v === null || v === undefined || v === "") return null;
+    const x = Number(v);
+    return Number.isFinite(x) ? x : null;
+  };
+  const fmt = (v) =>
+    v === null || v === undefined || v === ""
+      ? "—"
+      : Number(v).toLocaleString(undefined, { maximumFractionDigits: 3 });
+  const esc = (s) =>
+    String(s ?? "").replace(/[&<>"']/g, (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+    );
+  const toast = (msg) => {
+    const el = $("toast");
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = "block";
+    clearTimeout(window.__analysisToastTimer);
+    window.__analysisToastTimer = setTimeout(() => (el.style.display = "none"), 4600);
+  };
+
+  /* ---------- variance rendering (identical to original) ---------- */
+  function varianceHTML(v) {
+    if (v === null || v === undefined) return "—";
+    let cls;
+    if (v < -0.0001) cls = "variance-neg";
+    else if (v > 0.0001) cls = "variance-pos";
+    else cls = "variance-zero";
+    return `<span class="${cls}">${v > 0 ? "+" : ""}${esc(fmt(v))}</span>`;
+  }
+  function varianceBadgeHTML(v) {
+    if (v === null || v === undefined) return '<span class="badge">No count</span>';
+    if (v < -0.0001) return '<span class="badge badge-bad">Shortage</span>';
+    if (v > 0.0001) return '<span class="badge badge-warn">Excess</span>';
+    return '<span class="badge badge-good">Matched</span>';
+  }
+  function calcRowVariance(r) {
+    if (r.physical === null || r.physical === undefined) return null;
+    const expected =
+      (r.opening || 0) +
+      (r.receiving || 0) +
+      (r.transferIn || 0) -
+      (r.transferOut || 0) -
+      (r.waste || 0) -
+      (r.sold || 0);
+    return r.physical - expected;
+  }
+
+  /* ---------- analysis state (owned by this module) ---------- */
+  const A = {
+    running: false,
+    details: [],   // flat rows for the selected period
+    list: [],      // aggregated per item
+    period: null,  // { start, end, label }
+    lastRun: null,
+  };
+  window.__analysisState = A; // expose for debugging / other modules
+
+  /* ---------- period resolution (same rules as original) ---------- */
+  function getAnalysisPeriod() {
+    const mode = $("analysisMode").value;
+    const now = new Date();
+    const isoDate = (d) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+        d.getDate()
+      ).padStart(2, "0")}`;
+    const today = isoDate(now);
+
+    if (mode === "mtd") {
+      const start = isoDate(new Date(now.getFullYear(), now.getMonth(), 1));
+      return { start, end: today, label: `Month to date · ${start} → ${today}` };
+    }
+    if (mode === "month") {
+      const value = $("analysisMonth").value;
+      if (!value) throw new Error("Choose a month.");
+      const [y, m] = value.split("-").map(Number);
+      const end = isoDate(new Date(y, m, 0));
+      return { start: `${value}-01`, end, label: `Full month · ${value}` };
+    }
+    if (mode === "single") {
+      const date = $("analysisDate").value;
+      if (!date) throw new Error("Choose a date.");
+      return { start: date, end: date, label: `Single date · ${date}` };
+    }
+    const start = $("analysisStart").value;
+    const end = $("analysisEnd").value;
+    if (!start || !end) throw new Error("Choose both From and To dates.");
+    if (start > end) throw new Error("From date cannot be after To date.");
+    return { start, end, label: `Date range · ${start} → ${end}` };
+  }
+
+  /* ---------- controls show/hide (same as original) ---------- */
+  function updateAnalysisControls() {
+    const mode = $("analysisMode").value;
+    $("analysisMonthWrap").classList.toggle("hide", mode !== "month");
+    $("analysisDateWrap").classList.toggle("hide", mode !== "single");
+    $("analysisStartWrap").classList.toggle("hide", mode !== "range");
+    $("analysisEndWrap").classList.toggle("hide", mode !== "range");
+  }
+  window.updateAnalysisControls = updateAnalysisControls;
+
+  /* ---------- range → needed month sheets ---------- */
+  function sheetsForRange(start, end) {
+    const want = new Set();
+    const cursor = new Date(start + "T00:00:00");
+    const stop = new Date(end + "T00:00:00");
+    if (isNaN(cursor) || isNaN(stop)) return want;
+    while (cursor <= stop) {
+      const iso = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}-${String(cursor.getDate()).padStart(2, "0")}`;
+      const sn = sheetNameForDate(iso);
+      if (months.indexOf(sn) !== -1) want.add(sn);
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    return want;
+  }
+
+  /* ---------- preflight: months + needed sheets + settle ---------- */
+  async function preflight(period) {
+    // 1) Months list
+    if (!months.length) {
+      try {
+        await loadMonths();
+      } catch (e) {
+        console.warn("[Analysis] loadMonths failed:", e);
+      }
+    }
+
+    // 2) Load every month sheet the period touches
+    const want = sheetsForRange(period.start, period.end);
+    const missing = [...want].filter((s) => !sheetCache[s] && !sheetInflight[s]);
+    if (missing.length) {
+      toast(`Loading ${missing.length} month(s) needed for this view…`);
+      for (const s of missing) {
+        try {
+          if (typeof bgLoadState === "object") bgLoadState.current = s;
+          await fetchSheet(s);
+        } catch (e) {
+          console.warn("[Analysis] fetchSheet failed:", s, e);
+          if (failedRecordSheets.indexOf(s) === -1) failedRecordSheets.push(s);
+        } finally {
+          if (typeof bgLoadState === "object") bgLoadState.current = "";
+        }
+      }
+      rebuildRecords();
+    }
+
+    // 3) Wait out any still-in-flight background loads
+    const anyInflight = () => months.some((m) => sheetInflight[m]);
+    if (anyInflight()) {
+      toast("Waiting for background month loads to finish…");
+      for (let i = 0; i < 40 && anyInflight(); i++) {
+        await new Promise((r) => setTimeout(r, 300));
+      }
+    }
+
+    // 4) Retry any sheets that previously failed
+    if (failedRecordSheets.length) {
+      const retry = confirm(
+        "Some month sheets failed to load (" +
+          failedRecordSheets.join(", ") +
+          ").\n\nRetry now?\n\nCancel = run analysis with partial data."
+      );
+      if (retry) {
+        const names = failedRecordSheets.slice();
+        failedRecordSheets.length = 0;
+        for (const s of names) {
+          try {
+            if (sheetCache[s]) continue;
+            await fetchSheet(s);
+          } catch (e) {
+            if (failedRecordSheets.indexOf(s) === -1) failedRecordSheets.push(s);
+          }
+        }
+        rebuildRecords();
+      }
+    }
+  }
+
+  /* ---------- aggregation (identical math to original) ---------- */
+  function aggregate(filtered) {
+    const aggregated = {};
+    filtered.forEach((r) => {
+      if (!r.code) return;
+      const key = r.code.toLowerCase();
+      if (!aggregated[key]) {
+        aggregated[key] = {
+          code: r.code,
+          name: r.name,
+          opening: null,
+          receiving: 0,
+          transferIn: 0,
+          transferOut: 0,
+          waste: 0,
+          sold: 0,
+          actualCount: null,
+          actualDate: "",
+          expectedOnHand: 0,
+          variance: null,
+          days: 0,
+          firstDate: "",
+          lastDate: "",
+          records: [],
+        };
+      }
+      const a = aggregated[key];
+      if (a.days === 0) {
+        a.opening = r.opening ?? 0;
+        a.firstDate = r.date;
+      }
+      a.lastDate = r.date;
+      a.receiving += r.receiving || 0;
+      a.transferIn += r.transferIn || 0;
+      a.transferOut += r.transferOut || 0;
+      a.waste += r.waste || 0;
+      a.sold += r.sold || 0;
+      a.days++;
+      a.records.push(r);
+      if (
+        r.physical !== null &&
+        r.physical !== undefined &&
+        (!a.actualDate || r.date >= a.actualDate)
+      ) {
+        a.actualCount = r.physical;
+        a.actualDate = r.date;
+      }
+    });
+    Object.values(aggregated).forEach((a) => {
+      a.expectedOnHand =
+        a.opening + a.receiving + a.transferIn - a.transferOut - a.waste - a.sold;
+      a.variance = a.actualCount === null ? null : a.actualCount - a.expectedOnHand;
+    });
+    return Object.values(aggregated).sort((a, b) => a.code.localeCompare(b.code));
+  }
+
+  /* ---------- table render (same columns, same buttons) ---------- */
+  function renderAnalysisTable(list) {
+    const tb = $("analysisRows");
+    if (!tb) return;
+
+    if (!list.length) {
+      tb.innerHTML = `<tr><td colspan="13" class="empty">No items to show for this period.</td></tr>`;
+      return;
+    }
+    tb.innerHTML = list
+      .map(
+        (item) => `
+        <tr>
+          <td>${esc(item.code)}</td>
+          <td>${esc(item.name)}</td>
+          <td>${esc(fmt(item.opening))}</td>
+          <td>${esc(fmt(item.receiving))}</td>
+          <td>${esc(fmt(item.transferIn))}</td>
+          <td>${esc(fmt(item.transferOut))}</td>
+          <td>${esc(fmt(item.waste))}</td>
+          <td>${esc(fmt(item.sold))}</td>
+          <td>${esc(fmt(item.expectedOnHand))}</td>
+          <td>${
+            item.actualCount !== null ? esc(fmt(item.actualCount)) : "—"
+          }${item.actualDate ? `<div class="small-help">${esc(item.actualDate)}</div>` : ""}</td>
+          <td>${varianceHTML(item.variance)}</td>
+          <td>${varianceBadgeHTML(item.variance)}</td>
+          <td><button class="btn-green" style="padding:5px 9px;font-size:12px" onclick="openItemModal('${esc(
+            item.code
+          )}')">View</button></td>
+        </tr>`
+      )
+      .join("");
+  }
+
+  /* ---------- search filter (same behaviour as original) ---------- */
+  function filterAnalysisRows() {
+    const q = ($("analysisSearch")?.value || "").trim().toLowerCase();
+    if (!A.list.length) {
+      const tb = $("analysisRows");
+      if (tb)
+        tb.innerHTML = `<tr><td colspan="13" class="empty">Select a period and run analysis.</td></tr>`;
+      return;
+    }
+    const list = A.list.filter(
+      (item) =>
+        !q ||
+        item.code.toLowerCase().includes(q) ||
+        (item.name || "").toLowerCase().includes(q)
+    );
+    renderAnalysisTable(list);
+    if (q && !list.length) {
+      const tb = $("analysisRows");
+      if (tb)
+        tb.innerHTML = `<tr><td colspan="13" class="empty">No items match "${esc(
+          q
+        )}".</td></tr>`;
+    }
+  }
+  window.filterAnalysisRows = filterAnalysisRows;
+
+  /* ---------- summary text ---------- */
+  function setSummary(text, isError) {
+    const el = $("analysisSummary");
+    if (!el) return;
+    el.innerHTML = text;
+    el.style.color = isError ? "var(--red)" : "";
+  }
+
+  /* ---------- main entry point ---------- */
+  async function runItemAnalysis() {
+    if (A.running) {
+      toast("Analysis is already running.");
+      return;
+    }
+
+    // Resolve period first (throws on invalid inputs → caught below)
+    let period;
+    try {
+      period = getAnalysisPeriod();
+    } catch (e) {
+      return toast(e.message);
+    }
+
+    A.running = true;
+    const runBtn = document.querySelector(
+      '#page-analysis button[onclick="runItemAnalysis()"]'
+    );
+    const prevText = runBtn ? runBtn.textContent : "";
+    if (runBtn) {
+      runBtn.disabled = true;
+      runBtn.textContent = "Running…";
+    }
+
+    // Visible progress in the summary line
+    setSummary(`Loading sheets for ${period.label}…`, false);
+
+    try {
+      await preflight(period);
+
+      // Filter the merged records to the period
+      const filtered = records
+        .filter((r) => r.date && r.date >= period.start && r.date <= period.end)
+        .sort(
+          (a, b) =>
+            (a.date || "").localeCompare(b.date || "") ||
+            a.code.localeCompare(b.code)
+        );
+
+      // Header context
+      const storeNameEl = $("analysisStoreName");
+      if (storeNameEl)
+        storeNameEl.textContent = (selectedStore || "No store selected").toUpperCase();
+      const periodBadge = $("analysisPeriodBadge");
+      if (periodBadge) periodBadge.textContent = period.label;
+
+      // Empty state
+      if (!filtered.length) {
+        A.details = [];
+        A.list = [];
+        A.period = period;
+        A.lastRun = new Date();
+        const tb = $("analysisRows");
+        if (tb) {
+          tb.innerHTML = `<tr><td colspan="13" class="empty">No records found for ${esc(
+            selectedStore
+          )} between ${esc(period.start)} and ${esc(period.end)}. Confirm that the selected store's month tabs contain these dates, then refresh data.</td></tr>`;
+        }
+        setSummary(`0 records loaded for ${period.label}.`, true);
+        return;
+      }
+
+      // Aggregate + cache
+      const list = aggregate(filtered);
+      A.details = filtered;
+      A.list = list;
+      A.period = period;
+      A.lastRun = new Date();
+
+      // Render
+      filterAnalysisRows();
+
+      // Summary line
+      const sheetSet = new Set(filtered.map((r) => r.sheetName));
+      const baseMsg = `✓ ${list.length} item(s) · ${filtered.length} daily record(s) · ${sheetSet.size} sheet(s) · ${period.label} · ${selectedStore.toUpperCase()}`;
+      const failNote = failedRecordSheets.length
+        ? ` ⚠ Some sheets could not be loaded (${failedRecordSheets.join(", ")}); refresh or retry via Setup.`
+        : "";
+      setSummary(
+        `${baseMsg}. Positive variance = excess (yellow), negative = shortage (red), matched = green.${failNote}`,
+        false
+      );
+      toast(baseMsg);
+    } catch (e) {
+      console.warn("[Analysis] failed:", e);
+      setSummary(`Analysis failed: ${esc(e.message || e)}`, true);
+      toast("Analysis failed: " + (e.message || e));
+    } finally {
+      A.running = false;
+      if (runBtn) {
+        runBtn.disabled = false;
+        runBtn.textContent = prevText || "Run Analysis";
+      }
+    }
+  }
+  window.runItemAnalysis = runItemAnalysis;
+
+  /* ---------- item detail modal (same math, same rows) ---------- */
+  function openItemModal(code) {
+    const key = String(code).toLowerCase();
+    const details = A.details
+      .filter((r) => r.code.toLowerCase() === key)
+      .sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+    if (!details.length)
+      return toast("No detail rows found for this item in the selected period.");
+
+    const first = details[0];
+    const totals = {
+      opening: first.opening || 0,
+      receiving: 0,
+      transferIn: 0,
+      transferOut: 0,
+      waste: 0,
+      sold: 0,
+    };
+    let latestActual = null;
+    let latestActualDate = "";
+
+    details.forEach((r) => {
+      totals.receiving += r.receiving || 0;
+      totals.transferIn += r.transferIn || 0;
+      totals.transferOut += r.transferOut || 0;
+      totals.waste += r.waste || 0;
+      totals.sold += r.sold || 0;
+      if (
+        r.physical !== null &&
+        r.physical !== undefined &&
+        (!latestActualDate || r.date >= latestActualDate)
+      ) {
+        latestActual = r.physical;
+        latestActualDate = r.date;
+      }
+    });
+
+    const expected =
+      totals.opening +
+      totals.receiving +
+      totals.transferIn -
+      totals.transferOut -
+      totals.waste -
+      totals.sold;
+    const variance = latestActual === null ? null : latestActual - expected;
+
+    $("modalTitle").textContent = `${first.name || "Item"} (${code}) · ${(
+      selectedStore || ""
+    ).toUpperCase()}`;
+    $("modTotalOpening").textContent = fmt(totals.opening);
+    $("modTotalReceiving").textContent = fmt(totals.receiving);
+    $("modTotalTransferIn").textContent = fmt(totals.transferIn);
+    $("modTotalTransferOut").textContent = fmt(totals.transferOut);
+    $("modTotalWaste").textContent = fmt(totals.waste);
+    $("modTotalSold").textContent = fmt(totals.sold);
+    $("modExpectedOnHand").textContent = fmt(expected);
+    $("modActualCount").textContent =
+      latestActual === null
+        ? "—"
+        : `${fmt(latestActual)}${latestActualDate ? ` · ${latestActualDate}` : ""}`;
+    $("modVariance").innerHTML =
+      variance === null
+        ? "—"
+        : `${varianceHTML(variance)}<div class="small-help">${
+            variance > 0
+              ? "Excess stock (yellow)"
+              : variance < 0
+              ? "Shortage (red)"
+              : "Matched (green)"
+          }</div>`;
+
+    $("modalDetailRows").innerHTML = details
+      .map(
+        (r) => `<tr>
+          <td>${esc(r.date)}</td>
+          <td>${esc(fmt(r.opening))}</td>
+          <td>${esc(fmt(r.receiving))}</td>
+          <td>${esc(fmt(r.transferIn))}</td>
+          <td>${esc(fmt(r.transferOut))}</td>
+          <td>${esc(fmt(r.waste))}</td>
+          <td>${esc(fmt(r.sold))}</td>
+          <td>${esc(fmt(r.closing))}</td>
+          <td>${r.physical !== null ? esc(fmt(r.physical)) : "—"}</td>
+          <td>${varianceHTML(calcRowVariance(r))}</td>
+        </tr>`
+      )
+      .join("");
+
+    $("itemModal").classList.add("active");
+  }
+  window.openItemModal = openItemModal;
+
+  /* ---------- wire the UI once ---------- */
+  function wire() {
+    const mode = $("analysisMode");
+    if (mode && !mode.__analysisWired) {
+      mode.addEventListener("change", updateAnalysisControls);
+      mode.__analysisWired = true;
+    }
+    const runBtn = document.querySelector(
+      '#page-analysis button[onclick="runItemAnalysis()"]'
+    );
+    // Inline onclick already calls window.runItemAnalysis; nothing more needed.
+    // But ensure search input triggers our filter:
+    const search = $("analysisSearch");
+    if (search && !search.__analysisWired) {
+      search.addEventListener("input", filterAnalysisRows);
+      search.__analysisWired = true;
+    }
+
+    // Ensure controls reflect current mode on first paint
+    if (mode) updateAnalysisControls();
+
+    // If the module is loaded after init(), make sure placeholders match
+    if (!A.list.length && $("analysisRows")) {
+      const tb = $("analysisRows");
+      if (!tb.querySelector("tr")) {
+        tb.innerHTML = `<tr><td colspan="13" class="empty">Select a period and run analysis.</td></tr>`;
+      }
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", wire);
+  } else {
+    wire();
+  }
+
+  try {
+    console.log("[StockWise] Item Analysis · consolidated module active");
+  } catch (e) {}
+})();
+</div>
+
+
+
+
+
+
+
+</body></html>
