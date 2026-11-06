@@ -3786,6 +3786,10 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
     window.__movementFixRebuild = true;
   }
 
+
+
+
+
   /* ---------- 4. First draw on boot + when dashboard opens ---------- */
   function boot() {
     setTimeout(function () {
@@ -3816,6 +3820,276 @@ $("analysisEnd").addEventListener("change",()=>{if($("analysisMode").value==="ra
 
   console.log("[MovementFix] active — movement chart reads from all records.");
 })();
+
+
+
+/* ============================================================
+   StockWise — Stock Grid Auto/Manual Fill
+   ------------------------------------------------------------
+   Adds two buttons next to "Load grid":
+     • Auto   → sets every physical count cell to 0
+     • Manual → clears every physical count cell to blank
+   Both update closing/variance/status previews in place and
+   mark rows dirty so the next "Save changed rows" sends them.
+   Removed only from the Physical column — all other qty inputs
+   (receiving, transfer in/out, waste, sold) are untouched.
+   ============================================================ */
+(function () {
+  "use strict";
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* Format numbers the same way the grid does (max 3 decimals) */
+  function fmt(v) {
+    if (v === null || v === undefined || v === "") return "—";
+    var n = Number(v);
+    return Number.isFinite(n)
+      ? n.toLocaleString(undefined, { maximumFractionDigits: 3 })
+      : "—";
+  }
+
+  /* Compute closing + variance from a row's current input values.
+     Mirrors the grid module's computeRow() exactly. */
+  function computeRowFromInputs(tr) {
+    function val(field) {
+      var inp = tr.querySelector('input[data-field="' + field + '"]');
+      if (!inp) return null;
+      var raw = String(inp.value || "").trim();
+      return raw === "" ? null : Number(raw);
+    }
+    var opening     = val("opening")     || 0;
+    var receiving   = val("receiving")   || 0;
+    var transferIn  = val("transferIn")  || 0;
+    var transferOut = val("transferOut") || 0;
+    var waste       = val("waste")       || 0;
+    var sold        = val("sold")        || 0;
+    var physical    = val("physical");
+
+    var closing =
+      opening + receiving + transferIn - transferOut - waste - sold;
+    var variance =
+      physical === null || !Number.isFinite(physical)
+        ? null
+        : physical - closing;
+    return { closing: closing, variance: variance };
+  }
+
+  /* Pick the CSS class the grid uses for the variance colour */
+  function varCls(v) {
+    if (v === null) return "muted";
+    if (v < -0.0001) return "variance-neg";
+    if (v > 0.0001) return "variance-pos";
+    return "variance-zero";
+  }
+
+  /* Update the Closing / Variance / Status cells for one row */
+  function refreshRowPreview(tr) {
+    var r = computeRowFromInputs(tr);
+
+    var closeCell = tr.querySelector(".g-close");
+    if (closeCell) closeCell.textContent = fmt(r.closing);
+
+    var varCell = tr.querySelector(".g-var");
+    if (varCell) {
+      var txt =
+        r.variance === null
+          ? "—"
+          : (r.variance > 0 ? "+" : "") + fmt(r.variance);
+      varCell.innerHTML =
+        '<span class="' + varCls(r.variance) + '">' + txt + "</span>";
+    }
+
+    var statCell = tr.querySelector(".g-stat");
+    if (statCell) {
+      statCell.innerHTML = '<span class="badge badge-warn">Changed</span>';
+    }
+
+    /* Mark dirty in the way the grid module expects */
+    tr.classList.add("row-dirty");
+    var physInp = tr.querySelector('input[data-field="physical"]');
+    if (physInp) physInp.style.borderColor = "var(--green)";
+  }
+
+  /* Fill or clear the Physical column */
+  function applyPhysical(mode) {
+    var tb = $("gridRows");
+    if (!tb) return;
+
+    var rows = tb.querySelectorAll("tr[data-code]");
+    if (!rows.length) {
+      toast("Load the grid first.");
+      return;
+    }
+
+    var changed = 0;
+    rows.forEach(function (tr) {
+      var inp = tr.querySelector('input[data-field="physical"]');
+      if (!inp) return;
+
+      var current = String(inp.value || "").trim();
+      var next;
+
+      if (mode === "auto") {
+        // 0 must be explicit — blank means "not counted" to the backend
+        next = "0";
+      } else {
+        // Manual: blank, not "0"
+        next = "";
+      }
+
+      if (current === next) return; // already correct, skip
+      inp.value = next;
+      changed++;
+
+      // The grid module listens for "input" on each cell — fire it
+      // synthetically so its internal state matches the DOM. If the
+      // listener is missing (module not yet bound), the explicit
+      // refresh below still keeps the previews and dirty flag right.
+      try {
+        inp.dispatchEvent(new Event("input", { bubbles: true }));
+      } catch (e) { /* older browsers — ignore */ }
+
+      // Belt-and-braces: force the previews and dirty class regardless
+      refreshRowPreview(tr);
+    });
+
+    var status = $("gridStatus");
+    if (status) {
+      status.textContent =
+        (mode === "auto"
+          ? "Auto-fill: all physical counts set to 0."
+          : "Manual: all physical counts cleared (blank).") +
+        " " + changed + " row(s) updated — click Save changed rows to send.";
+    }
+
+    if (changed === 0) {
+      toast(
+        mode === "auto"
+          ? "All physical counts were already 0."
+          : "All physical counts were already blank."
+      );
+    } else {
+      toast(
+        (mode === "auto" ? "Set 0 on " : "Cleared ") +
+          changed +
+          " physical cell(s) ✓"
+      );
+    }
+  }
+
+  /* Make sure the toast helper exists in the global scope */
+  function toast(message) {
+    if (typeof window.toast === "function") return window.toast(message);
+    var el = $("toast");
+    if (!el) {
+      // Fallback: alert once, then stop — shouldn't happen in this app
+      try { console.log(message); } catch (e) {}
+      return;
+    }
+    el.textContent = message;
+    el.style.display = "block";
+    clearTimeout(window.__fillToastTimer);
+    window.__fillToastTimer = setTimeout(function () {
+      el.style.display = "none";
+    }, 4600);
+  }
+
+  /* Inject the two buttons into the grid toolbar */
+  function injectButtons() {
+    var gridDate = $("gridDate");
+    if (!gridDate) return;
+    if ($("gridFillAutoBtn")) return; // already injected
+
+    // The toolbar row is the closest flex container to the date input
+    var toolbar = gridDate.closest(".row");
+    if (!toolbar) return;
+
+    var actions =
+      toolbar.querySelector(".col-md-5.d-flex") ||
+      toolbar.querySelector(".col-12.col-md-5");
+
+    if (!actions) return;
+
+    var autoBtn = document.createElement("button");
+    autoBtn.id = "gridFillAutoBtn";
+    autoBtn.type = "button";
+    autoBtn.className = "btn-green";
+    autoBtn.textContent = "Auto (0)";
+    autoBtn.title =
+      "Set every Physical Count cell on this grid to 0 (explicit count of zero)";
+    autoBtn.addEventListener("click", function () {
+      applyPhysical("auto");
+    });
+
+    var manualBtn = document.createElement("button");
+    manualBtn.id = "gridFillManualBtn";
+    manualBtn.type = "button";
+    manualBtn.className = "btn-soft";
+    manualBtn.textContent = "Manual (blank)";
+    manualBtn.title =
+      "Clear every Physical Count cell (blank = not counted)";
+    manualBtn.addEventListener("click", function () {
+      applyPhysical("manual");
+    });
+
+    // Keep them at the front of the action group, right after Load grid
+    var loadBtn = actions.querySelector('button[onclick*="gridLoad"]');
+    if (loadBtn && loadBtn.nextSibling) {
+      actions.insertBefore(autoBtn, loadBtn.nextSibling);
+      actions.insertBefore(manualBtn, autoBtn.nextSibling);
+    } else {
+      actions.appendChild(autoBtn);
+      actions.appendChild(manualBtn);
+    }
+  }
+
+  /* Re-inject after the grid is rebuilt (Load grid, date change, save) */
+  function watchGrid() {
+    var tb = $("gridRows");
+    if (!tb) return;
+    if (tb.__fillWatcher) return;
+    var obs = new MutationObserver(function () {
+      // Re-inject buttons if the toolbar was rebuilt
+      if (!$("gridFillAutoBtn")) injectButtons();
+    });
+    obs.observe(tb, { childList: true });
+    tb.__fillWatcher = obs;
+  }
+
+  /* Boot */
+  function boot() {
+    injectButtons();
+    watchGrid();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+
+  // Expose for manual calls from console if ever needed
+  window.gridFillAuto   = function () { applyPhysical("auto");   };
+  window.gridFillManual = function () { applyPhysical("manual"); };
+
+  try {
+    console.log("[StockGrid Auto/Manual] active — two buttons added to the grid toolbar.");
+  } catch (e) {}
+})();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
